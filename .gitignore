@@ -1,0 +1,5 @@
+#compiled objectfiles
+obj/*.o
+
+#linked program
+*.out
