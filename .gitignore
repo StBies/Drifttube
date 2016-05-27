@@ -3,3 +3,6 @@ obj/*.o
 
 #linked program
 *.out
+
+#preliminary UML, to be included once done
+UML/

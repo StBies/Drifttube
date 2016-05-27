@@ -6,6 +6,15 @@
 
 using namespace std;
 
+
+/**
+ * Startup of the application is managed here
+ * @brief main
+ * 
+ * @author Stefan
+ * @date May 27, 2016
+ * @version 0.1
+ */
 int main(int argc, char** argv)
 {
 	TApplication* app = new TApplication("main",&argc,argv);
