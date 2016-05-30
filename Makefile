@@ -24,3 +24,7 @@ directories: ${OBJDIR}
 
 ${OBJDIR}:
 	$(MKDIR) ${OBJDIR}
+	
+clean: directories
+	rm -r ${OBJDIR}
+	rm prog.out

@@ -2,6 +2,7 @@
 #include "TH1D.h"
 #include "TCanvas.h"
 #include "TApplication.h"
+#include "DataProcessor.h"
 
 
 using namespace std;
@@ -25,7 +26,7 @@ int main(int argc, char** argv)
 		hist->Fill(d);
 	}
 	hist->Draw();
-
+	
 	app->Run();
 	return 0;
 }
