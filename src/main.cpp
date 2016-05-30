@@ -3,6 +3,7 @@
 #include "TCanvas.h"
 #include "TApplication.h"
 #include "DataProcessor.h"
+#include "TFile.h"
 
 
 using namespace std;
@@ -19,14 +20,11 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	TApplication* app = new TApplication("main",&argc,argv);
-	TCanvas *c1 = new TCanvas("Name", "Titel", 800,600);
-	TH1D *hist = new TH1D("test","test1",100,0,1);
-	for(double d = 0.0; d <= 1; d += 0.1)
-	{
-		hist->Fill(d);
-	}
-	hist->Draw();
-	
+
+	DataProcessor* processor = new DataProcessor("bla");
+	TH1I data = processor->getRawData();
+	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
+	data.Draw();
 	app->Run();
 	return 0;
 }

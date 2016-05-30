@@ -17,16 +17,21 @@
 class DataProcessor
 {
 public:
-	DataProcessor();
+	DataProcessor(TString filename);
 	virtual ~DataProcessor();
 	
 	Double_t getCharge(Int_t resistance);
+
+	TH1I getRawData();
 	
 private:
 	TH1I* integrate(TH1I& data);
+	//For testing during development only
+	TH1I createTestHist();
 	
+	//member variables
 	TFile _dataFile;
-	TH1D _rawData;
+	TH1I _rawData;
 };
 
 #endif //DATAPROCESSOR_H_

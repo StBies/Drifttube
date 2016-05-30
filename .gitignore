@@ -6,3 +6,6 @@ obj/*.o
 
 #preliminary UML, to be included once done
 UML/
+
+#Documentation
+doc/
