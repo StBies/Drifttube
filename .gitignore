@@ -5,7 +5,7 @@ obj/*.o
 *.out
 
 #preliminary UML, to be included once done
-UML/
+UML/*.html
 
 #Documentation
 doc/
