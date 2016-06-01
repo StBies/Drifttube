@@ -30,7 +30,7 @@ private:
 	TH1I createTestHist();
 	
 	//member variables
-	TFile _dataFile;
+	TFile* _dataFile;
 	TH1I _rawData;
 };
 

@@ -13,6 +13,7 @@
  */
 DataProcessor::DataProcessor(TString filename)
 {
+	_dataFile = new TFile(filename,"read");
 	_rawData = createTestHist();
 }
 

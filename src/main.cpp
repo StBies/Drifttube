@@ -8,7 +8,6 @@
 
 using namespace std;
 
-
 /**
  * Startup of the application is managed here
  * @brief main
@@ -20,11 +19,14 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	TApplication* app = new TApplication("main",&argc,argv);
-
 	DataProcessor* processor = new DataProcessor("bla");
 	TH1I data = processor->getRawData();
 	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
 	data.Draw();
 	app->Run();
+
 	return 0;
 }
+
+
+
