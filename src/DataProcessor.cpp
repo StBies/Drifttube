@@ -42,10 +42,13 @@ TH1D DataProcessor::createTestHist()
 	double min = 0.0;
 	double max = M_PI;
 
-	int nBins =100;
+	int nBins =5 * 1e6;
 	
+	//must use lower edges of bins in order not to fill bins twice because of too low floating point precision
+	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
 	Double_t* lowerEdgesOfBins = new Double_t[nBins + 1];
 	
+	#pragma omp parallel for
 	for(int i = 0; i <= nBins; i++)
 	{
 		lowerEdgesOfBins[i] = i * (max - min) / nBins;
@@ -53,11 +56,14 @@ TH1D DataProcessor::createTestHist()
 
 	TH1D* hist = new TH1D("test","test1",nBins,lowerEdgesOfBins);
 	
+	#pragma omp parallel for
 	for(int i = 0; i <= nBins; i++)
 	{
 		Double_t x = lowerEdgesOfBins[i];
 		hist->Fill(x,sin(x));
 	}
+	
+	delete lowerEdgesOfBins;
 	
 	return *hist;
 }
