@@ -42,14 +42,23 @@ TH1D DataProcessor::createTestHist()
 	double min = 0.0;
 	double max = M_PI;
 
-	int nBins = 100;
-
-	TH1D* hist = new TH1D("test","test1",nBins,min,max);
-	for(double d = 0.0; d <= max; d += (max - min)/nBins)
+	int nBins =100;
+	
+	Double_t* lowerEdgesOfBins = new Double_t[nBins + 1];
+	
+	for(int i = 0; i <= nBins; i++)
 	{
-		hist->Fill(d,sin(d));
-		cout << d << "\t" << sin(d) << endl;
+		lowerEdgesOfBins[i] = i * (max - min) / nBins;
 	}
+
+	TH1D* hist = new TH1D("test","test1",nBins,lowerEdgesOfBins);
+	
+	for(int i = 0; i <= nBins; i++)
+	{
+		Double_t x = lowerEdgesOfBins[i];
+		hist->Fill(x,sin(x));
+	}
+	
 	return *hist;
 }
 
@@ -89,6 +98,7 @@ TH1D DataProcessor::getRawData()
  * @return TH1I* pointer to a new heap-object histogram containing the integral of data
  * 
  * @warning Not yet implemented
+ * @warning Returned object must be destoyed by the user
  */
 TH1D* DataProcessor::integrate(TH1D& data)
 {
