@@ -22,16 +22,16 @@ public:
 	
 	Double_t getCharge(Int_t resistance);
 
-	TH1I getRawData();
+	TH1D getRawData();
 	
 private:
-	TH1I* integrate(TH1I& data);
+	TH1D* integrate(TH1D& data);
 	//For testing during development only
-	TH1I createTestHist();
+	TH1D createTestHist();
 	
 	//member variables
 	TFile* _dataFile;
-	TH1I _rawData;
+	TH1D _rawData;
 };
 
 #endif //DATAPROCESSOR_H_

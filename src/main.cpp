@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 {
 	TApplication* app = new TApplication("main",&argc,argv);
 	DataProcessor* processor = new DataProcessor("bla");
-	TH1I data = processor->getRawData();
+	TH1D data = processor->getRawData();
 	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
 	data.Draw();
 	app->Run();
