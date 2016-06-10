@@ -19,6 +19,7 @@ DataProcessor::DataProcessor(TString filename)
 {
 	_dataFile = new TFile(filename,"read");
 	_rawData = createTestHist();
+
 }
 
 
@@ -88,6 +89,24 @@ TH1D DataProcessor::getRawData()
 {
 	return _rawData;
 }
+
+
+
+Double_t DataProcessor::computeIntegral(TH1& data)
+{
+	//Double_t nBins;
+	Double_t zaehler = 0;
+
+	//nBins = data.GetNbinsX();
+
+	for(int i = 0; i < data.GetNbinsX(); i++)
+		{
+			zaehler = zaehler + data.GetBinContent(i);
+		}
+	return zaehler;
+
+}
+
 
 /**
  * Integrates the given data, which is in a histogram. This method will return

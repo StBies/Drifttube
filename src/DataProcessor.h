@@ -24,6 +24,8 @@ public:
 
 	TH1D getRawData();
 	
+	Double_t computeIntegral(TH1& data);
+
 private:
 	TH1D* integrate(TH1D& data);
 	//For testing during development only
