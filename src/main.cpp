@@ -10,6 +10,7 @@ using namespace std;
 
 /**
  * Startup of the application is managed here
+ * 
  * @brief main
  * 
  * @author Stefan
