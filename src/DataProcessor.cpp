@@ -1,6 +1,7 @@
 #include "DataProcessor.h"
 #include <iostream>
 #include <cmath>
+#include <omp.h>
 
 using namespace std;
 
@@ -49,6 +50,8 @@ TH1D DataProcessor::createTestHist()
 	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
 	Double_t* lowerEdgesOfBins = new Double_t[nBins + 1];
 	
+
+	double start = omp_get_wtime();
 	#pragma omp parallel for
 	for(int i = 0; i <= nBins; i++)
 	{
@@ -64,6 +67,8 @@ TH1D DataProcessor::createTestHist()
 		hist->Fill(x,sin(x));
 	}
 	
+	cout << "Filling took " << omp_get_wtime() - start << " seconds." << endl;
+
 	delete lowerEdgesOfBins;
 	
 	return *hist;
