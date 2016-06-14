@@ -27,7 +27,10 @@ int main(int argc, char** argv)
 	c1->cd(1);
 	data.Draw();
 	c1->cd(2);
-	processor->integrate(data)->Draw();
+	cout << "Beginning integration" << endl;
+	TH1D* integral = processor->integrate(data);
+	cout << "Done integrating" << endl;
+	integral->Draw();
 	app->Run();
 
 	return 0;

@@ -19,8 +19,8 @@ DataProcessor::DataProcessor(TString filename)
 	cout << "file opened" << endl;
 	//Getting segmetation violation error using Get()...
 	//TODO to be fixed
-//	_rawTree = (TTree*)_dataFile->Get("Tfadc;1");
-	_rawTree = (TTree*)nullptr;
+	_rawTree = (TTree*)_dataFile->Get("Tfadc");
+//	_rawTree = (TTree*)nullptr;
 	_rawData = createTestHist();
 //	_rawData = *(TH1D*)nullptr;
 }
@@ -50,11 +50,11 @@ TH1D DataProcessor::createTestHist()
 	
 	//must use lower edges of bins in order not to fill bins twice because of too low floating point precision
 	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
-	Double_t* lowerEdgesOfBins = new Double_t[nBins + 1];
+	Double_t* lowerEdgesOfBins = new Double_t[nBins+1];
 	
 
 	double start = omp_get_wtime();
-	#pragma omp parallel for
+//	#pragma omp parallel for
 	for(int i = 0; i <= nBins; i++)
 	{
 		lowerEdgesOfBins[i] = i * (max - min) / nBins;
@@ -62,7 +62,7 @@ TH1D DataProcessor::createTestHist()
 
 	TH1D* hist = new TH1D("test","test1",nBins,lowerEdgesOfBins);
 	
-	#pragma omp parallel for
+//	#pragma omp parallel for
 	for(int i = 0; i <= nBins; i++)
 	{
 		Double_t x = lowerEdgesOfBins[i];
@@ -145,25 +145,29 @@ Double_t DataProcessor::computeIntegral(TH1& data)
 TH1D* DataProcessor::integrate(TH1D& data)
 {
 	Int_t nBins = data.GetNbinsX();
-	Double_t* binLowEdges = new Double_t[nBins];
+	cout << "nBins is " << nBins << endl;
+	Double_t* binLowEdges = new Double_t[nBins+1];
 
-	for(Int_t i = 0; i < nBins; i++)
+	for(Int_t i = 0; i <= nBins; i++)
 	{
 		binLowEdges[i] = data.GetBinLowEdge(i);
 	}
 
-	//TODO implement
 
 	TH1D* result = new TH1D("not final","yet",nBins,binLowEdges);
 	delete binLowEdges;
+	//choose random bin width since all bins are the same size - might change
+	Double_t binWidth = result->GetBinWidth(1);
 
 	double integral = 0.0;
 
-	for(int i = 0; i < nBins; i++)
+	for(int i = 0; i <= nBins; i++)
 	{
-		integral += data.GetBinContent(i);
+		integral += data.GetBinContent(i)*binWidth;
 		result->Fill(i,integral);
+		cout << i << "\t" << integral << endl;
 	}
+
 
 	return result;
 }
