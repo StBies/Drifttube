@@ -1,7 +1,4 @@
 #include "DataProcessor.h"
-#include <iostream>
-#include <cmath>
-#include <omp.h>
 
 using namespace std;
 
@@ -11,16 +8,21 @@ using namespace std;
  * @brief Constructor
  * 
  * @author Stefan
- * @date May 30, 2016
- * @version 0.1
+ * @date June 14, 2016
+ * @version 0.2
  * 
  * @param filename relative path to the .root-file containing the raw data
  */
 DataProcessor::DataProcessor(TString filename)
 {
 	_dataFile = new TFile(filename,"read");
+	cout << "file opened" << endl;
+	//Getting segmetation violation error using Get()...
+	//TODO to be fixed
+//	_rawTree = (TTree*)_dataFile->Get("Tfadc;1");
+	_rawTree = (TTree*)nullptr;
 	_rawData = createTestHist();
-
+//	_rawData = *(TH1D*)nullptr;
 }
 
 
@@ -36,7 +38,7 @@ DataProcessor::DataProcessor(TString filename)
  */
 DataProcessor::~DataProcessor()
 {
-	
+	//TODO implement
 }
 
 TH1D DataProcessor::createTestHist()
@@ -44,7 +46,7 @@ TH1D DataProcessor::createTestHist()
 	double min = 0.0;
 	double max = M_PI;
 
-	int nBins =5 * 1e6;
+	int nBins =5 * 1e2;
 	
 	//must use lower edges of bins in order not to fill bins twice because of too low floating point precision
 	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
@@ -96,20 +98,30 @@ TH1D DataProcessor::getRawData()
 }
 
 
-
+/**
+ * Computes the integral of the data given as parameter. It will count positive as well as
+ * negative entries and sum up the bin content.
+ *
+ * @author Bene9
+ * @date June 10, 2016
+ * @version 0.1
+ *
+ * @param data TH1 family object containing the data to be integrated.
+ * @return Value of the integral over all bins
+ */
 Double_t DataProcessor::computeIntegral(TH1& data)
 {
 	//Double_t nBins;
-	Double_t zaehler = 0;
+	Double_t counter = 0;
 
 	//nBins = data.GetNbinsX();
 
 	for(int i = 0; i < data.GetNbinsX(); i++)
-		{
-			zaehler = zaehler + data.GetBinContent(i);
-		}
-	return zaehler;
+	{
+		counter += data.GetBinContent(i);
+	}
 
+	return counter;
 }
 
 
@@ -132,5 +144,26 @@ Double_t DataProcessor::computeIntegral(TH1& data)
  */
 TH1D* DataProcessor::integrate(TH1D& data)
 {
-	return new TH1D("not final","yet",1337,42,1337);
+	Int_t nBins = data.GetNbinsX();
+	Double_t* binLowEdges = new Double_t[nBins];
+
+	for(Int_t i = 0; i < nBins; i++)
+	{
+		binLowEdges[i] = data.GetBinLowEdge(i);
+	}
+
+	//TODO implement
+
+	TH1D* result = new TH1D("not final","yet",nBins,binLowEdges);
+	delete binLowEdges;
+
+	double integral = 0.0;
+
+	for(int i = 0; i < nBins; i++)
+	{
+		integral += data.GetBinContent(i);
+		result->Fill(i,integral);
+	}
+
+	return result;
 }

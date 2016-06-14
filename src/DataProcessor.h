@@ -3,6 +3,11 @@
 
 #include "TH1I.h"
 #include "TFile.h"
+#include "TTree.h"
+#include <iostream>
+#include <cmath>
+#include <omp.h>
+
 
 /**
  * A class, that processes raw data measured by an FADC, that comes as
@@ -25,15 +30,16 @@ public:
 	TH1D getRawData();
 	
 	Double_t computeIntegral(TH1& data);
+	TH1D* integrate(TH1D& data);
 
 private:
-	TH1D* integrate(TH1D& data);
 	//For testing during development only
 	TH1D createTestHist();
 	
 	//member variables
 	TFile* _dataFile;
 	TH1D _rawData;
+	TTree* _rawTree;
 };
 
 #endif //DATAPROCESSOR_H_
