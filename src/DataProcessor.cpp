@@ -16,7 +16,6 @@ using namespace std;
 DataProcessor::DataProcessor(TString filename)
 {
 	_dataFile = new TFile(filename,"read");
-	cout << "file opened" << endl;
 	//Getting segmetation violation error using Get()...
 	//TODO to be fixed
 	_rawTree = (TTree*)_dataFile->Get("Tfadc");
@@ -121,7 +120,7 @@ Double_t DataProcessor::computeIntegral(TH1& data)
 		counter += data.GetBinContent(i);
 	}
 
-	return counter;
+	return counter * data.GetBinWidth(1);
 }
 
 
@@ -132,20 +131,19 @@ Double_t DataProcessor::computeIntegral(TH1& data)
  * @brief histogram integrator
  * 
  * @author Stefan
- * @date June 9, 2016
- * @version 0.1
+ * @date June 15, 2016
+ * @version 0.2
  * 
  * @param data Data, that is to be integrated
  * 
  * @return TH1I* pointer to a new heap-object histogram containing the integral of data
  * 
- * @warning Not yet implemented
+ * @warning Does yet integrate the whole interval, that the data object provides data.
  * @warning Returned object must be destoyed by the user
  */
 TH1D* DataProcessor::integrate(TH1D& data)
 {
 	Int_t nBins = data.GetNbinsX();
-	cout << "nBins is " << nBins << endl;
 	Double_t* binLowEdges = new Double_t[nBins+1];
 
 	for(Int_t i = 0; i <= nBins; i++)
@@ -155,6 +153,7 @@ TH1D* DataProcessor::integrate(TH1D& data)
 
 
 	TH1D* result = new TH1D("not final","yet",nBins,binLowEdges);
+
 	delete binLowEdges;
 	//choose random bin width since all bins are the same size - might change
 	Double_t binWidth = result->GetBinWidth(1);
@@ -164,8 +163,7 @@ TH1D* DataProcessor::integrate(TH1D& data)
 	for(int i = 0; i <= nBins; i++)
 	{
 		integral += data.GetBinContent(i)*binWidth;
-		result->Fill(i,integral);
-		cout << i << "\t" << integral << endl;
+		result->Fill(data.GetBinLowEdge(i),integral);
 	}
 
 
