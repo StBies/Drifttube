@@ -25,10 +25,10 @@ int main(int argc, char** argv)
 	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
 	c1->Divide(1,2);
 	c1->cd(1);
-	data.Draw();
+	data.Draw("HIST");
 	c1->cd(2);
 	TH1D* integral = processor->integrate(data);
-	integral->Draw();
+	integral->Draw("HIST");
 	app->Run();
 
 	return 0;

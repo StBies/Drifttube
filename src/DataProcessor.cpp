@@ -15,13 +15,26 @@ using namespace std;
  */
 DataProcessor::DataProcessor(TString filename)
 {
+
+	//TODO clean up here
+	//TODO implement a way to read ALL events stored in the .root-file
+	//TODO read the raw data in a seperate, private method
+	//TODO store the histograms in an archive
+
 	_dataFile = new TFile(filename,"read");
-	//Getting segmetation violation error using Get()...
-	//TODO to be fixed
 	_rawTree = (TTree*)_dataFile->Get("Tfadc");
-//	_rawTree = (TTree*)nullptr;
-	_rawData = createTestHist();
-//	_rawData = *(TH1D*)nullptr;
+	int numberOfChannels;
+	_rawTree->SetBranchAddress("nchannels",&numberOfChannels);
+	_rawTree->GetEntry(0);
+	double* voltage = new double[numberOfChannels];
+	_rawTree->SetBranchAddress("Voltage",voltage);
+	_rawTree->GetEntry(6);
+	_rawData = *new TH1D("Voltage","FADC data",numberOfChannels,0,numberOfChannels);
+	for(int i = 0; i < numberOfChannels; i++)
+	{
+		_rawData.SetBinContent(i,voltage[i]);
+	}
+	//_rawData = createTestHist();
 }
 
 
@@ -42,10 +55,10 @@ DataProcessor::~DataProcessor()
 
 TH1D DataProcessor::createTestHist()
 {
-	double min = 0.0;
-	double max = M_PI;
+	double min = 0;
+	double max = 2* M_PI;
 
-	int nBins =5 * 1e2;
+	int nBins = 5 * 1e2;
 	
 	//must use lower edges of bins in order not to fill bins twice because of too low floating point precision
 	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
@@ -56,12 +69,12 @@ TH1D DataProcessor::createTestHist()
 //	#pragma omp parallel for
 	for(int i = 0; i <= nBins; i++)
 	{
-		lowerEdgesOfBins[i] = i * (max - min) / nBins;
+		lowerEdgesOfBins[i] = min + i * (max - min) / nBins;
 	}
 
 	TH1D* hist = new TH1D("test","test1",nBins,lowerEdgesOfBins);
 	
-//	#pragma omp parallel for
+	#pragma omp parallel for
 	for(int i = 0; i <= nBins; i++)
 	{
 		Double_t x = lowerEdgesOfBins[i];
@@ -102,8 +115,8 @@ TH1D DataProcessor::getRawData()
  * negative entries and sum up the bin content.
  *
  * @author Bene9
- * @date June 10, 2016
- * @version 0.1
+ * @date June 15, 2016
+ * @version 0.2
  *
  * @param data TH1 family object containing the data to be integrated.
  * @return Value of the integral over all bins
@@ -114,6 +127,8 @@ Double_t DataProcessor::computeIntegral(TH1& data)
 	Double_t counter = 0;
 
 	//nBins = data.GetNbinsX();
+
+	//TODO check if parallelization is of use here
 
 	for(int i = 0; i < data.GetNbinsX(); i++)
 	{
@@ -138,7 +153,7 @@ Double_t DataProcessor::computeIntegral(TH1& data)
  * 
  * @return TH1I* pointer to a new heap-object histogram containing the integral of data
  * 
- * @warning Does yet integrate the whole interval, that the data object provides data.
+ * @warning Does integrate the whole interval, that the data object provides data.
  * @warning Returned object must be destoyed by the user
  */
 TH1D* DataProcessor::integrate(TH1D& data)
