@@ -159,7 +159,7 @@ Double_t DataProcessor::computeIntegral(TH1& data)
  * @return TH1D* pointer to a new heap-object histogram containing the integral of data
  * 
  * @warning Does integrate the whole interval, that the data object provides data.
- * @warning Returned object must be destoyed by the user
+ * @warning Returned object must be destroyed by the user
  */
 TH1* DataProcessor::integrate(TH1& data)
 {
