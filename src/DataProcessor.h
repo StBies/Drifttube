@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cmath>
 #include <omp.h>
+#include <sstream>
 
 
 /**
@@ -30,7 +31,7 @@ public:
 	TH1D getRawData();
 	
 	Double_t computeIntegral(TH1& data);
-	TH1D* integrate(TH1D& data);
+	TH1* integrate(TH1& data);
 
 private:
 	//For testing during development only

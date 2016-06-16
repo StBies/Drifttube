@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	c1->cd(1);
 	data.Draw("HIST");
 	c1->cd(2);
-	TH1D* integral = processor->integrate(data);
+	TH1D* integral = (TH1D*)processor->integrate(data);
 	integral->Draw("HIST");
 	app->Run();
 

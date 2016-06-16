@@ -8,8 +8,8 @@ using namespace std;
  * @brief Constructor
  * 
  * @author Stefan
- * @date June 14, 2016
- * @version 0.2
+ * @date June 16, 2016
+ * @version 0.3
  * 
  * @param filename relative path to the .root-file containing the raw data
  */
@@ -30,10 +30,15 @@ DataProcessor::DataProcessor(TString filename)
 	_rawTree->SetBranchAddress("Voltage",voltage);
 	_rawTree->GetEntry(6);
 	_rawData = *new TH1D("Voltage","FADC data",numberOfChannels,0,numberOfChannels);
+	_rawData.GetXaxis()->SetTitle("channel number");
+	_rawData.GetYaxis()->SetTitle("voltage [a.u.]");
+
 	for(int i = 0; i < numberOfChannels; i++)
 	{
 		_rawData.SetBinContent(i,voltage[i]);
 	}
+
+	delete voltage;
 	//_rawData = createTestHist();
 }
 
@@ -141,22 +146,22 @@ Double_t DataProcessor::computeIntegral(TH1& data)
 
 /**
  * Integrates the given data, which is in a histogram. This method will return
- * a new histogram of type TH1I* containing the integrated original data.
+ * a new histogram of type TH1* containing the integrated original data.
  * 
  * @brief histogram integrator
  * 
  * @author Stefan
- * @date June 15, 2016
- * @version 0.2
+ * @date June 16, 2016
+ * @version 0.3
  * 
  * @param data Data, that is to be integrated
  * 
- * @return TH1I* pointer to a new heap-object histogram containing the integral of data
+ * @return TH1D* pointer to a new heap-object histogram containing the integral of data
  * 
  * @warning Does integrate the whole interval, that the data object provides data.
  * @warning Returned object must be destoyed by the user
  */
-TH1D* DataProcessor::integrate(TH1D& data)
+TH1* DataProcessor::integrate(TH1& data)
 {
 	Int_t nBins = data.GetNbinsX();
 	Double_t* binLowEdges = new Double_t[nBins+1];
@@ -166,8 +171,13 @@ TH1D* DataProcessor::integrate(TH1D& data)
 		binLowEdges[i] = data.GetBinLowEdge(i);
 	}
 
-
+	//TODO Check the actual parameter type and and return the correct object accordingly
 	TH1D* result = new TH1D("not final","yet",nBins,binLowEdges);
+	result->GetXaxis()->SetTitle(data.GetXaxis()->GetTitle());
+	stringstream yTitle;
+	yTitle << "integral of " << data.GetYaxis()->GetTitle();
+	result->GetYaxis()->SetTitle(yTitle.str().c_str());
+
 
 	delete binLowEdges;
 	//choose random bin width since all bins are the same size - might change
@@ -180,7 +190,6 @@ TH1D* DataProcessor::integrate(TH1D& data)
 		integral += data.GetBinContent(i)*binWidth;
 		result->Fill(data.GetBinLowEdge(i),integral);
 	}
-
 
 	return result;
 }
