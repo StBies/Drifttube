@@ -23,11 +23,9 @@ int main(int argc, char** argv)
 {
 	TApplication* app = new TApplication("main",&argc,argv);
 	DataProcessor* processor = new DataProcessor("bla");
-	cout << "DataProcessor built at " << processor << endl;
 	Archive* archive = new Archive("./testdata/fadc_data.root");
-	cout << "Archive built at " << archive << endl;
 	vector<TH1*>* rawData = archive->getRawData();
-	TH1D* data = (TH1D*)rawData->at(1);
+	TH1D* data = (TH1D*)rawData->at(0);
 	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
 	c1->Divide(1,2);
 	c1->cd(1);

@@ -6,6 +6,9 @@
  */
 
 #include "Archive.h"
+#include <malloc.h>
+#include <cmath>
+#include "omp.h"
 
 using namespace std;
 
@@ -25,13 +28,10 @@ Archive::Archive(TString filename)
 	TFile* file = readFile(filename);
 	TTree* tree = readTree(file, "Tfadc");
 
-	//TODO maybe better use it on stack.
-	_rawData = *new vector<TH1*>;
+	//TODO _rawData corrupts memory
 
-	for (int i = 0; i < tree->GetEntries(); i++)
-	{
-		_rawData.push_back(convertEntryToHistogram(i, tree));
-	}
+	//TODO maybe better use it on stack.
+	_rawData = convertAllEntriesToHistograms(tree);
 
 	file->Close();
 //	delete file;
@@ -58,18 +58,16 @@ Archive::~Archive()
  */
 vector<TH1*>* Archive::getRawData()
 {
-	return &_rawData;
+	return _rawData;
 }
 
 TFile* Archive::readFile(TString filename)
 {
-	cout << "reading file " << filename << endl;
 	return new TFile(filename, "read");
 }
 
 TTree* Archive::readTree(TFile* file, TString treename)
 {
-	cout << "reading tree " << treename << " from file." << endl;
 	return (TTree*) file->Get(treename);
 }
 
@@ -96,12 +94,64 @@ TH1* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	for (int i = 0; i < numberOfChannels; i++)
 	{
 		rawData->SetBinContent(i, voltage[i]);
-		cout << i << "\t" << voltage[i] << endl;
+//		rawData->SetBinContent(i, voltage[i] - 2100); minus offset
 	}
 	rawData->GetXaxis()->SetTitle("channel number");
 	rawData->GetYaxis()->SetTitle("voltage [a.u.]");
 
+	delete voltage;
+
 	//TODO check, why deleting this array results in segmentation violation
 
 	return rawData;
+}
+
+vector<TH1*>* Archive::convertAllEntriesToHistograms(TTree* tree)
+{
+	int nEntries = tree->GetEntries();
+
+	vector<TH1*>* result = new vector<TH1*>;
+
+	for (int i = 0; i < nEntries; i++)
+	{
+		//TODO what the f*** happens here with memory?!
+		cout << mallinfo().uordblks << endl;
+		result->push_back(convertEntryToHistogram(i, tree));
+	}
+
+	return result;
+}
+
+TH1D* Archive::createTestHist()
+{
+	double min = 0;
+	double max = 2 * M_PI;
+
+	int nBins = 5 * 1e2;
+
+	//must use lower edges of bins in order not to fill bins twice because of too low floating point precision
+	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
+	Double_t* lowerEdgesOfBins = new Double_t[nBins + 1];
+
+	double start = omp_get_wtime();
+//	#pragma omp parallel for
+	for (int i = 0; i <= nBins; i++)
+	{
+		lowerEdgesOfBins[i] = min + i * (max - min) / nBins;
+	}
+
+	TH1D* hist = new TH1D("test", "test1", nBins, lowerEdgesOfBins);
+
+//#pragma omp parallel for
+	for (int i = 0; i <= nBins; i++)
+	{
+		Double_t x = lowerEdgesOfBins[i];
+		hist->Fill(x, sin(x));
+	}
+
+	cout << "Filling took " << omp_get_wtime() - start << " seconds." << endl;
+
+	delete lowerEdgesOfBins;
+
+	return hist;
 }
