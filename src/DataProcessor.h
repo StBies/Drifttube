@@ -8,6 +8,7 @@
 #include <cmath>
 #include <omp.h>
 #include <sstream>
+#include <vector>
 
 
 /**
@@ -27,8 +28,6 @@ public:
 	virtual ~DataProcessor();
 	
 	Double_t getCharge(Int_t resistance);
-
-	TH1D getRawData();
 	
 	Double_t computeIntegral(TH1& data);
 	TH1* integrate(TH1& data);
@@ -36,11 +35,6 @@ public:
 private:
 	//For testing during development only
 	TH1D createTestHist();
-	
-	//member variables
-	TFile* _dataFile;
-	TH1D _rawData;
-	TTree* _rawTree;
 };
 
 #endif //DATAPROCESSOR_H_
