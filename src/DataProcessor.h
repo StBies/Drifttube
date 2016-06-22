@@ -1,14 +1,9 @@
 #ifndef DATAPROCESSOR_H_
 #define DATAPROCESSOR_H_
 
-#include "TH1I.h"
-#include "TFile.h"
-#include "TTree.h"
-#include <iostream>
-#include <cmath>
+#include "TH1D.h"
 #include <omp.h>
-#include <sstream>
-#include <vector>
+
 
 
 /**
