@@ -8,11 +8,12 @@
 #ifndef SRC_ARCHIVE_H_
 #define SRC_ARCHIVE_H_
 
-#include <vector>
 #include "TH1D.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TString.h"
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -32,20 +33,24 @@ public:
 	Archive(TString filename);
 	virtual ~Archive();
 
-	vector<TH1*>* getRawData();
+	TH1** getRawData();
+	TH1* getEvent(int event);
+	void writeToFile(TString filename);
+
 private:
 	TFile* readFile(TString filename);
 	TTree* readTree(TFile* file,TString treename);
 	TH1* convertEntryToHistogram(int entry,TTree* tree);
 
-	vector<TH1*>* convertAllEntriesToHistograms(TTree* tree);
+	void convertAllEntriesToHistograms(TTree* tree);
 	void storeToFile();
 
 	TH1D* createTestHist();
 
 	//TODO maybe a TTree would be better than a vector
-	vector<TH1*>* _rawData;
-	vector<TH1*> _processedData;
+	TH1** _rawData;
+	TH1** _processedData;
+	int _numberOfEntries;
 };
 
 #endif /* SRC_ARCHIVE_H_ */

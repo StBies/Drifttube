@@ -9,16 +9,10 @@ using namespace std;
  * 
  * @author Stefan
  * @date June 20, 2016
- * @version 0.4
- * 
- * @param filename relative path to the .root-file containing the raw data
+ * @version 0.5
  */
 DataProcessor::DataProcessor(TString filename)
 {
-	//TODO clean up here
-	//TODO implement a way to read ALL events stored in the .root-file
-	//TODO read the raw data in a seperate, private method
-	//TODO store the histograms in an archive
 }
 
 /**

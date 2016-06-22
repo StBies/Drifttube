@@ -5,7 +5,6 @@
 #include "DataProcessor.h"
 #include "Archive.h"
 #include "TFile.h"
-#include <vector>
 
 
 using namespace std;
@@ -24,8 +23,11 @@ int main(int argc, char** argv)
 	TApplication* app = new TApplication("main",&argc,argv);
 	DataProcessor* processor = new DataProcessor("bla");
 	Archive* archive = new Archive("./testdata/fadc_data.root");
-	vector<TH1*>* rawData = archive->getRawData();
-	TH1D* data = (TH1D*)rawData->at(0);
+	cout << "Archive built at " << archive << endl;
+	//TODO Histograms are not present anymore after writing it to the file
+	//must find way to write copies to the file instead of original data
+//	archive->writeToFile("./testdata/converted.root");
+	TH1D* data = (TH1D*)archive->getEvent(1);
 	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
 	c1->Divide(1,2);
 	c1->cd(1);
