@@ -155,14 +155,20 @@ TH1* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	}
 
 	int numberOfChannels;
-//	double* voltage = new double[numberOfChannels];
-	double voltage[numberOfChannels];
 	tree->SetBranchAddress("nchannels", &numberOfChannels);
-
 	tree->GetEntry(0);
-	tree->SetBranchAddress("Voltage", &voltage);
+	//voltage on stack seems not to work since it's size is not known
+	//at compile time
+	//double voltage[numberOfChannels];
+	double* voltage = new double[numberOfChannels];
+	tree->SetBranchAddress("Voltage", voltage);
 	tree->GetEntry(entry);
 
+	
+	//Does not work to set as title for some reason
+	//stringstream name;
+	//name << "Event nr. " << entry;
+	//const TString title = *new TString(name.str().c_str(),14);
 
 	TH1D* rawData = new TH1D("Voltage", "FADC data", numberOfChannels, 0,
 			numberOfChannels);
@@ -173,7 +179,6 @@ TH1* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	}
 	rawData->GetXaxis()->SetTitle("channel number");
 	rawData->GetYaxis()->SetTitle("voltage [a.u.]");
-
 
 	return rawData;
 }
