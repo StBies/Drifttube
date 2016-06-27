@@ -33,9 +33,10 @@ public:
 	Archive(TString filename);
 	virtual ~Archive();
 
+	int getSize();
 	TH1** getRawData();
+	TH1** getProcessedData();
 	TH1* getEvent(int event);
-	void writeToFile(TString filename);
 
 private:
 	TFile* readFile(TString filename);
@@ -43,7 +44,7 @@ private:
 	TH1* convertEntryToHistogram(int entry,TTree* tree);
 
 	void convertAllEntriesToHistograms(TTree* tree);
-	void storeToFile();
+	void writeToFile(TString filename);
 
 	TH1D* createTestHist();
 

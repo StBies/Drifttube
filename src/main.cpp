@@ -24,17 +24,19 @@ int main(int argc, char** argv)
 	DataProcessor* processor = new DataProcessor("bla");
 	Archive* archive = new Archive("./testdata/fadc_data.root");
 	cout << "Archive built at " << archive << endl;
-	//TODO Histograms are not present anymore after writing it to the file
-	//must find way to write copies to the file instead of original data
-//	archive->writeToFile("./testdata/converted.root");
-	TH1D* data = (TH1D*)archive->getEvent(1);
+	TH1** rawData = archive->getRawData();
+	TH1** processedData = archive->getProcessedData();
+	processor->integrateAll(rawData,processedData,archive->getSize());
+	TH1D* data = (TH1D*)archive->getEvent(5);
+	TH1D* integral = (TH1D*)processedData[5];
 	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
 	c1->Divide(1,2);
 	c1->cd(1);
-	data->Draw("HIST");
+	data->DrawCopy("HIST");
 	c1->cd(2);
-	TH1D* integral = (TH1D*)processor->integrate(*data);
-	integral->Draw("HIST");
+	integral->DrawCopy("HIST");
+	delete processor;
+	delete archive;
 	app->Run();
 
 	return 0;

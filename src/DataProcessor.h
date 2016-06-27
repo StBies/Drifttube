@@ -28,6 +28,7 @@ public:
 	
 	Double_t computeIntegral(TH1& data);
 	TH1* integrate(TH1& data);
+	void integrateAll(TH1** data, TH1** storage, int size);
 
 private:
 	//For testing during development only

@@ -8,6 +8,7 @@
 #include "Archive.h"
 #include <cmath>
 #include "omp.h"
+#include <regex>
 
 using namespace std;
 
@@ -24,33 +25,32 @@ using namespace std;
  */
 Archive::Archive(TString filename)
 {
-	TFile* file = readFile(filename);
-	TTree* tree = readTree(file,"Tfadc");
 
-//	TFile* file = new TFile(filename,"read");
-//	TTree* tree = (TTree*)file->Get("Tfadc");
+	TFile* file = new TFile(filename,"read");
+	TTree* tree = (TTree*)file->Get("Tfadc");
 
 	_numberOfEntries = tree->GetEntries();
 
 	_rawData = new TH1*[_numberOfEntries];
 	_processedData = new TH1*[_numberOfEntries];
 
-	for(int i = 0; i < _numberOfEntries; i++)
-	{
-		_rawData[i] = convertEntryToHistogram(i,tree);
-	}
-
+	convertAllEntriesToHistograms(tree);
 
 	file->Close();
 }
 
 Archive::~Archive()
 {
-	// TODO Auto-generated destructor stub
+	writeToFile("./testdata/converted.root");
+}
+
+int Archive::getSize()
+{
+	return _numberOfEntries;
 }
 
 /**
- * Getter method for the raw data histogram. Returns a vector containing TH1*
+ * Getter method for the raw data histogram. Returns an array containing TH1*
  * type objects for all events.
  *
  * @brief raw data getter method
@@ -59,13 +59,18 @@ Archive::~Archive()
  * @date June 20, 2016
  * @version 0.2
  *
- * @return vector containing histograms for all events
+ * @return Array containing histograms for all events
  *
- * @warning Pointer to original vector, delete with care.
+ * @warning Pointer to original array, delete with care.
  */
 TH1** Archive::getRawData()
 {
 	return _rawData;
+}
+
+TH1** Archive::getProcessedData()
+{
+	return _processedData;
 }
 
 //TODO comment
@@ -119,6 +124,9 @@ void Archive::writeToFile(TString filename)
 {
 	//TODO better save a tree for raw data as well as a tree for processed data later.
 	TFile file(filename,"recreate");
+	file.cd();
+	TTree tree;
+
 	for(int i = 0; i < _numberOfEntries; i++)
 	{
 		TH1* hist = _rawData[i];

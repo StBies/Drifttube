@@ -141,3 +141,29 @@ TH1* DataProcessor::integrate(TH1& data)
 
 	return result;
 }
+
+/**
+ * Integrates all histograms, that are passed to this method in form of an array of
+ * pointers to TH1 type objects. The resulting objects are written to the passed array
+ * storage
+ *
+ * @brief Integrate all data in an array
+ *
+ * @param data Pointer to an array containing pointers to TH1 type objects that are to
+ * be integrated
+ * @param storage Adress of the array in that the resulting integrals should be written
+ * @param size size of the datasample. data and storage must both have length size
+ *
+ *
+ * @require length(data) = length(storage) = size
+ * @ensure storage[i] = integrate(data[i])
+ */
+void DataProcessor::integrateAll(TH1** data, TH1** storage,int size)
+{
+	//TODO check why element data[size-1] is already corrupted
+	for(int i = 0; i < size - 1; i++)
+	{
+		cout << "[" << i << "/" << size << "] integrating" << endl;
+		storage[i] = integrate(*data[i]);
+	}
+}
