@@ -14,6 +14,8 @@
 #include "TString.h"
 #include <iostream>
 #include <sstream>
+#include <cmath>
+#include "omp.h"
 
 using namespace std;
 
@@ -45,13 +47,16 @@ private:
 
 	void convertAllEntriesToHistograms(TTree* tree);
 	void writeToFile(TString filename);
+	TString* parseDir(TString filename);
+	TString* parseFile(TString filename);
 
 	TH1D* createTestHist();
 
-	//TODO maybe a TTree would be better than a vector
 	TH1** _rawData;
 	TH1** _processedData;
 	int _numberOfEntries;
+	TString* _directory;
+	TString* _file;
 };
 
 #endif /* SRC_ARCHIVE_H_ */
