@@ -21,14 +21,14 @@
 class DataProcessor
 {
 public:
-	DataProcessor(TString filename);
+	DataProcessor();
 	virtual ~DataProcessor();
 	
 	Double_t getCharge(Int_t resistance);
 	
-	Double_t computeIntegral(TH1& data);
-	TH1* integrate(TH1& data);
-	void integrateAll(TH1** data, TH1** storage, int size);
+	Double_t computeIntegral(TH1D& data);
+	TH1D* integrate(TH1D* data);
+	void integrateAll(TH1D** data, TH1D** storage, int size);
 
 private:
 	//For testing during development only

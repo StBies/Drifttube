@@ -12,7 +12,7 @@ using namespace std;
  * @date June 20, 2016
  * @version 0.5
  */
-DataProcessor::DataProcessor(TString filename)
+DataProcessor::DataProcessor()
 {
 }
 
@@ -76,7 +76,7 @@ TH1D DataProcessor::createTestHist()
  * @param data TH1 family object containing the data to be integrated.
  * @return Value of the integral over all bins
  */
-Double_t DataProcessor::computeIntegral(TH1& data)
+Double_t DataProcessor::computeIntegral(TH1D& data)
 {
 	//Double_t nBins;
 	Double_t counter = 0;
@@ -110,21 +110,23 @@ Double_t DataProcessor::computeIntegral(TH1& data)
  * @warning Does integrate the whole interval, that the data object provides data.
  * @warning Returned object must be destroyed by the user
  */
-TH1* DataProcessor::integrate(TH1& data)
+TH1D* DataProcessor::integrate(TH1D* data)
 {
-	Int_t nBins = data.GetNbinsX();
+	cout << "integrate() called" << endl;
+	Int_t nBins = data->GetNbinsX();
 	Double_t* binLowEdges = new Double_t[nBins + 1];
+	cout << "array built" << endl;
 
 	for (Int_t i = 0; i <= nBins; i++)
 	{
-		binLowEdges[i] = data.GetBinLowEdge(i);
+		binLowEdges[i] = data->GetBinLowEdge(i);
 	}
 
 	//TODO Check the actual parameter type and and return the correct object accordingly
 	TH1D* result = new TH1D("not final", "yet", nBins, binLowEdges);
-	result->GetXaxis()->SetTitle(data.GetXaxis()->GetTitle());
+	result->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
 	stringstream yTitle;
-	yTitle << "integral of " << data.GetYaxis()->GetTitle();
+	yTitle << "integral of " << data->GetYaxis()->GetTitle();
 	result->GetYaxis()->SetTitle(yTitle.str().c_str());
 
 	delete binLowEdges;
@@ -135,8 +137,8 @@ TH1* DataProcessor::integrate(TH1& data)
 
 	for (int i = 0; i <= nBins; i++)
 	{
-		integral += data.GetBinContent(i) * binWidth;
-		result->Fill(data.GetBinLowEdge(i), integral);
+		integral += data->GetBinContent(i) * binWidth;
+		result->Fill(data->GetBinLowEdge(i), integral);
 	}
 
 	return result;
@@ -158,12 +160,12 @@ TH1* DataProcessor::integrate(TH1& data)
  * @require length(data) = length(storage) = size
  * @ensure storage[i] = integrate(data[i])
  */
-void DataProcessor::integrateAll(TH1** data, TH1** storage,int size)
+void DataProcessor::integrateAll(TH1D** data, TH1D** storage,int size)
 {
 	//TODO check why element data[size-1] is already corrupted
 	for(int i = 0; i < size - 1; i++)
 	{
 		cout << "[" << i << "/" << size << "] integrating" << endl;
-		storage[i] = integrate(*data[i]);
+		storage[i] = integrate(data[i]);
 	}
 }

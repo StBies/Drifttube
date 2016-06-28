@@ -28,8 +28,8 @@ Archive::Archive(TString filename)
 
 	_numberOfEntries = tree->GetEntries();
 
-	_rawData = new TH1*[_numberOfEntries];
-	_processedData = new TH1*[_numberOfEntries];
+	_rawData = new TH1D*[_numberOfEntries];
+	_processedData = new TH1D*[_numberOfEntries];
 
 	convertAllEntriesToHistograms(tree);
 
@@ -85,7 +85,7 @@ int Archive::getSize()
  *
  * @warning Pointer to original array, delete with care.
  */
-TH1** Archive::getRawData()
+TH1D** Archive::getRawData()
 {
 	return _rawData;
 }
@@ -107,7 +107,7 @@ TH1** Archive::getRawData()
  * @warning Not filled with actual TH1 objects until DataProcessor integrated
  * raw data
  */
-TH1** Archive::getProcessedData()
+TH1D** Archive::getProcessedData()
 {
 	return _processedData;
 }
@@ -130,7 +130,7 @@ TH1** Archive::getProcessedData()
  *
  * @require event < #events_total
  */
-TH1* Archive::getEvent(int event)
+TH1D* Archive::getEvent(int event)
 {
 	return _rawData[event];
 }
@@ -222,15 +222,8 @@ void Archive::writeToFile(TString filename)
  *
  * @warning Heap object returned, deletion must be taken care about by the caller.
  */
-TH1* Archive::convertEntryToHistogram(int entry, TTree* tree)
+TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 {
-	if (entry >= tree->GetEntries())
-	{
-		cerr << "Only " << tree->GetEntries() << " events, are stored. Event "
-				<< entry << " cannot be processed." << endl;
-		return (TH1*) nullptr;
-	}
-
 	int numberOfChannels;
 	tree->SetBranchAddress("nchannels", &numberOfChannels);
 	tree->GetEntry(0);
@@ -241,13 +234,10 @@ TH1* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	tree->SetBranchAddress("Voltage", voltage);
 	tree->GetEntry(entry);
 
-	
-	//Does not work to set as title for some reason
-	//stringstream name;
-	//name << "Event nr. " << entry;
-	//const TString title = *new TString(name.str().c_str(),14);
+	char name[20];
+	sprintf(name,"Event nr. %d",entry);
 
-	TH1D* rawData = new TH1D("Voltage", "FADC data", numberOfChannels, 0,
+	TH1D* rawData = new TH1D(name,"FADC data", numberOfChannels, 0,
 			numberOfChannels);
 	for (int i = 0; i < numberOfChannels; i++)
 	{
@@ -276,7 +266,7 @@ void Archive::convertAllEntriesToHistograms(TTree* tree)
 {
 	int nEntries = tree->GetEntries();
 
-	for (int i = 0; i < nEntries; i++)
+	for (int i = 0; i < nEntries - 1; i++)
 	{
 		_rawData[i] = convertEntryToHistogram(i, tree);
 	}

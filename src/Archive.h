@@ -16,6 +16,7 @@
 #include <sstream>
 #include <cmath>
 #include "omp.h"
+#include <cstdlib>
 
 using namespace std;
 
@@ -36,14 +37,14 @@ public:
 	virtual ~Archive();
 
 	int getSize();
-	TH1** getRawData();
-	TH1** getProcessedData();
-	TH1* getEvent(int event);
+	TH1D** getRawData();
+	TH1D** getProcessedData();
+	TH1D* getEvent(int event);
 
 private:
 	TFile* readFile(TString filename);
 	TTree* readTree(TFile* file,TString treename);
-	TH1* convertEntryToHistogram(int entry,TTree* tree);
+	TH1D* convertEntryToHistogram(int entry,TTree* tree);
 
 	void convertAllEntriesToHistograms(TTree* tree);
 	void writeToFile(TString filename);
@@ -52,11 +53,11 @@ private:
 
 	TH1D* createTestHist();
 
-	TH1** _rawData;
-	TH1** _processedData;
-	int _numberOfEntries;
+	TH1D** _rawData;
+	TH1D** _processedData;
 	TString* _directory;
 	TString* _file;
+	int _numberOfEntries;
 };
 
 #endif /* SRC_ARCHIVE_H_ */
