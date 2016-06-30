@@ -32,11 +32,19 @@ using namespace std;
 class DataSet
 {
 public:
-	DataSet();
+	DataSet(vector<TH1D*> rawData);
+	DataSet(vector<TH1D*> rawData, vector<TH1D*> processedData);
 	virtual ~DataSet();
+
+	void addRawData(TH1D* histogram);
+	void addIntegral(TH1D* histogram);
+	int getSize();
+	bool isIntegrated();
+	Event* getEvent(int event);
 
 private:
 	int _size;
+	bool _integrated;
 	vector<TH1D*> _rawData;
 	vector<TH1D*> _processedData;
 };
