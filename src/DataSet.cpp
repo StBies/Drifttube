@@ -37,14 +37,31 @@ DataSet::~DataSet()
 	// TODO Auto-generated destructor stub
 }
 
+
+/**
+ * Adds a raw data histogram to the DataSet. Does increment the size of the DataSet as well
+ *
+ * @brief Add raw data histogram
+ *
+ * @author Stefan
+ * @date June 30, 2016
+ * @version 0.1
+ *
+ * @param histogram the histogram to add to the DataSet
+ *
+ * @require histgram != nullptr
+ * @ensure new size = old size + 1
+ */
 void DataSet::addRawData(TH1D* histogram)
 {
 	_rawData.push_back(histogram);
 	_size += 1;
 }
 
+//TODO comment
 void DataSet::addIntegral(TH1D* histogram)
 {
+	//TODO size checks
 	_processedData.push_back(histogram);
 }
 
@@ -92,6 +109,7 @@ int DataSet::getSize()
  */
 Event* DataSet::getEvent(int event)
 {
+	//only give an event if requirements are met, else throw requirement exception
 	(event < _size) && _integrated ?  : throw 'r';
 	Event* result = new Event();
 	result->rawData = _rawData[event];
