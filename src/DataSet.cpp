@@ -21,7 +21,10 @@ DataSet::DataSet(vector<TH1D*>& data)
 
 DataSet::~DataSet()
 {
-	// TODO Auto-generated destructor stub
+	for(TH1D* data : _data)
+	{
+		delete data;
+	}
 }
 
 

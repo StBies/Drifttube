@@ -54,6 +54,8 @@ Archive::Archive(TString filename)
 Archive::~Archive()
 {
 	writeToFile("./testdata/converted.root");
+	delete _rawData;
+	delete _processedData;
 }
 
 
@@ -235,6 +237,7 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	tree->SetBranchAddress("Voltage", voltage);
 	tree->GetEntry(entry);
 
+	//TODO check, if stringstream would work as well
 	char name[20];
 	sprintf(name,"Event #%d",entry);
 
