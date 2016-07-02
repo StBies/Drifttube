@@ -149,10 +149,11 @@ TH1D* DataProcessor::integrate(TH1D* data)
  *
  * @brief Integrate all data in an array
  *
- * @param data Pointer to an array containing pointers to TH1 type objects that are to
- * be integrated
- * @param storage Adress of the array in that the resulting integrals should be written
- * @param size size of the datasample. data and storage must both have length size
+ * @param data Pointer to the DataSet object that is to be integrated
+ *
+ * @return Pointer to a DataSet type object containing the processed data
+ *
+ * @warning Heap object returned, caller needs to handle memory
  */
 DataSet* DataProcessor::integrateAll(DataSet* data)
 {
@@ -166,9 +167,9 @@ DataSet* DataProcessor::integrateAll(DataSet* data)
 			TH1D* integral = integrate(data->getEvent(i));
 			result->addData(integral);
 		}
-		catch(exception& e)
+		catch(Exception& e)
 		{
-			cerr << e.what() << endl;
+			cerr << e.error() << endl;
 		}
 	}
 

@@ -13,7 +13,7 @@ DataSet::DataSet()
 	_size = 0;
 }
 
-DataSet::DataSet(vector<TH1D*> data)
+DataSet::DataSet(vector<TH1D*>& data)
 {
 	_size = _data.size();
 	_data = data;
@@ -78,11 +78,11 @@ int DataSet::getSize()
  *
  * @param event Number of the requested Event
  *
- * @return Pointer to an Event struct containing two TH1D*: rawData and processedData
+ * @return Pointer to a TH1D containing the data
  *
  * @require event < this.getSize()
  *
- * @warning Throws an exception (char 'r' if the above mentioned requirements are not met
+ * @warning Throws an Exception if the above mentioned requirements are not met
  * @warning Heap object returned, memory management to be done by caller
  *
  */

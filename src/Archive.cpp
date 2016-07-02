@@ -221,7 +221,7 @@ void Archive::writeToFile(TString filename)
  * @param entry Number of the entry, you want to convert. Must be smaller than the number of entries in the tree
  * @param tree Pointer to the TTree containing the raw data
  *
- * @return pointer to the TH1* type histogram
+ * @return pointer to the TH1D* type histogram
  *
  * @warning Heap object returned, deletion must be taken care about by the caller.
  */

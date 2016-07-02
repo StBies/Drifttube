@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 	TH1D* data;
 	try
 	{
-		data = dataSet->getEvent(1021);
+		data = dataSet->getEvent(1);
 	}
 	catch(EventSizeException& e)
 	{
