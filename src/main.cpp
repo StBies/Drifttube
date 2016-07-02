@@ -20,6 +20,7 @@ using namespace std;
  */
 int main(int argc, char** argv)
 {
+	TH1::AddDirectory(kFALSE);
 	TApplication* app = new TApplication("main",&argc,argv);
 	DataProcessor* processor = new DataProcessor();
 	Archive* archive = new Archive("./testdata/fadc_data.root");
@@ -51,9 +52,9 @@ int main(int argc, char** argv)
 	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
 	c1->Divide(1,2);
 	c1->cd(1);
-	data->DrawCopy("HIST");
+	data->Draw("HIST");
 	c1->cd(2);
-	integral->DrawCopy("HIST");
+	integral->Draw("HIST");
 	app->Run();
 
 	return 0;

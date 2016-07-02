@@ -236,9 +236,9 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	tree->GetEntry(entry);
 
 	char name[20];
-	sprintf(name,"Event_%d",entry);
+	sprintf(name,"Event #%d",entry);
 
-	TH1D* rawData = new TH1D("Voltage","FADC data", numberOfChannels, 0,
+	TH1D* rawData = new TH1D(name,"FADC data", numberOfChannels, 0,
 			numberOfChannels);
 	for (int i = 0; i < numberOfChannels; i++)
 	{
