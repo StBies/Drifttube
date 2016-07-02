@@ -10,3 +10,6 @@ UML/*.html
 #Documentation
 doc/
 /Debug/
+
+#Data
+data/
