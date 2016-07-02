@@ -19,6 +19,15 @@ DataSet::DataSet(vector<TH1D*>& data)
 	_data = data;
 }
 
+/**
+ * Destructor of a DataSet, deletes this object as well as all histograms it holds
+ *
+ * @brief Dtor
+ *
+ * @author Stefan
+ * @date July 02, 2016
+ * @version 0.1
+ */
 DataSet::~DataSet()
 {
 	for(TH1D* data : _data)
