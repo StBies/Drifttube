@@ -193,3 +193,21 @@ double DataProcessor::findMinimum(TH1D* data)
 	int bin = data->GetMinimumBin();
 	return data->GetBinCenter(bin);
 }
+
+TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
+{
+	//TODO fully implement and test
+	//TODO parallel?
+
+	double triggerpos = 42;
+	TH1D* result = new TH1D("Drifttime spectrum","TDC spectrum",150,0,100);
+
+	for(int i = 0; i < data->getSize(); i++)
+	{
+		TH1D* event = data->getEvent(i);
+		double diff  = triggerpos - findMinimum(event);
+		result->Fill(diff);
+	}
+
+	return result;
+}

@@ -30,6 +30,9 @@ public:
 	TH1D* integrate(TH1D* data);
 	DataSet* integrateAll(DataSet* data);
 	double findMinimum(TH1D* data);
+	TH1D* calculateDriftTimeSpectrum(DataSet* data);
+
+	void calibrate(DataSet* triggerdata);
 
 private:
 	//For testing during development only

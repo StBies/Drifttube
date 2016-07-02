@@ -9,6 +9,15 @@
 
 using namespace std;
 
+typedef struct
+{
+	string infilename;
+	char mode;
+	string calibfile;
+} ParsedArgs;
+
+ParsedArgs* parseCmdArgs(int argc, char** argv);
+
 /**
  * Startup of the application is managed here
  * 
@@ -23,7 +32,7 @@ int main(int argc, char** argv)
 	TH1::AddDirectory(kFALSE);
 	TApplication* app = new TApplication("main",&argc,argv);
 	DataProcessor* processor = new DataProcessor();
-	Archive* archive = new Archive("./testdata/fadc_data.root");
+	Archive* archive = new Archive("testdata/fadc_data.root");
 
 //	//TODO work on real data
 //	TH1D* data = archive->createTestHist();
@@ -31,7 +40,6 @@ int main(int argc, char** argv)
 
 	DataSet* dataSet = archive->getRawData();
 	DataSet* integralSet = processor->integrateAll(dataSet);
-
 
 	cout << "Data size is " << dataSet->getSize() << endl;
 	cout << "Integral size is " << integralSet->getSize() << endl;
@@ -41,7 +49,7 @@ int main(int argc, char** argv)
 	{
 		data = dataSet->getEvent(1);
 	}
-	catch(EventSizeException& e)
+	catch(Exception& e)
 	{
 		cerr << e.error() << endl;
 	}
@@ -58,4 +66,17 @@ int main(int argc, char** argv)
 	app->Run();
 
 	return 0;
+}
+
+//TODO to be implemented
+ParsedArgs* parseCmdArgs(int argc, char** argv)
+{
+	ParsedArgs* result = new ParsedArgs;
+	if(argc > 1)
+	{
+		for(int i = 0; i < argc; i++)
+		{
+			cout << "Arg " << i << " = " << argv[i] << endl;
+		}
+	}
 }
