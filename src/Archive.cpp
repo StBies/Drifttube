@@ -22,16 +22,18 @@ using namespace std;
  */
 Archive::Archive(TString filename)
 {
-
 	TFile* file = new TFile(filename,"read");
 	TTree* tree = (TTree*)file->Get("Tfadc");
 
-	_numberOfEntries = tree->GetEntries();
+	_rawData = new DataSet();
+	_numberOfEntries = tree->GetEntries() - 2;
 
-	_rawData = new TH1D*[_numberOfEntries];
-	_processedData = new TH1D*[_numberOfEntries];
+	for(int i = 0; i < _numberOfEntries; i++)
+	{
+		_rawData->addData(convertEntryToHistogram(i,tree));
+	}
 
-	convertAllEntriesToHistograms(tree);
+	cout << "DataSet size is: " << _rawData->getSize() << endl;
 
 	_directory = parseDir(filename);
 	_file = parseFile(filename);
@@ -71,6 +73,7 @@ int Archive::getSize()
 	return _numberOfEntries;
 }
 
+//TODO overhaul
 /**
  * Getter method for the raw data histograms. Returns an array containing TH1*
  * type objects for all events.
@@ -85,12 +88,12 @@ int Archive::getSize()
  *
  * @warning Pointer to original array, delete with care.
  */
-TH1D** Archive::getRawData()
+DataSet* Archive::getRawData()
 {
 	return _rawData;
 }
 
-//TODO overhaul method
+//TODO overhaul
 /**
  * Getter method for the processed data histograms. Returns an array containing TH1*
  * type objects for all events.
@@ -107,7 +110,7 @@ TH1D** Archive::getRawData()
  * @warning Not filled with actual TH1 objects until DataProcessor integrated
  * raw data
  */
-TH1D** Archive::getProcessedData()
+DataSet* Archive::getProcessedData()
 {
 	return _processedData;
 }
@@ -132,7 +135,7 @@ TH1D** Archive::getProcessedData()
  */
 TH1D* Archive::getEvent(int event)
 {
-	return _rawData[event];
+	return _rawData->getEvent(event);
 }
 
 /**
@@ -198,7 +201,7 @@ void Archive::writeToFile(TString filename)
 
 	for(int i = 0; i < _numberOfEntries; i++)
 	{
-		TH1* hist = _rawData[i];
+		TH1* hist = _rawData->getEvent(i);
 		hist->Write();
 	}
 	file.Close();
@@ -227,17 +230,15 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	int numberOfChannels;
 	tree->SetBranchAddress("nchannels", &numberOfChannels);
 	tree->GetEntry(0);
-	//voltage on stack seems not to work since it's size is not known
-	//at compile time
-	//double voltage[numberOfChannels];
+
 	double* voltage = new double[numberOfChannels];
 	tree->SetBranchAddress("Voltage", voltage);
 	tree->GetEntry(entry);
 
 	char name[20];
-	sprintf(name,"Event nr. %d",entry);
+	sprintf(name,"Event_%d",entry);
 
-	TH1D* rawData = new TH1D(name,"FADC data", numberOfChannels, 0,
+	TH1D* rawData = new TH1D("Voltage","FADC data", numberOfChannels, 0,
 			numberOfChannels);
 	for (int i = 0; i < numberOfChannels; i++)
 	{
@@ -268,7 +269,7 @@ void Archive::convertAllEntriesToHistograms(TTree* tree)
 
 	for (int i = 0; i < nEntries - 1; i++)
 	{
-		_rawData[i] = convertEntryToHistogram(i, tree);
+		_rawData->addData(convertEntryToHistogram(i, tree));
 	}
 }
 
@@ -283,8 +284,6 @@ TH1D* Archive::createTestHist()
 	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
 	Double_t* lowerEdgesOfBins = new Double_t[nBins + 1];
 
-	double start = omp_get_wtime();
-//	#pragma omp parallel for
 	for (int i = 0; i <= nBins; i++)
 	{
 		lowerEdgesOfBins[i] = min + i * (max - min) / nBins;
@@ -292,14 +291,11 @@ TH1D* Archive::createTestHist()
 
 	TH1D* hist = new TH1D("test", "test1", nBins, lowerEdgesOfBins);
 
-//#pragma omp parallel for
 	for (int i = 0; i <= nBins; i++)
 	{
 		Double_t x = lowerEdgesOfBins[i];
 		hist->Fill(x, sin(x));
 	}
-
-	cout << "Filling took " << omp_get_wtime() - start << " seconds." << endl;
 
 	delete lowerEdgesOfBins;
 

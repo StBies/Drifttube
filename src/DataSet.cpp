@@ -7,29 +7,16 @@
 
 #include "DataSet.h"
 
-DataSet::DataSet(vector<TH1D*> rawData, vector<TH1D*> processedData)
+DataSet::DataSet()
 {
-	//check if both containers are of the same size, else throw exception
-	if(_rawData.size() != _processedData.size())
-	{
-		throw 's';
-	}
-	else
-	{
-		_size = _rawData.size();
-	}
-
-	_rawData = rawData;
-	_processedData = processedData;
-	_integrated = true;
+	_data.resize(0);
+	_size = 0;
 }
 
-DataSet::DataSet(vector<TH1D*> rawData)
+DataSet::DataSet(vector<TH1D*> data)
 {
-	_size = rawData.size();
-	_rawData = rawData;
-	_processedData.resize(_size);
-	_integrated = false;
+	_size = _data.size();
+	_data = data;
 }
 
 DataSet::~DataSet()
@@ -52,17 +39,10 @@ DataSet::~DataSet()
  * @require histgram != nullptr
  * @ensure new size = old size + 1
  */
-void DataSet::addRawData(TH1D* histogram)
+void DataSet::addData(TH1D* histogram)
 {
-	_rawData.push_back(histogram);
-	_size += 1;
-}
-
-//TODO comment
-void DataSet::addIntegral(TH1D* histogram)
-{
-	//TODO size checks
-	_processedData.push_back(histogram);
+	_data.push_back(histogram);
+	_size++;
 }
 
 /**
@@ -100,38 +80,20 @@ int DataSet::getSize()
  *
  * @return Pointer to an Event struct containing two TH1D*: rawData and processedData
  *
- * @require event < this.getSize() && this.isIntegrated()
- * @ensure Event != nullptr && Event.rawData != nullptr && Event.processedData != nullptr
+ * @require event < this.getSize()
  *
  * @warning Throws an exception (char 'r' if the above mentioned requirements are not met
  * @warning Heap object returned, memory management to be done by caller
  *
  */
-Event* DataSet::getEvent(int event)
+TH1D* DataSet::getEvent(int event)
 {
 	//only give an event if requirements are met, else throw requirement exception
-	(event < _size) && _integrated ?  : throw 'r';
-	Event* result = new Event();
-	result->rawData = _rawData[event];
-	result->integratedData = _processedData[event];
-	return result;
-}
-
-
-/**
- * Checks, if the DataSet object contains integrated as well as raw data.
- *
- * @brief Checks if integrated
- *
- * @author Stefan
- * @date June 30, 2016
- * @version 0.1
- *
- * @return True if integrated, false else.
- */
-bool DataSet::isIntegrated()
-{
-	return _integrated;
+	if(event > _size)
+	{
+		throw EventSizeException(event);
+	}
+	return _data[event];
 }
 
 

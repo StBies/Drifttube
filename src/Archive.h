@@ -12,11 +12,10 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
-#include <iostream>
-#include <sstream>
 #include <cmath>
-#include "omp.h"
 #include <cstdlib>
+#include <iostream>
+#include "DataSet.h"
 
 using namespace std;
 
@@ -37,9 +36,12 @@ public:
 	virtual ~Archive();
 
 	int getSize();
-	TH1D** getRawData();
-	TH1D** getProcessedData();
+	DataSet* getRawData();
+	DataSet* getProcessedData();
 	TH1D* getEvent(int event);
+
+	void setProcessedData();
+	TH1D* createTestHist();
 
 private:
 	TFile* readFile(TString filename);
@@ -51,10 +53,9 @@ private:
 	TString* parseDir(TString filename);
 	TString* parseFile(TString filename);
 
-	TH1D* createTestHist();
 
-	TH1D** _rawData;
-	TH1D** _processedData;
+	DataSet* _rawData;
+	DataSet* _processedData;
 	TString* _directory;
 	TString* _file;
 	int _numberOfEntries;

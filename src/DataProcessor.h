@@ -5,6 +5,7 @@
 #include <omp.h>
 #include <iostream>
 #include <sstream>
+#include "DataSet.h"
 
 
 
@@ -24,11 +25,10 @@ public:
 	DataProcessor();
 	virtual ~DataProcessor();
 	
-	Double_t getCharge(Int_t resistance);
-	
 	Double_t computeIntegral(TH1D& data);
 	TH1D* integrate(TH1D* data);
-	void integrateAll(TH1D** data, TH1D** storage, int size);
+	DataSet* integrateAll(DataSet* data);
+	double findMinimum(TH1D* data);
 
 private:
 	//For testing during development only

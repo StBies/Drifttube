@@ -9,13 +9,8 @@
 #define DATASET_H_
 
 #include "TH1D.h"
+#include "EventSizeException.h"
 #include <vector>
-
-typedef struct
-{
-	TH1D* rawData;
-	TH1D* integratedData;
-} Event;
 
 using namespace std;
 
@@ -26,27 +21,23 @@ using namespace std;
  * @brief Collection of data
  *
  * @author Stefan
- * @date June 27, 2016
- * @version 0.2
+ * @date July 2, 2016
+ * @version 0.3
  */
 class DataSet
 {
 public:
-	DataSet(vector<TH1D*> rawData);
-	DataSet(vector<TH1D*> rawData, vector<TH1D*> processedData);
+	DataSet();
+	DataSet(vector<TH1D*> data);
 	virtual ~DataSet();
 
-	void addRawData(TH1D* histogram);
-	void addIntegral(TH1D* histogram);
+	void addData(TH1D* histogram);
 	int getSize();
-	bool isIntegrated();
-	Event* getEvent(int event);
+	TH1D* getEvent(int event);
 
 private:
 	int _size;
-	bool _integrated;
-	vector<TH1D*> _rawData;
-	vector<TH1D*> _processedData;
+	vector<TH1D*> _data;
 };
 
 #endif /* DATASET_H_ */

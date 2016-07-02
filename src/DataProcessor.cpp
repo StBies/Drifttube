@@ -112,10 +112,8 @@ Double_t DataProcessor::computeIntegral(TH1D& data)
  */
 TH1D* DataProcessor::integrate(TH1D* data)
 {
-	cout << "integrate() called" << endl;
 	Int_t nBins = data->GetNbinsX();
 	Double_t* binLowEdges = new Double_t[nBins + 1];
-	cout << "array built" << endl;
 
 	for (Int_t i = 0; i <= nBins; i++)
 	{
@@ -155,17 +153,42 @@ TH1D* DataProcessor::integrate(TH1D* data)
  * be integrated
  * @param storage Adress of the array in that the resulting integrals should be written
  * @param size size of the datasample. data and storage must both have length size
- *
- *
- * @require length(data) = length(storage) = size
- * @ensure storage[i] = integrate(data[i])
  */
-void DataProcessor::integrateAll(TH1D** data, TH1D** storage,int size)
+DataSet* DataProcessor::integrateAll(DataSet* data)
 {
+	DataSet* result = new DataSet();
 	//TODO check why element data[size-1] is already corrupted
-	for(int i = 0; i < size - 1; i++)
+	for(int i = 0; i < data->getSize(); i++)
 	{
-		cout << "[" << i << "/" << size << "] integrating" << endl;
-		storage[i] = integrate(data[i]);
+		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;
+		try
+		{
+			TH1D* integral = integrate(data->getEvent(i));
+			result->addData(integral);
+		}
+		catch(exception& e)
+		{
+			cerr << e.what() << endl;
+		}
 	}
+
+	return result;
+}
+
+
+/**
+ * Find the position of the minimum of the given data. Will only find the absolute
+ * minimum. Can not yet find more than one negative peak.
+ *
+ * @author Stefan
+ * @date July 2, 2016
+ * @version 0.1
+ *
+ * @param data Data as a pointer to a TH1D histogram containing the data
+ * @return Center position of the bin containing the data minimum
+ */
+double DataProcessor::findMinimum(TH1D* data)
+{
+	int bin = data->GetMinimumBin();
+	return data->GetBinCenter(bin);
 }
