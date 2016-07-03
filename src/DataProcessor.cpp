@@ -169,7 +169,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
 	double triggerpos = 42;
 	TH1D* result = new TH1D("Drifttime spectrum","TDC spectrum",150,0,100);
 
-//	#pragma omp parallel for
+	#pragma omp parallel for
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);

@@ -1,5 +1,4 @@
 /*
- * Archive.cpp
  *
  *  Created on: 15.06.2016
  *      Author: stefan
@@ -24,14 +23,19 @@ Archive::Archive(TString filename)
 {
 	TFile* file = new TFile(filename,"read");
 	TTree* tree = (TTree*)file->Get("Tfadc");
+	cout << "Reading tree" << endl;
 
 	_rawData = new DataSet();
 	_numberOfEntries = tree->GetEntries() - 2;
 
-	for(int i = 0; i < _numberOfEntries; i++)
-	{
-		_rawData->addData(convertEntryToHistogram(i,tree));
-	}
+	cout << "Beginning conversion. Entries: " << _numberOfEntries << endl;
+
+	convertAllEntriesToHistograms(tree);
+
+//	for(int i = 0; i < _numberOfEntries; i++)
+//	{
+//		_rawData->addData(convertEntryToHistogram(i,tree));
+//	}
 
 	cout << "DataSet size is: " << _rawData->getSize() << endl;
 
@@ -268,9 +272,7 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
  */
 void Archive::convertAllEntriesToHistograms(TTree* tree)
 {
-	int nEntries = tree->GetEntries();
-
-	for (int i = 0; i < nEntries - 1; i++)
+	for (int i = 0; i < _numberOfEntries; i++)
 	{
 		_rawData->addData(convertEntryToHistogram(i, tree));
 	}

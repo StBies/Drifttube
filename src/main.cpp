@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 	TH1::AddDirectory(kFALSE);
 	TApplication* app = new TApplication("main",&argc,argv);
 	DataProcessor* processor = new DataProcessor();
-	Archive* archive = new Archive("testdata/fadc_data.root");
+	Archive* archive = new Archive("data/fadc_data.root");
 
 	DataSet* dataSet = archive->getRawData();
 	DataSet* integralSet = processor->integrateAll(dataSet);
