@@ -34,12 +34,9 @@ int main(int argc, char** argv)
 	DataProcessor* processor = new DataProcessor();
 	Archive* archive = new Archive("testdata/fadc_data.root");
 
-//	//TODO work on real data
-//	TH1D* data = archive->createTestHist();
-//	TH1D* integral = processor->integrate(data);
-
 	DataSet* dataSet = archive->getRawData();
 	DataSet* integralSet = processor->integrateAll(dataSet);
+	TH1D* spect = processor->calculateDriftTimeSpectrum(dataSet);
 
 	cout << "Data size is " << dataSet->getSize() << endl;
 	cout << "Integral size is " << integralSet->getSize() << endl;
@@ -62,7 +59,7 @@ int main(int argc, char** argv)
 	c1->cd(1);
 	data->Draw("HIST");
 	c1->cd(2);
-	integral->Draw("HIST");
+	spect->Draw("HIST");
 	app->Run();
 
 	return 0;

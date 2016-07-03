@@ -31,40 +31,6 @@ DataProcessor::~DataProcessor()
 	//TODO implement
 }
 
-TH1D DataProcessor::createTestHist()
-{
-	double min = 0;
-	double max = 2 * M_PI;
-
-	int nBins = 5 * 1e2;
-
-	//must use lower edges of bins in order not to fill bins twice because of too low floating point precision
-	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
-	Double_t* lowerEdgesOfBins = new Double_t[nBins + 1];
-
-	double start = omp_get_wtime();
-//	#pragma omp parallel for
-	for (int i = 0; i <= nBins; i++)
-	{
-		lowerEdgesOfBins[i] = min + i * (max - min) / nBins;
-	}
-
-	TH1D* hist = new TH1D("test", "test1", nBins, lowerEdgesOfBins);
-
-#pragma omp parallel for
-	for (int i = 0; i <= nBins; i++)
-	{
-		Double_t x = lowerEdgesOfBins[i];
-		hist->Fill(x, sin(x));
-	}
-
-	cout << "Filling took " << omp_get_wtime() - start << " seconds." << endl;
-
-	delete lowerEdgesOfBins;
-
-	return *hist;
-}
-
 /**
  * Computes the integral of the data given as parameter. It will count positive as well as
  * negative entries and sum up the bin content.
@@ -194,6 +160,7 @@ double DataProcessor::findMinimum(TH1D* data)
 	return data->GetBinCenter(bin);
 }
 
+
 TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
 {
 	//TODO fully implement and test
@@ -202,6 +169,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
 	double triggerpos = 42;
 	TH1D* result = new TH1D("Drifttime spectrum","TDC spectrum",150,0,100);
 
+//	#pragma omp parallel for
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);

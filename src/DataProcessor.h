@@ -33,10 +33,6 @@ public:
 	TH1D* calculateDriftTimeSpectrum(DataSet* data);
 
 	void calibrate(DataSet* triggerdata);
-
-private:
-	//For testing during development only
-	TH1D createTestHist();
 };
 
 #endif //DATAPROCESSOR_H_
