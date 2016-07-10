@@ -26,7 +26,7 @@ Archive::Archive(TString filename)
 	cout << "Reading tree" << endl;
 
 	_rawData = new DataSet();
-	_numberOfEntries = (tree->GetEntries() - 2)/50;
+	_numberOfEntries = (tree->GetEntries() - 2);
 
 	cout << "Beginning conversion. Entries: " << _numberOfEntries << endl;
 
@@ -203,16 +203,12 @@ void Archive::writeToFile(TString filename)
 	//TODO better save a tree for raw data as well as a tree for processed data later.
 	TFile file(filename,"recreate");
 	file.cd();
-	TTree tree("conv","processed data");
 
-	TH1D* hist;
-	TBranch* branch = tree.Branch("converted","TH1D",&hist);
 
 	for(int i = 0; i < _numberOfEntries; i++)
 	{
-		hist = _rawData->getEvent(i);
-		branch->Fill();
-		branch->Write();
+		TH1D* hist = _rawData->getEvent(i);
+		hist->Write();
 	}
 	file.Close();
 }
