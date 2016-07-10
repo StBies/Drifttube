@@ -125,6 +125,7 @@ DataSet* DataProcessor::integrateAll(DataSet* data)
 {
 	DataSet* result = new DataSet();
 	//TODO check why element data[size-1] is already corrupted
+#pragma omp parallel for
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;

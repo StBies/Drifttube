@@ -26,16 +26,16 @@ Archive::Archive(TString filename)
 	cout << "Reading tree" << endl;
 
 	_rawData = new DataSet();
-	_numberOfEntries = tree->GetEntries() - 2;
+	_numberOfEntries = (tree->GetEntries() - 2)/50;
 
 	cout << "Beginning conversion. Entries: " << _numberOfEntries << endl;
 
-	convertAllEntriesToHistograms(tree);
+//	convertAllEntriesToHistograms(tree);
 
-//	for(int i = 0; i < _numberOfEntries; i++)
-//	{
-//		_rawData->addData(convertEntryToHistogram(i,tree));
-//	}
+	for(int i = 0; i < _numberOfEntries; i++)
+	{
+		_rawData->addData(convertEntryToHistogram(i,tree));
+	}
 
 	cout << "DataSet size is: " << _rawData->getSize() << endl;
 
@@ -203,12 +203,16 @@ void Archive::writeToFile(TString filename)
 	//TODO better save a tree for raw data as well as a tree for processed data later.
 	TFile file(filename,"recreate");
 	file.cd();
-	TTree tree;
+	TTree tree("conv","processed data");
+
+	TH1D* hist;
+	TBranch* branch = tree.Branch("converted","TH1D",&hist);
 
 	for(int i = 0; i < _numberOfEntries; i++)
 	{
-		TH1* hist = _rawData->getEvent(i);
-		hist->Write();
+		hist = _rawData->getEvent(i);
+		branch->Fill();
+		branch->Write();
 	}
 	file.Close();
 }

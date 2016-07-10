@@ -62,6 +62,8 @@ int main(int argc, char** argv)
 	spect->Draw("HIST");
 	app->Run();
 
+	delete archive;
+
 	return 0;
 }
 
