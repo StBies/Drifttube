@@ -7,6 +7,8 @@
 #include <sstream>
 #include "DataSet.h"
 #include "EventSizeException.h"
+#include "TFile.h"
+#include "TTree.h"
 
 
 
@@ -32,7 +34,7 @@ public:
 	double findMinimum(TH1D* data);
 	TH1D* calculateDriftTimeSpectrum(DataSet* data);
 
-	void calibrate(DataSet* triggerdata);
+	void calibrate(TString triggerDataFile);
 };
 
 #endif //DATAPROCESSOR_H_
