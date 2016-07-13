@@ -161,7 +161,18 @@ double DataProcessor::findMinimum(TH1D* data)
 	return data->GetBinCenter(bin);
 }
 
-
+/**
+ * Calculates the spectrum of drifttimes for the data given in a DataSet object containing raw data.
+ * The result is a histogram containing the spectrum.
+ *
+ * @author Stefan
+ * @date July 13, 2016
+ * @version 0.3
+ *
+ * @param data Pointer to a DataSet object containing the raw data out of which the spectrum is to be calculated
+ *
+ * @return TH1D* histogram containing the spectrum of drifttimes
+ */
 TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
 {
 	//TODO fully implement and test
@@ -181,6 +192,20 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
 	return result;
 }
 
+/**
+ * Finds the bin number in a passed histogram, in which a passed, integer threshold is surpassed.
+ * The threshold should be negative since it only checks, when signals are LOWER than the given threshold.
+ * However, a positive threshold will be multiplied with -1 internally.
+ *
+ * @author Stefan
+ * @data July 13, 2016
+ * @version 0.1
+ *
+ * @param data Pointer to a TH1D histogram where the first occurance of a signal bigger than threshold is to be found
+ * @param threshold that is to be surpassed. Should be given negative, positive values are multiplied by -1 internally
+ *
+ * @return Bin number of the first occurance of a signal larger than threshold
+ */
 int DataProcessor::findSignalStart(TH1D* data,int threshold)
 {
 	threshold *= (threshold < 0 ? 1 : -1);
