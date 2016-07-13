@@ -167,18 +167,32 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
 	//TODO fully implement and test
 	//TODO parallel?
 
-	double triggerpos = 42;
-	TH1D* result = new TH1D("Drifttime spectrum","TDC spectrum",150,0,100);
+	int triggerpos = 0;
+	TH1D* result = new TH1D("Drifttime spectrum","TDC spectrum",250,0,750);
 
-	#pragma omp parallel for
+//	#pragma omp parallel for
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);
-		double diff  = findMinimum(event) - triggerpos ;
+		int diff  = findSignalStart(event,-50) - triggerpos ;
 		result->Fill(diff);
 	}
 
 	return result;
+}
+
+int DataProcessor::findSignalStart(TH1D* data,int threshold)
+{
+	threshold *= (threshold < 0 ? 1 : -1);
+
+	for(int i = 0; i < data->GetNbinsX(); i++)
+	{
+		if(data->GetBinContent(i) < threshold)
+		{
+			return i;
+		}
+	}
+	return -42;
 }
 
 void DataProcessor::calibrate(TString triggerDataFile)
