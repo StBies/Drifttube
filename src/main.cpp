@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 	data->Draw("HIST");
 	c1->cd(2);
 	spect->Draw("HIST");
-	delete archive;
+//	delete archive;
 	app->Run();
 
 

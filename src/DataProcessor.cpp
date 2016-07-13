@@ -174,7 +174,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);
-		double diff  = triggerpos - findMinimum(event);
+		double diff  = findMinimum(event) - triggerpos ;
 		result->Fill(diff);
 	}
 
