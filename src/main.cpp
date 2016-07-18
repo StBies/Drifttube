@@ -11,9 +11,8 @@ using namespace std;
 
 typedef struct
 {
-	string infilename;
+	TString infilename;
 	char mode;
-	string calibfile;
 } ParsedArgs;
 
 ParsedArgs* parseCmdArgs(int argc, char** argv);
@@ -29,10 +28,15 @@ ParsedArgs* parseCmdArgs(int argc, char** argv);
  */
 int main(int argc, char** argv)
 {
+	ParsedArgs* args = parseCmdArgs(argc,argv);
 	TH1::AddDirectory(kFALSE);
 	TApplication* app = new TApplication("main",&argc,argv);
 	DataProcessor* processor = new DataProcessor();
-	Archive* archive = new Archive("data/fadc_data.root");
+
+	TString filename = args->infilename;
+	cout << "using file: " << filename;
+
+	Archive* archive = new Archive(filename);
 
 	DataSet* dataSet = archive->getRawData();
 	DataSet* integralSet = processor->integrateAll(dataSet);
@@ -77,6 +81,14 @@ ParsedArgs* parseCmdArgs(int argc, char** argv)
 		for(int i = 0; i < argc; i++)
 		{
 			cout << "Arg " << i << " = " << argv[i] << endl;
+			if(argv[i][0] == 'i' && argv[i][1] == 'f' && argv[i][2] == '=')
+			{
+				TString file(argv[i]);
+				int equalSignPos = file.First('=') + 1;
+				TSubString filename = file(equalSignPos,file.Length());
+				result->infilename = *new TString(filename);
+			}
+			cout << "var: infilename = " << result->infilename << endl;
 		}
 	}
 }
