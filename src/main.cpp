@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	DataProcessor* processor = new DataProcessor();
 
 	TString filename = args->infilename;
-	cout << "using file: " << filename;
+	cout << "using file: " << filename << endl;;
 
 	Archive* archive = new Archive(filename);
 
@@ -91,4 +91,5 @@ ParsedArgs* parseCmdArgs(int argc, char** argv)
 			cout << "var: infilename = " << result->infilename << endl;
 		}
 	}
+	return result;
 }
