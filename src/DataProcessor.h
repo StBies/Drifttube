@@ -18,6 +18,8 @@
  * time-dependant currents and deposited charge in a drifttube detector.
  * Makes use of ROOT libraries by CERN.
  * 
+ * @brief Processes data from FADC.
+ *
  * @author Stefan
  * @date May 30, 2016
  * @version 0.1 

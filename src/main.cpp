@@ -9,6 +9,17 @@
 
 using namespace std;
 
+/**
+ * A struct containing information given as commandline parameters on program start.
+ * Contains information about the datafile that is to be used as well as the mode
+ * of operation in that the program is to be executed.
+ *
+ * @brief Parsed command line parameters
+ *
+ * @author Stefan
+ * @date July 18, 2016
+ * @version 0.2
+ */
 typedef struct
 {
 	TString infilename;

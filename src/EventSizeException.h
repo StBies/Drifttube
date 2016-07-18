@@ -14,6 +14,17 @@
 
 using namespace std;
 
+/**
+ * A simple Exception, that carries the number of an event for which it was thrown.
+ * It inherits from the class Exception and implements its virtual/abstract method
+ * error()
+ *
+ * @brief Exception, that carries an eventnumber
+ *
+ * @author Stefan
+ * @data July 18, 2016
+ * @version 0.1
+ */
 class EventSizeException: public Exception
 {
 public:
