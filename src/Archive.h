@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "DataSet.h"
+#include <sstream>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ public:
 	DataSet* getProcessedData();
 	TH1D* getEvent(int event);
 
-	void setProcessedData();
+	void setProcessedData(DataSet* data);
 	TH1D* createTestHist();
 
 private:

@@ -87,7 +87,10 @@ TH1D* DataProcessor::integrate(TH1D* data)
 	}
 
 	//TODO Check the actual parameter type and and return the correct object accordingly
-	TH1D* result = new TH1D("not final", "yet", nBins, binLowEdges);
+	TString name = data->GetName();
+	name.Append(" (integrated)");
+
+	TH1D* result = new TH1D(name, "Integrated FADC data", nBins, binLowEdges);
 	result->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
 	stringstream yTitle;
 	yTitle << "integral of " << data->GetYaxis()->GetTitle();
@@ -260,5 +263,4 @@ void DataProcessor::calibrate(TString triggerDataFile)
 	branch->Fill();
 	calibTree.Write();
 	calib.Close();
-
 }

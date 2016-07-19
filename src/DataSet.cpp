@@ -13,10 +13,10 @@ DataSet::DataSet()
 	_size = 0;
 }
 
-DataSet::DataSet(vector<TH1D*>& data)
+DataSet::DataSet(vector<TH1D*>* data)
 {
-	_size = _data.size();
-	_data = data;
+	_size = data->size();
+	_data = *data;
 }
 
 /**

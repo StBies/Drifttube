@@ -57,7 +57,11 @@ Archive::Archive(TString filename)
  */
 Archive::~Archive()
 {
-	writeToFile("./testdata/converted.root");
+	stringstream name;
+	name << *_directory << "processed_" << *_file;
+	TString filename(name.str());
+	cout << "Saving data to: " << filename << endl;
+	writeToFile(filename);
 	delete _rawData;
 	delete _processedData;
 }
@@ -119,6 +123,22 @@ DataSet* Archive::getRawData()
 DataSet* Archive::getProcessedData()
 {
 	return _processedData;
+}
+
+/**
+ * Sets a DataSet as this objects member _processedData.
+ *
+ * @brief Setter method for processed data
+ *
+ * @author Stefan
+ * @date July 19, 2016
+ * @version 0.1
+ *
+ * @param data Pointer to the dataset containing the processed data
+ */
+void Archive::setProcessedData(DataSet* data)
+{
+	_processedData = data;
 }
 
 //TODO exceptionhandling
@@ -200,15 +220,46 @@ TTree* Archive::readTree(TFile* file, TString treename)
  */
 void Archive::writeToFile(TString filename)
 {
+	/*
+	 * Seems not to work: Probably not possible to store a list of TH1Ds in a branch of a root-file
+	 * HELP WANTED
 	//TODO better save a tree for raw data as well as a tree for processed data later.
 	TFile file(filename,"recreate");
 	file.cd();
 
+	TH1D* hist = nullptr;
+	TH1D* integral = nullptr;
+
+	TTree* tree = new TTree("tree","stored data");
+	TBranch* rawBranch = tree->Branch("raw_data","TH1D",&hist);
+	TBranch* processedBranch = tree->Branch("processed_data","TH1D",&integral);
+	TBranch* dtSpect = tree->Branch("DT_spect","TH1D",&hist);
+	TBranch* rtRel = tree->Branch("RT relation","TH1D",&integral);
 
 	for(int i = 0; i < _numberOfEntries; i++)
 	{
-		TH1D* hist = _rawData->getEvent(i);
+		hist = _rawData->getEvent(i);
+		integral = _processedData->getEvent(i);
+		tree->SetBranchAddress("raw_data",&hist);
+		tree->SetBranchAddress("processed_data",&integral);
+		rawBranch->Write();
+	}
+	tree->Write();
+	file.Close();
+	*/
+
+	TFile file(filename,"recreate");
+	file.cd();
+
+	TH1D* hist = nullptr;
+	TH1D* integral = nullptr;
+
+	for(int i = 0; i < _numberOfEntries; i++)
+	{
+		hist = _rawData->getEvent(i);
+		integral = _processedData->getEvent(i);
 		hist->Write();
+		integral->Write();
 	}
 	file.Close();
 }
@@ -250,7 +301,7 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	for (int i = 0; i < numberOfChannels; i++)
 	{
 //		rawData->SetBinContent(i, voltage[i]);
-		rawData->SetBinContent(i, voltage[i] - 2100); //minus offset
+		rawData->SetBinContent(i, voltage[i] - 2200); //minus offset
 	}
 	rawData->GetXaxis()->SetTitle("channel number");
 	rawData->GetYaxis()->SetTitle("voltage [a.u.]");
