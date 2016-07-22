@@ -3,12 +3,13 @@ void findSignalEnd(TString filename)
 	TFile* file = new TFile(filename, "read");
 	TTree* tree = (TTree*) file->Get("Tfadc");
 
-//	TTree* params = new TTree("params", "title");
+	TFile* test = new TFile("../data/test.root", "recreate");
+	TTree* params = new TTree("params", "title");
 
 	int drifttime;
 	int pos;
-//	params->Branch("Drifttime", &drifttime, "drifttime/I");
-//	params->Branch("relPeakhight", &pos, "relPeakhight/I");
+	params->Branch("Drifttime", &drifttime, "drifttime/I");
+	params->Branch("relPeakhight", &pos, "relPeakhight/I");
 
 	const int nch;
 	tree->SetBranchAddress("nchannels", &nch);
@@ -16,7 +17,8 @@ void findSignalEnd(TString filename)
 
 	//find offset
 	double sum = 0;
-	for (int i = 0; i < tree->GetEntries() - 2; i++)
+
+	for (int i = 0; i < tree->GetEntries(); i++)
 	{
 		double voltage[nch];
 		tree->SetBranchAddress("Voltage", &voltage);
@@ -24,13 +26,15 @@ void findSignalEnd(TString filename)
 
 		sum += voltage[0];
 	}
-	sum /= (tree->GetEntries() - 2);
+	sum /= tree->GetEntries();
+	cout << sum << endl;
 
 	std::vector<int> minPos;
 	std::vector<int> drifttimes;
-	for (int i = 0; i < tree->GetEntries() - 2; i++)
+	for (int i = 0; i < tree->GetEntries(); i++)
 	{
-		std::cout << "Event nr: " << i << endl;
+		drifttime = 0;
+//		std::cout << "Event nr: " << i << endl;
 		double voltage[nch];
 		tree->SetBranchAddress("Voltage", &voltage);
 		tree->GetEntry(i);
@@ -52,19 +56,13 @@ void findSignalEnd(TString filename)
 			double th = offset - 50;
 			if (voltage[j] < th)
 			{
-				drifttimes.push_back(j);
-				break;
-			}
-			else
-			{
-				drifttimes.push_back(-1);
+				drifttime = j;
+				cout << j << endl;
 				break;
 			}
 		}
 
 		//find, where threshold is last succeeded
-		if (min != offset)
-		{
 			pos = 0;
 			double threshold = offset - 0.3 * (offset - min);
 
@@ -76,28 +74,18 @@ void findSignalEnd(TString filename)
 				}
 			}
 			minPos.push_back(pos);
-		}
+			params->Fill();
 	}
 
-	cout << "DT size: " << drifttimes.size() << " cut size: " << minPos.size() << endl;
-
-//	for(int i = 0; i < drifttimes.size(); i++)
+	test->cd();
+	params->Write();
+	test->Close();
+//	TCanvas* c1 = new TCanvas("c1", "Windowtitle", 800, 600);
+//	c1->cd();
+//	TH1D* hist = new TH1D("name", "title", nch, 0, nch - 1);
+//	for (int i = 0; i < minPos.size(); i++)
 //	{
-//		pos = minPos[i];
-//		drifttime = drifttimes[i];
-//		params->Fill();
+//		hist->Fill(minPos[i]);
 //	}
-
-//	TFile* test = new TFile("../data/test.root", "recreate");
-//	test->cd();
-//	params->Write();
-//	test->Close();
-	TCanvas* c1 = new TCanvas("c1", "Windowtitle", 800, 600);
-	c1->cd();
-	TH1D* hist = new TH1D("name", "title", nch, 0, nch - 1);
-	for (int i = 0; i < minPos.size(); i++)
-	{
-		hist->Fill(minPos[i]);
-	}
-	hist->Draw("HIST");
+//	hist->Draw("HIST");
 }
