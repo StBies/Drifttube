@@ -1,9 +1,17 @@
+#include "TString.h"
+
 void findSignalEnd(TString filename)
 {
+	TSubString st = filename(filename.Last('/')+1,filename.Length());
+	TSubString st2 = filename(0,filename.Last('/')+1);
 	TFile* file = new TFile(filename, "read");
 	TTree* tree = (TTree*) file->Get("Tfadc");
 
-	TFile* test = new TFile("../data/test.root", "recreate");
+	TString ofName = "converted_";
+	ofName.Append(st);
+	TString filename_out(st2);
+	filename_out.Append(ofName);
+	TFile* test = new TFile(filename_out, "recreate");
 	TTree* params = new TTree("params", "title");
 
 	int drifttime;
@@ -31,7 +39,9 @@ void findSignalEnd(TString filename)
 
 	std::vector<int> minPos;
 	std::vector<int> drifttimes;
-	for (int i = 0; i < tree->GetEntries(); i++)
+
+	int nEntries = tree->GetEntries();
+	for (int i = 0; i < nEntries; i++)
 	{
 		drifttime = 0;
 //		std::cout << "Event nr: " << i << endl;

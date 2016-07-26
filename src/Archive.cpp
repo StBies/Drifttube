@@ -26,7 +26,7 @@ Archive::Archive(TString filename)
 	cout << "Reading tree" << endl;
 
 	_rawData = new DataSet();
-	_numberOfEntries = (tree->GetEntries() - 2)/50;
+	_numberOfEntries = (tree->GetEntries() - 2);
 
 	cout << "Beginning conversion. Entries: " << _numberOfEntries << endl;
 
