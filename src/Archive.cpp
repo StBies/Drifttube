@@ -22,7 +22,6 @@ using namespace std;
 Archive::Archive(TString filename)
 {
 	TFile file(filename,"read");
-	file.ReadAll();
 	TTree* tree = (TTree*)file.Get("Tfadc");
 	cout << "Reading tree" << endl;
 
@@ -220,9 +219,12 @@ void Archive::writeToFile(TString filename)
  */
 TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 {
-	int numberOfChannels;
-	tree->SetBranchAddress("nchannels", &numberOfChannels);
-	tree->GetEntry(0);
+	//Not reading this entry from the tree makes the program be run in seconds
+	//instead of hours!!!!
+	//No idea why, HELP WANTED
+	const int numberOfChannels = 800;
+//	tree->SetBranchAddress("nchannels", &numberOfChannels);
+//	tree->GetEntry(0);
 
 	double voltage[800];
 	tree->SetBranchAddress("Voltage", &voltage);
