@@ -71,13 +71,13 @@ int main(int argc, char** argv)
 	TH1D* rt = processor->integrate(spect);
 
 	//TODO to be seperated into class DrawingTool
-	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
-	c1->Divide(1,2);
-	c1->cd(1);
-	spect->Draw("HIST");
-	c1->cd(2);
-	rt->Draw("HIST");
-//	delete archive;
+//	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
+//	c1->Divide(1,2);
+//	c1->cd(1);
+//	spect->Draw("HIST");
+//	c1->cd(2);
+//	rt->Draw("HIST");
+	delete archive;
 	app->Run();
 
 

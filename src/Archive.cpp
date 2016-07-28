@@ -22,6 +22,7 @@ using namespace std;
 Archive::Archive(TString filename)
 {
 	TFile file(filename,"read");
+	file.ReadAll();
 	TTree* tree = (TTree*)file.Get("Tfadc");
 	cout << "Reading tree" << endl;
 
@@ -31,11 +32,6 @@ Archive::Archive(TString filename)
 	cout << "Beginning conversion. Entries: " << _numberOfEntries << endl;
 
 	convertAllEntriesToHistograms(tree);
-
-//	for(int i = 0; i < _numberOfEntries; i++)
-//	{
-//		_rawData->addData(convertEntryToHistogram(i,tree));
-//	}
 
 	cout << "DataSet size is: " << _rawData->getSize() << endl;
 
@@ -141,7 +137,6 @@ void Archive::setProcessedData(DataSet* data)
 	_processedData = data;
 }
 
-//TODO exceptionhandling
 /**
  * Method, that returns a histogram for a single event.
  *
@@ -161,7 +156,14 @@ void Archive::setProcessedData(DataSet* data)
  */
 TH1D* Archive::getEvent(int event)
 {
-	return _rawData->getEvent(event);
+	try
+	{
+		return _rawData->getEvent(event);
+	}
+	catch(Exception& e)
+	{
+		cerr << e.error() << endl;
+	}
 }
 
 /**
@@ -179,36 +181,9 @@ TH1D* Archive::getEvent(int event)
  */
 void Archive::writeToFile(TString filename)
 {
-	/*
-	 * Seems not to work: Probably not possible to store a list of TH1Ds in a branch of a root-file
-	 * HELP WANTED
-	//TODO better save a tree for raw data as well as a tree for processed data later.
 	TFile file(filename,"recreate");
-	file.cd();
-
-	TH1D* hist = nullptr;
-	TH1D* integral = nullptr;
-
-	TTree* tree = new TTree("tree","stored data");
-	TBranch* rawBranch = tree->Branch("raw_data","TH1D",&hist);
-	TBranch* processedBranch = tree->Branch("processed_data","TH1D",&integral);
-	TBranch* dtSpect = tree->Branch("DT_spect","TH1D",&hist);
-	TBranch* rtRel = tree->Branch("RT relation","TH1D",&integral);
-
-	for(int i = 0; i < _numberOfEntries; i++)
-	{
-		hist = _rawData->getEvent(i);
-		integral = _processedData->getEvent(i);
-		tree->SetBranchAddress("raw_data",&hist);
-		tree->SetBranchAddress("processed_data",&integral);
-		rawBranch->Write();
-	}
-	tree->Write();
-	file.Close();
-	*/
-
-	TFile file(filename,"recreate");
-	file.cd();
+	file.mkdir("rawData");
+	file.mkdir("integrated");
 
 	TH1D* hist = nullptr;
 	TH1D* integral = nullptr;
@@ -217,7 +192,9 @@ void Archive::writeToFile(TString filename)
 	{
 		hist = _rawData->getEvent(i);
 		integral = _processedData->getEvent(i);
+		file.cd("rawData");
 		hist->Write();
+		file.cd("integrated");
 		integral->Write();
 	}
 	file.Close();
@@ -247,8 +224,8 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	tree->SetBranchAddress("nchannels", &numberOfChannels);
 	tree->GetEntry(0);
 
-	double* voltage = new double[numberOfChannels];
-	tree->SetBranchAddress("Voltage", voltage);
+	double voltage[800];
+	tree->SetBranchAddress("Voltage", &voltage);
 	tree->GetEntry(entry);
 
 	stringstream s;
@@ -259,7 +236,6 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 			numberOfChannels);
 	for (int i = 0; i < numberOfChannels; i++)
 	{
-//		rawData->SetBinContent(i, voltage[i]);
 		rawData->SetBinContent(i, voltage[i] - 2200); //minus offset
 	}
 	rawData->GetXaxis()->SetTitle("channel number");
@@ -282,6 +258,7 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
  */
 void Archive::convertAllEntriesToHistograms(TTree* tree)
 {
+	double starttime;
 	for (int i = 0; i < _numberOfEntries; i++)
 	{
 		_rawData->addData(convertEntryToHistogram(i, tree));

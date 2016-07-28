@@ -15,6 +15,7 @@
 #include <iostream>
 #include "DataSet.h"
 #include <sstream>
+#include "omp.h"
 
 using namespace std;
 

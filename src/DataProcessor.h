@@ -33,12 +33,12 @@ public:
 	Double_t computeIntegral(TH1D& data);
 	TH1D* integrate(TH1D* data);
 	DataSet* integrateAll(DataSet* data);
-	double findMinimum(TH1D* data);
-	int findSignalStart(TH1D* data, int threshold);
+	int findMinimumBin(TH1D* data);
+	int findDriftTime(TH1D& data, int threshold);
 	TH1D* calculateDriftTimeSpectrum(DataSet* data);
 
 	void calibrate(TString triggerDataFile);
-//	static void processFast(TString filename);
+	void writeResults(DataSet& raw, DataSet& integrated);
 };
 
 #endif //DATAPROCESSOR_H_

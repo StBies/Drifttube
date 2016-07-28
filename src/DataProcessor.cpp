@@ -96,7 +96,7 @@ TH1D* DataProcessor::integrate(TH1D* data)
 	yTitle << "integral of " << data->GetYaxis()->GetTitle();
 	result->GetYaxis()->SetTitle(yTitle.str().c_str());
 
-	delete binLowEdges;
+	delete[] binLowEdges;
 	//choose random bin width since all bins are the same size - might change
 	Double_t binWidth = result->GetBinWidth(1);
 
@@ -128,7 +128,6 @@ DataSet* DataProcessor::integrateAll(DataSet* data)
 {
 	DataSet* result = new DataSet();
 	//TODO check why element data[size-1] is already corrupted
-//#pragma omp parallel for
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;
@@ -156,12 +155,11 @@ DataSet* DataProcessor::integrateAll(DataSet* data)
  * @version 0.1
  *
  * @param data Data as a pointer to a TH1D histogram containing the data
- * @return Center position of the bin containing the data minimum
+ * @return bin containing the data minimum
  */
-double DataProcessor::findMinimum(TH1D* data)
+int DataProcessor::findMinimumBin(TH1D* data)
 {
-	int bin = data->GetMinimumBin();
-	return data->GetBinCenter(bin);
+	return data->GetMinimumBin();
 }
 
 /**
@@ -188,7 +186,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);
-		int diff  = findSignalStart(event,-50) - triggerpos ;
+		int diff  = findDriftTime(*event,-50) - triggerpos ;
 		result->Fill(diff);
 	}
 
@@ -209,13 +207,13 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
  *
  * @return Bin number of the first occurance of a signal larger than threshold
  */
-int DataProcessor::findSignalStart(TH1D* data,int threshold)
+int DataProcessor::findDriftTime(TH1D& data,int threshold)
 {
 	threshold *= (threshold < 0 ? 1 : -1);
 
-	for(int i = 0; i < data->GetNbinsX(); i++)
+	for(int i = 0; i < data.GetNbinsX(); i++)
 	{
-		if(data->GetBinContent(i) < threshold)
+		if(data.GetBinContent(i) < threshold)
 		{
 			return i;
 		}
@@ -264,10 +262,3 @@ void DataProcessor::calibrate(TString triggerDataFile)
 	calibTree.Write();
 	calib.Close();
 }
-
-//static void processFast(TString filename)
-//{
-//	TFile file(filename,"open");
-//	TTree* tree = (TTree*)file.Get("Tfadc");
-//
-//}
