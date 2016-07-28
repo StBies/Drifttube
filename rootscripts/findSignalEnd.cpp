@@ -16,8 +16,14 @@ void findSignalEnd(TString filename)
 
 	int drifttime;
 	int pos;
+	int minimumpos;
+	int minheight;
+	double integralmin;
 	params->Branch("Drifttime", &drifttime, "drifttime/I");
 	params->Branch("relPeakhight", &pos, "relPeakhight/I");
+	params->Branch("minimum", &minimumpos, "minimumpos/I");
+	params->Branch("minimumheight", &minheight, "minheight/I");
+	params->Branch("integralminimumheight", &integralmin,"integralmin/D");
 
 	const int nch;
 	tree->SetBranchAddress("nchannels", &nch);
@@ -37,12 +43,12 @@ void findSignalEnd(TString filename)
 	sum /= tree->GetEntries();
 	cout << sum << endl;
 
-	std::vector<int> minPos;
-	std::vector<int> drifttimes;
 
 	int nEntries = tree->GetEntries();
 	for (int i = 0; i < nEntries; i++)
 	{
+		minimumpos = 0;
+		minheight = 0;
 		drifttime = 0;
 //		std::cout << "Event nr: " << i << endl;
 		double voltage[nch];
@@ -57,6 +63,8 @@ void findSignalEnd(TString filename)
 			if (voltage[j] < min)
 			{
 				min = voltage[j];
+				minimumpos = j;
+				minheight = min;
 			}
 		}
 
@@ -67,7 +75,6 @@ void findSignalEnd(TString filename)
 			if (voltage[j] < th)
 			{
 				drifttime = j;
-				cout << j << endl;
 				break;
 			}
 		}
@@ -83,19 +90,23 @@ void findSignalEnd(TString filename)
 					pos = j;
 				}
 			}
-			minPos.push_back(pos);
+
+			//find integral minimum height
+			double integral = 0.0;
+			integralmin = 0.0;
+			for(int j = 0; j < nch; j++)
+			{
+				integral += (voltage[j] - offset);
+				if(integral < integralmin)
+				{
+					integralmin = integral;
+				}
+			}
 			params->Fill();
+
 	}
 
 	test->cd();
 	params->Write();
 	test->Close();
-//	TCanvas* c1 = new TCanvas("c1", "Windowtitle", 800, 600);
-//	c1->cd();
-//	TH1D* hist = new TH1D("name", "title", nch, 0, nch - 1);
-//	for (int i = 0; i < minPos.size(); i++)
-//	{
-//		hist->Fill(minPos[i]);
-//	}
-//	hist->Draw("HIST");
 }

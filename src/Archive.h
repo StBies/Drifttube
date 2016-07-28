@@ -12,8 +12,6 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
-#include <cmath>
-#include <cstdlib>
 #include <iostream>
 #include "DataSet.h"
 #include <sstream>
@@ -42,23 +40,20 @@ public:
 	TH1D* getEvent(int event);
 
 	void setProcessedData(DataSet* data);
-	TH1D* createTestHist();
 
 private:
-	TFile* readFile(TString filename);
-	TTree* readTree(TFile* file,TString treename);
 	TH1D* convertEntryToHistogram(int entry,TTree* tree);
 
 	void convertAllEntriesToHistograms(TTree* tree);
 	void writeToFile(TString filename);
-	TString* parseDir(TString filename);
-	TString* parseFile(TString filename);
+	TString parseDir(TString filename);
+	TString parseFile(TString filename);
 
 
 	DataSet* _rawData;
 	DataSet* _processedData;
-	TString* _directory;
-	TString* _file;
+	TString _directory;
+	TString _file;
 	int _numberOfEntries;
 };
 

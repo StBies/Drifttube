@@ -264,3 +264,10 @@ void DataProcessor::calibrate(TString triggerDataFile)
 	calibTree.Write();
 	calib.Close();
 }
+
+//static void processFast(TString filename)
+//{
+//	TFile file(filename,"open");
+//	TTree* tree = (TTree*)file.Get("Tfadc");
+//
+//}

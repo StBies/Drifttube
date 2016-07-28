@@ -38,6 +38,7 @@ public:
 	TH1D* calculateDriftTimeSpectrum(DataSet* data);
 
 	void calibrate(TString triggerDataFile);
+//	static void processFast(TString filename);
 };
 
 #endif //DATAPROCESSOR_H_

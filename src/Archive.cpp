@@ -14,34 +14,34 @@ using namespace std;
  * @brief Constructor
  *
  * @author Stefan
- * @date June 20, 2016
- * @version 0.1
+ * @date July 28, 2016
+ * @version 0.3
  *
  * @param filename relative path to the .root-file containing the raw data
  */
 Archive::Archive(TString filename)
 {
-	TFile* file = new TFile(filename,"read");
-	TTree* tree = (TTree*)file->Get("Tfadc");
+	TFile file(filename,"read");
+	TTree* tree = (TTree*)file.Get("Tfadc");
 	cout << "Reading tree" << endl;
 
 	_rawData = new DataSet();
-	_numberOfEntries = (tree->GetEntries() - 2);
+	_numberOfEntries = tree->GetEntries();
 
 	cout << "Beginning conversion. Entries: " << _numberOfEntries << endl;
 
-//	convertAllEntriesToHistograms(tree);
+	convertAllEntriesToHistograms(tree);
 
-	for(int i = 0; i < _numberOfEntries; i++)
-	{
-		_rawData->addData(convertEntryToHistogram(i,tree));
-	}
+//	for(int i = 0; i < _numberOfEntries; i++)
+//	{
+//		_rawData->addData(convertEntryToHistogram(i,tree));
+//	}
 
 	cout << "DataSet size is: " << _rawData->getSize() << endl;
 
 	_directory = parseDir(filename);
 	_file = parseFile(filename);
-	file->Close();
+	file.Close();
 }
 
 
@@ -58,7 +58,7 @@ Archive::Archive(TString filename)
 Archive::~Archive()
 {
 	stringstream name;
-	name << *_directory << "processed_" << *_file;
+	name << _directory << "processed_" << _file;
 	TString filename(name.str());
 	cout << "Saving data to: " << filename << endl;
 	writeToFile(filename);
@@ -165,47 +165,6 @@ TH1D* Archive::getEvent(int event)
 }
 
 /**
- * Read a file given with total or relative path as parameter and return the
- * opened file.
- *
- * @author Stefan
- * @date June 28, 2016+
- * @version 0.1
- *
- * @param filename relative or absolute path to the file
- *
- * @return TFile* object pointer to opened file
- *
- * @warning must be closed by caller
- */
-TFile* Archive::readFile(TString filename)
-{
-	return new TFile(filename, "read");
-}
-
-
-/**
- * Read a tree with given treename from the TFile file
- *
- * @brief Read a tree from a file
- *
- * @author Stefan
- * @date June 22, 2016
- * @version 0.1
- *
- * @param file Pointer to TFile object containing the tree
- * @param treename Name of the TTree object
- *
- * @return Pointer to the read TTree object.
- *
- * @warning Heap object returned, deletion must be taken care about by the caller.
- */
-TTree* Archive::readTree(TFile* file, TString treename)
-{
-	return (TTree*) file->Get(treename);
-}
-
-/**
  * Writes the histograms to a file, that is specified with parameter filename.
  *
  * @brief Write data to file
@@ -292,9 +251,9 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	tree->SetBranchAddress("Voltage", voltage);
 	tree->GetEntry(entry);
 
-	//TODO check, if stringstream would work as well
-	char name[20];
-	sprintf(name,"Event #%d",entry);
+	stringstream s;
+	s << "Event #" << entry;
+	TString name(s.str());
 
 	TH1D* rawData = new TH1D(name,"FADC data", numberOfChannels, 0,
 			numberOfChannels);
@@ -329,35 +288,6 @@ void Archive::convertAllEntriesToHistograms(TTree* tree)
 	}
 }
 
-TH1D* Archive::createTestHist()
-{
-	double min = 0;
-	double max = 2 * M_PI;
-
-	int nBins = 5 * 1e2;
-
-	//must use lower edges of bins in order not to fill bins twice because of too low floating point precision
-	//could as well use a local variable array if nBins is not too high to fit into the CPU cache
-	Double_t* lowerEdgesOfBins = new Double_t[nBins + 1];
-
-	for (int i = 0; i <= nBins; i++)
-	{
-		lowerEdgesOfBins[i] = min + i * (max - min) / nBins;
-	}
-
-	TH1D* hist = new TH1D("test", "test1", nBins, lowerEdgesOfBins);
-
-	for (int i = 0; i <= nBins; i++)
-	{
-		Double_t x = lowerEdgesOfBins[i];
-		hist->Fill(x, sin(x));
-	}
-
-	delete lowerEdgesOfBins;
-
-	return hist;
-}
-
 /**
  * Parses the directory from the given String containing the full path to file.
  *
@@ -372,15 +302,13 @@ TH1D* Archive::createTestHist()
  *
  * @param filename TString containing the full path to file
  *
- * @return Pointer to a TString containing the relative or absolute path
- *
- * @warning Heap object, memory management to be done by caller
+ * @return TString containing the relative or absolute path
  */
-TString* Archive::parseDir(TString filename)
+TString Archive::parseDir(TString filename)
 {
 	int positionOfLastSlash = filename.Last('/');
 	TSubString dir = filename(0,positionOfLastSlash+1);
-	return new TString(dir);
+	return TString(dir);
 }
 
 /**
@@ -397,13 +325,12 @@ TString* Archive::parseDir(TString filename)
  *
  * @param filename TString containing the full path to file
  *
- * @return Pointer to a TString containing the filename
+ * @return TString containing the filename
  *
- * @warning Heap object, memory management to be done by caller
  */
-TString* Archive::parseFile(TString filename)
+TString Archive::parseFile(TString filename)
 {
 	int positionOfLastSlash = filename.Last('/');
 	TSubString file = filename(positionOfLastSlash+1,filename.Length());
-	return new TString(file);
+	return TString(file);
 }
