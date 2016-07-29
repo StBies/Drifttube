@@ -42,7 +42,7 @@ DataProcessor::~DataProcessor()
  * @param data TH1 family object containing the data to be integrated.
  * @return Value of the integral over all bins
  */
-Double_t DataProcessor::computeIntegral(TH1D& data)
+Double_t DataProcessor::computeIntegral(const TH1D& data)
 {
 	//Double_t nBins;
 	Double_t counter = 0;
@@ -157,7 +157,7 @@ DataSet* DataProcessor::integrateAll(DataSet* data)
  * @param data Data as a pointer to a TH1D histogram containing the data
  * @return bin containing the data minimum
  */
-int DataProcessor::findMinimumBin(TH1D* data)
+inline int DataProcessor::findMinimumBin(TH1D* data)
 {
 	return data->GetMinimumBin();
 }
@@ -207,7 +207,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
  *
  * @return Bin number of the first occurance of a signal larger than threshold
  */
-int DataProcessor::findDriftTime(TH1D& data,int threshold)
+int DataProcessor::findDriftTime(const TH1D& data,int threshold)
 {
 	threshold *= (threshold < 0 ? 1 : -1);
 

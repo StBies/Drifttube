@@ -1,10 +1,10 @@
 #ifndef DATAPROCESSOR_H_
 #define DATAPROCESSOR_H_
 
-#include "TH1D.h"
 #include <omp.h>
 #include <iostream>
 #include <sstream>
+#include "TH1D.h"
 #include "DataSet.h"
 #include "EventSizeException.h"
 #include "TFile.h"
@@ -30,15 +30,15 @@ public:
 	DataProcessor();
 	virtual ~DataProcessor();
 	
-	Double_t computeIntegral(TH1D& data);
+	Double_t computeIntegral(const TH1D& data);
 	TH1D* integrate(TH1D* data);
 	DataSet* integrateAll(DataSet* data);
 	int findMinimumBin(TH1D* data);
-	int findDriftTime(TH1D& data, int threshold);
+	int findDriftTime(const TH1D& data, int threshold);
 	TH1D* calculateDriftTimeSpectrum(DataSet* data);
 
 	void calibrate(TString triggerDataFile);
-	void writeResults(DataSet& raw, DataSet& integrated);
+	void writeResults(const DataSet& raw, const DataSet& integrated);
 };
 
 #endif //DATAPROCESSOR_H_

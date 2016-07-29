@@ -78,10 +78,8 @@ int Archive::getSize()
 	return _numberOfEntries;
 }
 
-//TODO overhaul
 /**
- * Getter method for the raw data histograms. Returns an array containing TH1*
- * type objects for all events.
+ * Getter method for the raw data histograms. Returns a DataSet* object pointer
  *
  * @brief raw data getter method
  *
@@ -89,9 +87,9 @@ int Archive::getSize()
  * @date June 20, 2016
  * @version 0.2
  *
- * @return Array containing histograms for all events
+ * @return DataSet* containing histograms for all events
  *
- * @warning Pointer to original array, delete with care.
+ * @warning Pointer to original DataSet, delete with care.
  */
 DataSet* Archive::getRawData()
 {
@@ -100,8 +98,8 @@ DataSet* Archive::getRawData()
 
 //TODO overhaul
 /**
- * Getter method for the processed data histograms. Returns an array containing TH1*
- * type objects for all events.
+ * Getter method for the processed data DataSet. Returns a DataSet* object pointer
+ * containing the processed data
  *
  * @brief raw data getter method
  *
@@ -109,9 +107,9 @@ DataSet* Archive::getRawData()
  * @date June 20, 2016
  * @version 0.2
  *
- * @return Array containing histograms for all events
+ * @return DataSet* containing histograms for all events
  *
- * @warning Pointer to original array, delete with care.
+ * @warning Pointer to original object, delete with care.
  * @warning Not filled with actual TH1 objects until DataProcessor integrated
  * raw data
  */
@@ -260,7 +258,6 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
  */
 void Archive::convertAllEntriesToHistograms(TTree* tree)
 {
-	double starttime;
 	for (int i = 0; i < _numberOfEntries; i++)
 	{
 		_rawData->addData(convertEntryToHistogram(i, tree));
