@@ -2,8 +2,9 @@
 
 void findSignalEnd(TString filename)
 {
-	TSubString st = filename(filename.Last('/')+1,filename.Length());
-	TSubString st2 = filename(0,filename.Last('/')+1);
+	//find filename of ingoing .root file and prepend the word converted_ for outfile
+	TSubString st = filename(filename.Last('/') + 1, filename.Length());
+	TSubString st2 = filename(0, filename.Last('/') + 1);
 	TFile* file = new TFile(filename, "read");
 	TTree* tree = (TTree*) file->Get("Tfadc");
 
@@ -14,6 +15,7 @@ void findSignalEnd(TString filename)
 	TFile* test = new TFile(filename_out, "recreate");
 	TTree* params = new TTree("params", "title");
 
+	//define branches and variables to store there
 	int drifttime;
 	int pos;
 	int minimumpos;
@@ -23,7 +25,7 @@ void findSignalEnd(TString filename)
 	params->Branch("relPeakhight", &pos, "relPeakhight/I");
 	params->Branch("minimum", &minimumpos, "minimumpos/I");
 	params->Branch("minimumheight", &minheight, "minheight/I");
-	params->Branch("integralminimumheight", &integralmin,"integralmin/D");
+	params->Branch("integralminimumheight", &integralmin, "integralmin/D");
 
 	const int nch;
 	tree->SetBranchAddress("nchannels", &nch);
@@ -31,7 +33,6 @@ void findSignalEnd(TString filename)
 
 	//find offset
 	double sum = 0;
-
 	for (int i = 0; i < tree->GetEntries(); i++)
 	{
 		double voltage[nch];
@@ -41,8 +42,6 @@ void findSignalEnd(TString filename)
 		sum += voltage[0];
 	}
 	sum /= tree->GetEntries();
-	cout << sum << endl;
-
 
 	int nEntries = tree->GetEntries();
 	for (int i = 0; i < nEntries; i++)
@@ -50,7 +49,7 @@ void findSignalEnd(TString filename)
 		minimumpos = 0;
 		minheight = 0;
 		drifttime = 0;
-//		std::cout << "Event nr: " << i << endl;
+
 		double voltage[nch];
 		tree->SetBranchAddress("Voltage", &voltage);
 		tree->GetEntry(i);
@@ -58,6 +57,8 @@ void findSignalEnd(TString filename)
 		//find minimum
 		double offset = sum;
 		double min = offset;
+		double integral = 0.0;
+		integralmin = 0.0;
 		for (int j = 0; j < nch; j++)
 		{
 			if (voltage[j] < min)
@@ -65,6 +66,12 @@ void findSignalEnd(TString filename)
 				min = voltage[j];
 				minimumpos = j;
 				minheight = min;
+			}
+			//find the minimum of the voltage's integral
+			integral += (voltage[j] - offset);
+			if (integral < integralmin)
+			{
+				integralmin = integral;
 			}
 		}
 
@@ -80,29 +87,17 @@ void findSignalEnd(TString filename)
 		}
 
 		//find, where threshold is last succeeded
-			pos = 0;
-			double threshold = offset - 0.3 * (offset - min);
+		pos = 0;
+		double threshold = offset - 0.3 * (offset - min);
 
-			for (int j = 0; j < nch - 1; j++)
+		for (int j = 0; j < nch - 1; j++)
+		{
+			if (voltage[j] < threshold && voltage[j + 1] >= threshold)
 			{
-				if (voltage[j] < threshold && voltage[j + 1] >= threshold)
-				{
-					pos = j;
-				}
+				pos = j;
 			}
-
-			//find integral minimum height
-			double integral = 0.0;
-			integralmin = 0.0;
-			for(int j = 0; j < nch; j++)
-			{
-				integral += (voltage[j] - offset);
-				if(integral < integralmin)
-				{
-					integralmin = integral;
-				}
-			}
-			params->Fill();
+		}
+		params->Fill();
 
 	}
 
