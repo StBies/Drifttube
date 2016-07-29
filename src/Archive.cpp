@@ -195,6 +195,7 @@ void Archive::writeToFile(TString filename)
 		integral->Write();
 	}
 	file.Close();
+	cout << "Saving complete" << endl;
 }
 
 

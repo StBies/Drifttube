@@ -22,7 +22,7 @@ void findSignalEnd(TString filename)
 	int minheight;
 	double integralmin;
 	params->Branch("Drifttime", &drifttime, "drifttime/I");
-	params->Branch("relPeakhight", &pos, "relPeakhight/I");
+	params->Branch("signalEnd", &pos, "signalEnd/I");
 	params->Branch("minimum", &minimumpos, "minimumpos/I");
 	params->Branch("minimumheight", &minheight, "minheight/I");
 	params->Branch("integralminimumheight", &integralmin, "integralmin/D");
@@ -56,16 +56,15 @@ void findSignalEnd(TString filename)
 
 		//find minimum
 		double offset = sum;
-		double min = offset;
+
 		double integral = 0.0;
 		integralmin = 0.0;
 		for (int j = 0; j < nch; j++)
 		{
-			if (voltage[j] < min)
+			if (voltage[j] - offset < minheight)
 			{
-				min = voltage[j];
+				minheight = voltage[j] - offset;
 				minimumpos = j;
-				minheight = min;
 			}
 			//find the minimum of the voltage's integral
 			integral += (voltage[j] - offset);
@@ -88,7 +87,7 @@ void findSignalEnd(TString filename)
 
 		//find, where threshold is last succeeded
 		pos = 0;
-		double threshold = offset - 0.3 * (offset - min);
+		double threshold = offset - 0.3 * abs(minheight);
 
 		for (int j = 0; j < nch - 1; j++)
 		{
