@@ -42,7 +42,7 @@ DataProcessor::~DataProcessor()
  * @param data TH1 family object containing the data to be integrated.
  * @return Value of the integral over all bins
  */
-Double_t DataProcessor::computeIntegral(const TH1D& data)
+Double_t DataProcessor::computeIntegral(const TH1D& data) const
 {
 	//Double_t nBins;
 	Double_t counter = 0;
@@ -76,7 +76,7 @@ Double_t DataProcessor::computeIntegral(const TH1D& data)
  * @warning Does integrate the whole interval, that the data object provides data.
  * @warning Returned object must be destroyed by the user
  */
-TH1D* DataProcessor::integrate(TH1D* data)
+TH1D* DataProcessor::integrate(TH1D* data) const
 {
 	Int_t nBins = data->GetNbinsX();
 	Double_t* binLowEdges = new Double_t[nBins + 1];
@@ -124,7 +124,7 @@ TH1D* DataProcessor::integrate(TH1D* data)
  *
  * @warning Heap object returned, caller needs to handle memory
  */
-DataSet* DataProcessor::integrateAll(DataSet* data)
+DataSet* DataProcessor::integrateAll(DataSet* data) const
 {
 	DataSet* result = new DataSet();
 	//TODO check why element data[size-1] is already corrupted
@@ -157,7 +157,7 @@ DataSet* DataProcessor::integrateAll(DataSet* data)
  * @param data Data as a pointer to a TH1D histogram containing the data
  * @return bin containing the data minimum
  */
-inline int DataProcessor::findMinimumBin(TH1D* data)
+inline int DataProcessor::findMinimumBin(TH1D* data) const
 {
 	return data->GetMinimumBin();
 }
@@ -174,7 +174,7 @@ inline int DataProcessor::findMinimumBin(TH1D* data)
  *
  * @return TH1D* histogram containing the spectrum of drifttimes
  */
-TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
+TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 {
 	//TODO fully implement and test
 	//TODO parallel?
@@ -207,7 +207,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data)
  *
  * @return Bin number of the first occurance of a signal larger than threshold
  */
-int DataProcessor::findDriftTime(const TH1D& data,int threshold)
+int DataProcessor::findDriftTime(const TH1D& data,int threshold) const
 {
 	threshold *= (threshold < 0 ? 1 : -1);
 
@@ -221,7 +221,7 @@ int DataProcessor::findDriftTime(const TH1D& data,int threshold)
 	return -42;
 }
 
-void DataProcessor::calibrate(TString triggerDataFile)
+void DataProcessor::calibrate(const TString triggerDataFile)
 {
 	TFile file(triggerDataFile,"read");
 	TFile calib("calib.root","recreate");

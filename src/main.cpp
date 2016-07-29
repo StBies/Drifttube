@@ -26,7 +26,7 @@ typedef struct
 	char mode;
 } ParsedArgs;
 
-ParsedArgs* parseCmdArgs(int argc, char** argv);
+ParsedArgs parseCmdArgs(int argc, char** argv);
 
 /**
  * Startup of the application is managed here
@@ -39,20 +39,20 @@ ParsedArgs* parseCmdArgs(int argc, char** argv);
  */
 int main(int argc, char** argv)
 {
-	ParsedArgs* args = parseCmdArgs(argc,argv);
+	ParsedArgs args = parseCmdArgs(argc,argv);
 	TH1::AddDirectory(kFALSE);
-	TApplication* app = new TApplication("main",&argc,argv);
-	DataProcessor* processor = new DataProcessor();
+//	TApplication* app = new TApplication("main",&argc,argv);
+	DataProcessor processor;
 
-	TString filename = args->infilename;
+	TString filename = args.infilename;
 	cout << "using file: " << filename << endl;;
 
 	Archive* archive = new Archive(filename);
 
 	DataSet* dataSet = archive->getRawData();
-	DataSet* integralSet = processor->integrateAll(dataSet);
+	DataSet* integralSet = processor.integrateAll(dataSet);
 	archive->setProcessedData(integralSet);
-	TH1D* spect = processor->calculateDriftTimeSpectrum(dataSet);
+	TH1D* spect = processor.calculateDriftTimeSpectrum(dataSet);
 
 	cout << "Data size is " << dataSet->getSize() << endl;
 	cout << "Integral size is " << integralSet->getSize() << endl;
@@ -68,39 +68,28 @@ int main(int argc, char** argv)
 	}
 
 	TH1D* integral = integralSet->getEvent(1);
-	TH1D* rt = processor->integrate(spect);
+	TH1D* rt = processor.integrate(spect);
 
-	//TODO to be seperated into class DrawingTool
-//	TCanvas* c1 = new TCanvas("c1","Windowtitle",800,600);
-//	c1->Divide(1,2);
-//	c1->cd(1);
-//	spect->Draw("HIST");
-//	c1->cd(2);
-//	rt->Draw("HIST");
 	delete archive;
-	app->Run();
-
 
 	return 0;
 }
 
 //TODO to be implemented
-ParsedArgs* parseCmdArgs(int argc, char** argv)
+ParsedArgs parseCmdArgs(int argc, char** argv)
 {
-	ParsedArgs* result = new ParsedArgs;
+	ParsedArgs result;
 	if(argc > 1)
 	{
 		for(int i = 0; i < argc; i++)
 		{
-			cout << "Arg " << i << " = " << argv[i] << endl;
 			if(argv[i][0] == 'i' && argv[i][1] == 'f' && argv[i][2] == '=')
 			{
 				TString file(argv[i]);
 				int equalSignPos = file.First('=') + 1;
 				TSubString filename = file(equalSignPos,file.Length());
-				result->infilename = *new TString(filename);
+				result.infilename = TString(filename);
 			}
-			cout << "var: infilename = " << result->infilename << endl;
 		}
 	}
 	return result;

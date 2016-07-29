@@ -13,5 +13,5 @@ doc/
 
 #Data
 data/
-testdata/conv*
+testdata/*
 spectra/*

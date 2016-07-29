@@ -70,7 +70,7 @@ void DataSet::addData(TH1D* histogram)
  *
  * @ensure size >= 0
  */
-int DataSet::getSize()
+int DataSet::getSize() const
 {
 	return _size;
 }
@@ -98,7 +98,7 @@ int DataSet::getSize()
  * @warning Heap object returned, memory management to be done by caller
  *
  */
-TH1D* DataSet::getEvent(int event)
+TH1D* DataSet::getEvent(int event) const
 {
 	//only give an event if requirements are met, else throw requirement exception
 	if(event > _size)

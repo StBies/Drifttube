@@ -35,10 +35,10 @@ public:
 	Archive(TString filename);
 	virtual ~Archive();
 
-	int getSize();
-	DataSet* getRawData();
-	DataSet* getProcessedData();
-	TH1D* getEvent(int event);
+	int getSize() const;
+	DataSet* getRawData() const;
+	DataSet* getProcessedData() const;
+	TH1D* getEvent(int event) const;
 
 	void setProcessedData(DataSet* data);
 

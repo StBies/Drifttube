@@ -32,8 +32,8 @@ public:
 	virtual ~DataSet();
 
 	void addData(TH1D* histogram);
-	int getSize();
-	TH1D* getEvent(int event);
+	int getSize() const;
+	TH1D* getEvent(int event) const;
 
 private:
 	int _size;

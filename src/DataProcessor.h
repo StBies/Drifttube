@@ -30,12 +30,12 @@ public:
 	DataProcessor();
 	virtual ~DataProcessor();
 	
-	Double_t computeIntegral(const TH1D& data);
-	TH1D* integrate(TH1D* data);
-	DataSet* integrateAll(DataSet* data);
-	int findMinimumBin(TH1D* data);
-	int findDriftTime(const TH1D& data, int threshold);
-	TH1D* calculateDriftTimeSpectrum(DataSet* data);
+	Double_t computeIntegral(const TH1D& data) const;
+	TH1D* integrate(TH1D* data) const;
+	DataSet* integrateAll(DataSet* data) const;
+	int findMinimumBin(TH1D* data) const;
+	int findDriftTime(const TH1D& data, int threshold) const;
+	TH1D* calculateDriftTimeSpectrum(DataSet* data) const;
 
 	void calibrate(TString triggerDataFile);
 	void writeResults(const DataSet& raw, const DataSet& integrated);

@@ -73,7 +73,7 @@ Archive::~Archive()
  *
  * @return integer number of events that are stored in this archive
  */
-int Archive::getSize()
+int Archive::getSize() const
 {
 	return _numberOfEntries;
 }
@@ -91,7 +91,7 @@ int Archive::getSize()
  *
  * @warning Pointer to original DataSet, delete with care.
  */
-DataSet* Archive::getRawData()
+DataSet* Archive::getRawData() const
 {
 	return _rawData;
 }
@@ -113,7 +113,7 @@ DataSet* Archive::getRawData()
  * @warning Not filled with actual TH1 objects until DataProcessor integrated
  * raw data
  */
-DataSet* Archive::getProcessedData()
+DataSet* Archive::getProcessedData() const
 {
 	return _processedData;
 }
@@ -151,7 +151,7 @@ void Archive::setProcessedData(DataSet* data)
  *
  * @require event < #events_total
  */
-TH1D* Archive::getEvent(int event)
+TH1D* Archive::getEvent(int event) const
 {
 	try
 	{
@@ -160,6 +160,7 @@ TH1D* Archive::getEvent(int event)
 	catch(Exception& e)
 	{
 		cerr << e.error() << endl;
+		return nullptr;
 	}
 }
 
