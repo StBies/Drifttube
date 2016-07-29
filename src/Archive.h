@@ -8,14 +8,14 @@
 #ifndef SRC_ARCHIVE_H_
 #define SRC_ARCHIVE_H_
 
+#include <iostream>
+#include <memory>
+#include <sstream>
 #include "TH1D.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
-#include <iostream>
 #include "DataSet.h"
-#include <sstream>
-#include "omp.h"
 
 using namespace std;
 
