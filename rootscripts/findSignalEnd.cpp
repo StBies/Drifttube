@@ -44,6 +44,7 @@ void findSignalEnd(TString filename)
 	sum /= tree->GetEntries();
 
 	int nEntries = tree->GetEntries();
+	int saturation = 0;
 	for (int i = 0; i < nEntries; i++)
 	{
 		minimumpos = 0;
@@ -96,9 +97,15 @@ void findSignalEnd(TString filename)
 				pos = j;
 			}
 		}
+		if (minheight < -2175 && minheight >= -2250)
+		{
+			cout << i << endl;
+			saturation++;
+		}
 		params->Fill();
 
 	}
+	cout << "Percent of saturation events: " <<(double)saturation / (double)nEntries * 100 << endl;;
 
 	test->cd();
 	params->Write();

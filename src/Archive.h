@@ -16,6 +16,7 @@
 #include "TTree.h"
 #include "TString.h"
 #include "DataSet.h"
+#include "DataPresenceException.h"
 
 using namespace std;
 
@@ -39,8 +40,12 @@ public:
 	DataSet* getRawData() const;
 	DataSet* getProcessedData() const;
 	TH1D* getEvent(int event) const;
+	TH1D* getDrifttimeSpectrum() const;
+	TH1D* getRtRelation() const;
 
 	void setProcessedData(DataSet* data);
+	void setDifttimeSpect(TH1D* spect);
+	void setRtRelation(TH1D* data);
 
 private:
 	TH1D* convertEntryToHistogram(int entry,TTree* tree);
@@ -53,9 +58,14 @@ private:
 
 	DataSet* _rawData;
 	DataSet* _processedData;
+	TH1D* _drifttimeSpect;
+	TH1D* _rtRelation;
 	TString _directory;
 	TString _file;
 	int _numberOfEntries;
+	bool _dtFilled;
+	bool _rtFilled;
+	bool _integralsFilled;
 };
 
 #endif /* SRC_ARCHIVE_H_ */

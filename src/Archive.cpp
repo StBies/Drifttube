@@ -21,6 +21,9 @@ using namespace std;
  */
 Archive::Archive(TString filename)
 {
+	_rtFilled = false;
+	_dtFilled = false;
+	_integralsFilled = false;
 	TFile file(filename,"read");
 	TTree* tree = (TTree*)file.Get("Tfadc");
 	cout << "Reading tree" << endl;
@@ -97,6 +100,7 @@ DataSet* Archive::getRawData() const
 }
 
 //TODO overhaul
+//TODO exceptionhandling
 /**
  * Getter method for the processed data DataSet. Returns a DataSet* object pointer
  * containing the processed data
@@ -132,6 +136,7 @@ DataSet* Archive::getProcessedData() const
 void Archive::setProcessedData(DataSet* data)
 {
 	_processedData = data;
+	_integralsFilled = true;
 }
 
 /**
@@ -165,6 +170,92 @@ TH1D* Archive::getEvent(int event) const
 }
 
 /**
+ * Returns the spectrum of drifttimes as TH1D* histogram if present, throws an DataPresenceException else.
+ *
+ * @brief Getter method for DT spectrum
+ *
+ * @author Stefan
+ * @date August 1, 2016
+ * @version 0.1
+ *
+ * @return TH1D* pointer to the drifttime spectrum
+ *
+ * @warning If the spectrum was not yet set, a DataPresenceException is thrown.
+ */
+TH1D* Archive::getDrifttimeSpectrum() const
+{
+	if (_dtFilled)
+	{
+		return _drifttimeSpect;
+	}
+	else
+	{
+		throw DataPresenceException();
+	}
+}
+
+/**
+ * Returns the radius-drifttime relation as TH1D* histogram if present, throws an DataPresenceException else.
+ *
+ * @brief Getter method for rt relation
+ *
+ * @author Stefan
+ * @date August 1, 2016
+ * @version 0.1
+ *
+ * @return TH1D* pointer to the rt relation
+ *
+ * @warning If the relation was not yet set, a DataPresenceException is thrown.
+ */
+TH1D* Archive::getRtRelation() const
+{
+	if (_rtFilled)
+	{
+		return _rtRelation;
+	}
+	else
+	{
+		throw DataPresenceException();
+	}
+}
+
+/**
+ * Stores a calculated drifttime spectrum in the Archive.
+ *
+ * @brief Setter method for the drifttime spectrum
+ *
+ * @author Stefan
+ * @date August 1, 2016
+ * @version 0.1
+ *
+ * @param spect Pointer to the TH1D histogram containing the drifttime spectrum
+ */
+void Archive::setDifttimeSpect(TH1D* spect)
+{
+	_dtFilled = true;
+	_drifttimeSpect = spect;
+}
+
+
+/**
+ * Stores a calculated radius-drifttime relation in the Archive object.
+ *
+ * @brief Setter method for the rt relation
+ *
+ * @author Stefan
+ * @date August 1, 2016
+ * @version 0.1
+ *
+ * @param data Pointer to the histogram that is to be stored
+ *
+ */
+void Archive::setRtRelation(TH1D* data)
+{
+	_rtFilled = true;
+	_rtRelation = data;
+}
+
+/**
  * Writes the histograms to a file, that is specified with parameter filename.
  *
  * @brief Write data to file
@@ -182,6 +273,8 @@ void Archive::writeToFile(TString filename)
 	TFile file(filename,"recreate");
 	file.mkdir("rawData");
 	file.mkdir("integrated");
+	file.mkdir("dtSpect");
+	file.mkdir("rtRelation");
 
 	TH1D* hist = nullptr;
 	TH1D* integral = nullptr;
@@ -195,6 +288,10 @@ void Archive::writeToFile(TString filename)
 		file.cd("integrated");
 		integral->Write();
 	}
+	file.cd("dtSpect");
+	_drifttimeSpect->Write();
+	file.cd("rtRelation");
+	_rtRelation->Write();
 	file.Close();
 	cout << "Saving complete" << endl;
 }

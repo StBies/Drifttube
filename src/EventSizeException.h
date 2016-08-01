@@ -8,7 +8,6 @@
 #ifndef EVENTSIZEEXCEPTION_H_
 #define EVENTSIZEEXCEPTION_H_
 
-#include <string>
 #include <sstream>
 #include "Exception.h"
 

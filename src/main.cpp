@@ -70,6 +70,10 @@ int main(int argc, char** argv)
 	TH1D* integral = integralSet->getEvent(1);
 	TH1D* rt = processor.integrate(spect);
 
+	archive->setDifttimeSpect(spect);
+	archive->setRtRelation(rt);
+	cout << "here" << endl;
+
 	delete archive;
 
 	return 0;
