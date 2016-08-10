@@ -51,6 +51,7 @@ int main(int argc, char** argv)
 
 	DataSet* dataSet = archive->getRawData();
 	DataSet* integralSet = processor.integrateAll(dataSet);
+	processor.writeResults(*dataSet,*integralSet);
 	archive->setProcessedData(integralSet);
 	TH1D* spect = processor.calculateDriftTimeSpectrum(dataSet);
 
@@ -72,7 +73,6 @@ int main(int argc, char** argv)
 
 	archive->setDifttimeSpect(spect);
 	archive->setRtRelation(rt);
-	cout << "here" << endl;
 
 	delete archive;
 

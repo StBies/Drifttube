@@ -35,6 +35,8 @@ public:
 	int getSize() const;
 	TH1D* getEvent(int event) const;
 
+//	DataSet& operator+(DataSet& data) const;
+
 private:
 	int _size;
 	vector<TH1D*> _data;

@@ -262,3 +262,54 @@ void DataProcessor::calibrate(const TString triggerDataFile)
 	calibTree.Write();
 	calib.Close();
 }
+
+//TODO comment
+//TODO handle filename and location where it will be saved
+void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated) const
+{
+	TFile* file = new TFile("testparams.root","recreate");
+	TTree* params = new TTree("params","extracted parameters");
+
+	int drifttime;
+	int endPos;
+	int minimumpos;
+	int minheight;
+	double integralmin;
+
+	params->Branch("Drifttime", &drifttime, "drifttime/I");
+	params->Branch("signalEnd", &endPos, "signalEnd/I");
+	params->Branch("minimum", &minimumpos, "minimumpos/I");
+	params->Branch("minimumheight", &minheight, "minheight/I");
+	params->Branch("integralminimumheight", &integralmin, "integralmin/D");
+
+	const int nEvents = raw.getSize();
+
+	for(int i = 0; i < nEvents; i++)
+	{
+		drifttime = 0;
+		endPos = 0;
+		minimumpos = 0;
+		minheight = 0;
+		integralmin = 0;
+
+		try
+		{
+			TH1D* rawHist = raw.getEvent(i);
+			TH1D* intHist = integrated.getEvent(i);
+
+			drifttime = findDriftTime(*rawHist,50);
+			minimumpos = findMinimumBin(rawHist);
+			minheight = rawHist->GetBinContent(minimumpos);
+			endPos = findMinimumBin(intHist);
+			integralmin = intHist->GetBinContent(endPos);
+		}
+		catch(Exception& e)
+		{
+			cerr << e.error() << endl;
+		}
+		params->Fill();
+	}
+	params->Write();
+	file->Close();
+	cout << "writing short param tree done" << endl;
+}

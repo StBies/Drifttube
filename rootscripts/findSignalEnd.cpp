@@ -21,6 +21,7 @@ void findSignalEnd(TString filename)
 	int minimumpos;
 	int minheight;
 	double integralmin;
+	int integralminpos;
 	params->Branch("Drifttime", &drifttime, "drifttime/I");
 	params->Branch("signalEnd", &pos, "signalEnd/I");
 	params->Branch("minimum", &minimumpos, "minimumpos/I");
@@ -47,6 +48,7 @@ void findSignalEnd(TString filename)
 	int saturation = 0;
 	for (int i = 0; i < nEntries; i++)
 	{
+		integralminpos = 0;
 		minimumpos = 0;
 		minheight = 0;
 		drifttime = 0;
@@ -72,6 +74,7 @@ void findSignalEnd(TString filename)
 			if (integral < integralmin)
 			{
 				integralmin = integral;
+				integralminpos = j;
 			}
 		}
 
@@ -88,8 +91,8 @@ void findSignalEnd(TString filename)
 
 		//find, where threshold is last succeeded
 		pos = 0;
-		double threshold = offset - 0.3 * abs(minheight);
-
+//		double threshold = offset - 0.3 * abs(minheight);
+		double threshold = offset - 100;
 		for (int j = 0; j < nch - 1; j++)
 		{
 			if (voltage[j] < threshold && voltage[j + 1] >= threshold)
@@ -97,6 +100,8 @@ void findSignalEnd(TString filename)
 				pos = j;
 			}
 		}
+		//TODO overhaul
+		pos = integralminpos;
 		if (minheight < -2175 && minheight >= -2250)
 		{
 			cout << i << endl;
