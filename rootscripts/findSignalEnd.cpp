@@ -28,9 +28,9 @@ void findSignalEnd(TString filename)
 	params->Branch("minimumheight", &minheight, "minheight/I");
 	params->Branch("integralminimumheight", &integralmin, "integralmin/D");
 
-	const int nch;
-	tree->SetBranchAddress("nchannels", &nch);
-	tree->GetEntry(0);
+	const int nch = 800;
+//	tree->SetBranchAddress("nchannels", &nch);
+//	tree->GetEntry(0);
 
 	//find offset
 	double sum = 0;

@@ -1,5 +1,4 @@
 #include "DataProcessor.h"
-#include <cmath>
 
 using namespace std;
 
@@ -78,6 +77,7 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 	Int_t nBins = data->GetNbinsX();
 	Double_t* binLowEdges = new Double_t[nBins + 1];
 
+//	#pragma omp parallel for
 	for (Int_t i = 0; i <= nBins; i++)
 	{
 		binLowEdges[i] = data->GetBinLowEdge(i);
@@ -99,6 +99,8 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 
 	double integral = 0.0;
 
+	//TODO check, why this doesn't work
+//	#pragma omp parallel for reduction(+:integral) shared(result,binWidth)
 	for (int i = 0; i <= nBins; i++)
 	{
 		integral += data->GetBinContent(i) * binWidth;
@@ -124,7 +126,11 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 DataSet* DataProcessor::integrateAll(DataSet* data) const
 {
 	DataSet* result = new DataSet();
-	//TODO check why element data[size-1] is already corrupted
+	//TODO seems like this SOMETIMES crashes in parallel AFTER FINISHING THE PROGRAM
+	//TODO crashes sometimes when writing the file since this resulting DataSet has
+	// a smaller size than incoming data
+	//TODO no idea what happens there
+//	#pragma omp parallel for shared(result)
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;

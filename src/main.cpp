@@ -5,6 +5,7 @@
 #include "DataProcessor.h"
 #include "Archive.h"
 #include "TFile.h"
+#include "omp.h"
 
 
 using namespace std;
@@ -44,34 +45,30 @@ int main(int argc, char** argv)
 	DataProcessor processor;
 
 	TString filename = args.infilename;
-	cout << "using file: " << filename << endl;;
+	cout << "using file: " << filename << endl;
+
+	double beginRuntime = omp_get_wtime();
 
 	Archive* archive = new Archive(filename);
 
 	DataSet* dataSet = archive->getRawData();
 	DataSet* integralSet = processor.integrateAll(dataSet);
-	processor.writeResults(*dataSet,*integralSet);
 	archive->setProcessedData(integralSet);
 	TH1D* spect = processor.calculateDriftTimeSpectrum(dataSet);
 
 	cout << "Data size is " << dataSet->getSize() << endl;
 	cout << "Integral size is " << integralSet->getSize() << endl;
 
-	TH1D* data;
-	try
-	{
-		data = dataSet->getEvent(1);
-	}
-	catch(Exception& e)
-	{
-		cerr << e.error() << endl;
-	}
-
 	TH1D* integral = integralSet->getEvent(1);
 	TH1D* rt = processor.integrate(spect);
 
 	archive->setDifttimeSpect(spect);
 	archive->setRtRelation(rt);
+
+	double endRuntime = omp_get_wtime();
+
+	cout << "Computation without saving took " << endRuntime - beginRuntime << " seconds" << endl;
+	processor.writeResults(*dataSet,*integralSet);
 
 	delete archive;
 
