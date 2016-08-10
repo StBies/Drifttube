@@ -41,7 +41,6 @@ int main(int argc, char** argv)
 {
 	ParsedArgs args = parseCmdArgs(argc,argv);
 	TH1::AddDirectory(kFALSE);
-//	TApplication* app = new TApplication("main",&argc,argv);
 	DataProcessor processor;
 
 	TString filename = args.infilename;

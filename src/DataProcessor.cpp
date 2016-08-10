@@ -44,10 +44,7 @@ DataProcessor::~DataProcessor()
  */
 Double_t DataProcessor::computeIntegral(const TH1D& data) const
 {
-	//Double_t nBins;
 	Double_t counter = 0;
-
-	//nBins = data.GetNbinsX();
 
 	//TODO check if parallelization is of use here
 
@@ -263,8 +260,21 @@ void DataProcessor::calibrate(const TString triggerDataFile)
 	calib.Close();
 }
 
-//TODO comment
 //TODO handle filename and location where it will be saved
+/**
+ * A method to write some parameters like drifttime, position of signalend, position of voltage minimum as well as minimum
+ * height and the height of the minimum of the integral to disk. The resulting .root file will contain a tree with those
+ * parameters for each event in the given DataSets.
+ *
+ * @brief writes some extracted parameters to disk
+ *
+ * @author Stefan
+ * @date August 10, 2016
+ * @version 0.2
+ *
+ * @param raw raw data DataSet
+ * @param integrated integrated data DataSet
+ */
 void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated) const
 {
 	TFile* file = new TFile("testparams.root","recreate");
@@ -311,5 +321,6 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated) 
 	}
 	params->Write();
 	file->Close();
+	//TODO check if, I can handle memory myself. For now, ROOT deletes file and params
 	cout << "writing short param tree done" << endl;
 }
