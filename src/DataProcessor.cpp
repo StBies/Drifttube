@@ -125,27 +125,31 @@ TH1D* DataProcessor::integrate(TH1D* data) const
  */
 DataSet* DataProcessor::integrateAll(DataSet* data) const
 {
-	DataSet* result = new DataSet();
-	//TODO seems like this SOMETIMES crashes in parallel AFTER FINISHING THE PROGRAM
-	//TODO crashes sometimes when writing the file since this resulting DataSet has
-	// a smaller size than incoming data
-	//TODO no idea what happens there
-//	#pragma omp parallel for shared(result)
+//	DataSet* result = new DataSet();
+	vector<TH1D*>* set = new vector<TH1D*>;
+	set->resize(data->getSize());
+
+	#pragma omp parallel for shared(set)
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;
 		try
 		{
 			TH1D* integral = integrate(data->getEvent(i));
-			result->addData(integral);
+			//Writing with dynamic memory allocation needs to be critical flagged
+			//TODO change to index based writing
+//			#pragma omp critical
+//			{
+//				result->addData(integral);
+//			}
+			(*set)[i] = integral;
 		}
 		catch(Exception& e)
 		{
 			cerr << e.error() << endl;
 		}
 	}
-
-	return result;
+	return new DataSet(set);
 }
 
 
