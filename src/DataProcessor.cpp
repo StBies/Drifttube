@@ -117,6 +117,10 @@ TH1D* DataProcessor::integrate(TH1D* data) const
  *
  * @brief Integrate all data in an array
  *
+ * @author Stefan
+ * @date August 12, 2016
+ * @version 0.8
+ *
  * @param data Pointer to the DataSet object that is to be integrated
  *
  * @return Pointer to a DataSet type object containing the processed data
