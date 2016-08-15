@@ -136,7 +136,7 @@ DataSet* DataProcessor::integrateAll(DataSet* data) const
 	#pragma omp parallel for shared(set)
 	for(int i = 0; i < data->getSize(); i++)
 	{
-		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;
+//		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;
 		try
 		{
 			TH1D* integral = integrate(data->getEvent(i));
