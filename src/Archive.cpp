@@ -332,14 +332,14 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	TString name(s.str());
 
 	TH1D* rawData = new TH1D(name,"FADC data", numberOfChannels, 0,
-			numberOfChannels);
+			numberOfChannels*4);
 
 	#pragma omp parallel for
 	for (int i = 0; i < numberOfChannels; i++)
 	{
 		rawData->SetBinContent(i, voltage[i] - 2200); //minus offset
 	}
-	rawData->GetXaxis()->SetTitle("channel number");
+	rawData->GetXaxis()->SetTitle("time [ns]");
 	rawData->GetYaxis()->SetTitle("voltage [a.u.]");
 
 	return rawData;
