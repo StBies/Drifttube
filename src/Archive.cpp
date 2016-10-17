@@ -5,6 +5,7 @@
  */
 
 #include "Archive.h"
+#include "globals.h"
 
 using namespace std;
 
@@ -304,8 +305,8 @@ void Archive::writeToFile(TString filename)
  * @brief Convert data from tree to histogram
  *
  * @author Stefan
- * @date June 22, 2016
- * @version 0.1
+ * @date October 17, 2016
+ * @version 0.9
  *
  * @param entry Number of the entry, you want to convert. Must be smaller than the number of entries in the tree
  * @param tree Pointer to the TTree containing the raw data
@@ -316,12 +317,7 @@ void Archive::writeToFile(TString filename)
  */
 TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 {
-	//Not reading this entry from the tree makes the program be run in seconds
-	//instead of hours!!!!
-	//No idea why, HELP WANTED
 	const int numberOfChannels = 800;
-//	tree->SetBranchAddress("nchannels", &numberOfChannels);
-//	tree->GetEntry(0);
 
 	double voltage[800];
 	tree->SetBranchAddress("Voltage", &voltage);
@@ -332,15 +328,15 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	TString name(s.str());
 
 	TH1D* rawData = new TH1D(name,"FADC data", numberOfChannels, 0,
-			numberOfChannels*4);
+			numberOfChannels * ADC_BINS_TO_TIME);
 
 	#pragma omp parallel for
 	for (int i = 0; i < numberOfChannels; i++)
 	{
-		rawData->SetBinContent(i, voltage[i] - 2200); //minus offset
+		rawData->SetBinContent(i, (voltage[i] - 2200)*ADC_CHANNELS_TO_VOLTAGE); //minus offset
 	}
 	rawData->GetXaxis()->SetTitle("time [ns]");
-	rawData->GetYaxis()->SetTitle("voltage [a.u.]");
+	rawData->GetYaxis()->SetTitle("voltage [V]");
 
 	return rawData;
 }

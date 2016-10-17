@@ -1,4 +1,5 @@
 #include "DataProcessor.h"
+#include "globals.h"
 
 using namespace std;
 
@@ -178,8 +179,8 @@ inline int DataProcessor::findMinimumBin(TH1D* data) const
  * The result is a histogram containing the spectrum.
  *
  * @author Stefan
- * @date July 13, 2016
- * @version 0.3
+ * @date October 17, 2016
+ * @version 0.9
  *
  * @param data Pointer to a DataSet object containing the raw data out of which the spectrum is to be calculated
  *
@@ -191,35 +192,36 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 	//TODO parallel?
 
 	int triggerpos = 0;
-	TH1D* result = new TH1D("Drifttime spectrum","TDC spectrum",250,0,750);
+	TH1D* result = new TH1D("Drifttime spectrum","TDC spectrum",800,0,800 * ADC_BINS_TO_TIME);
 
 //	#pragma omp parallel for
 	for(int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);
-		int diff  = findDriftTime(*event,-50) - triggerpos ;
-		result->Fill(diff);
+		int diff  = findDriftTime(*event,-50 * ADC_CHANNELS_TO_VOLTAGE) - triggerpos ;
+		result->Fill(diff * ADC_BINS_TO_TIME);
 	}
 
 	return result;
 }
 
 /**
- * Finds the bin number in a passed histogram, in which a passed, integer threshold is surpassed.
+ * Finds the bin number in a passed histogram, in which a passed threshold in volt is surpassed.
  * The threshold should be negative since it only checks, when signals are LOWER than the given threshold.
  * However, a positive threshold will be multiplied with -1 internally.
  *
  * @author Stefan
- * @data July 13, 2016
- * @version 0.1
+ * @data October 17, 2016
+ * @version 0.9
  *
  * @param data Pointer to a TH1D histogram where the first occurance of a signal bigger than threshold is to be found
- * @param threshold that is to be surpassed. Should be given negative, positive values are multiplied by -1 internally
+ * @param threshold in volt that is to be surpassed. Should be given negative, positive values are multiplied by -1 internally
  *
  * @return Bin number of the first occurance of a signal larger than threshold
  */
-int DataProcessor::findDriftTime(const TH1D& data,int threshold) const
+int DataProcessor::findDriftTime(const TH1D& data,double threshold) const
 {
+	//if threshold given positive, change sign
 	threshold *= (threshold < 0 ? 1 : -1);
 
 	for(int i = 0; i < data.GetNbinsX(); i++)
