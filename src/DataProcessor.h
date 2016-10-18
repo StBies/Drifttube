@@ -9,6 +9,7 @@
 #include "EventSizeException.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "globals.h"
 
 
 
@@ -38,7 +39,7 @@ public:
 	TH1D* calculateDriftTimeSpectrum(DataSet* data) const;
 
 	void calibrate(TString triggerDataFile);
-	void writeResults(const DataSet& raw, const DataSet& integrated) const;
+	void writeResults(const DataSet& raw, const DataSet& integrated, const TString filename, const TString dirname) const;
 };
 
 #endif //DATAPROCESSOR_H_

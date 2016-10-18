@@ -188,11 +188,10 @@ inline int DataProcessor::findMinimumBin(TH1D* data) const
  */
 TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 {
-	//TODO fully implement and test
-	//TODO parallel?
-
 	int triggerpos = 0;
-	TH1D* result = new TH1D("Drifttime spectrum","TDC spectrum",800,0,800 * ADC_BINS_TO_TIME);
+	TH1D* result = new TH1D("Drifttime spectrum","Drift time spectrum",800,0,800 * ADC_BINS_TO_TIME);
+	result->GetXaxis()->SetTitle("drift time [ns]");
+	result->GetYaxis()->SetTitle("frequency");
 
 //	#pragma omp parallel for
 	for(int i = 0; i < data->getSize(); i++)
@@ -291,9 +290,13 @@ void DataProcessor::calibrate(const TString triggerDataFile)
  * @param raw raw data DataSet
  * @param integrated integrated data DataSet
  */
-void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated) const
+void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, const TString filename, const TString dirname) const
 {
-	TFile* file = new TFile("testparams.root","recreate");
+	stringstream name;
+	name << dirname << "converted_" << filename;
+	TString outFilename(name.str());
+
+	TFile* file = new TFile(outFilename,"recreate");
 	TTree* params = new TTree("params","extracted parameters");
 
 	int drifttime;
@@ -323,7 +326,7 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated) 
 			TH1D* rawHist = raw.getEvent(i);
 			TH1D* intHist = integrated.getEvent(i);
 
-			drifttime = findDriftTime(*rawHist,50);
+			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE );
 			minimumpos = findMinimumBin(rawHist);
 			minheight = rawHist->GetBinContent(minimumpos);
 			endPos = findMinimumBin(intHist);

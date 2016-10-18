@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 	double endRuntime = omp_get_wtime();
 
 	cout << "Computation without saving took " << endRuntime - beginRuntime << " seconds" << endl;
-	processor.writeResults(*dataSet,*integralSet);
+	processor.writeResults(*dataSet,*integralSet,archive->getFilename(),archive->getDirname());
 
 	delete archive;
 

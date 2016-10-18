@@ -5,6 +5,14 @@
  *      Author: stefan
  */
 
+
+/**
+ * Header containing globally available data constants, that are needed within the program
+ *
+ * @author Stefan
+ * @date October 18, 2016
+ * @version 0.8
+ */
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 

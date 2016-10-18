@@ -221,6 +221,38 @@ TH1D* Archive::getRtRelation() const
 }
 
 /**
+ * Returns the filename in a TString
+ *
+ * @brief Getter method for the filename
+ *
+ * @author Stefan
+ * @data October 18, 2016
+ * @version 1.0
+ *
+ * @return TString containing filename
+ */
+TString Archive::getFilename() const
+{
+	return _file;
+}
+
+/**
+ * Returns the directoryname in a TString
+ *
+ * @brief Getter method for the directoryname
+ *
+ * @author Stefan
+ * @data October 18, 2016
+ * @version 1.0
+ *
+ * @return TString containing directoryname
+ */
+TString Archive::getDirname() const
+{
+	return _directory;
+}
+
+/**
  * Stores a calculated drifttime spectrum in the Archive.
  *
  * @brief Setter method for the drifttime spectrum

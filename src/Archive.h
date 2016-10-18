@@ -42,6 +42,8 @@ public:
 	TH1D* getEvent(int event) const;
 	TH1D* getDrifttimeSpectrum() const;
 	TH1D* getRtRelation() const;
+	TString getFilename() const;
+	TString getDirname() const;
 
 	void setProcessedData(DataSet* data);
 	void setDifttimeSpect(TH1D* spect);
