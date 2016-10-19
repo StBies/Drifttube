@@ -100,8 +100,6 @@ DataSet* Archive::getRawData() const
 	return _rawData;
 }
 
-//TODO overhaul
-//TODO exceptionhandling
 /**
  * Getter method for the processed data DataSet. Returns a DataSet* object pointer
  * containing the processed data
@@ -109,18 +107,24 @@ DataSet* Archive::getRawData() const
  * @brief raw data getter method
  *
  * @author Stefan
- * @date June 20, 2016
- * @version 0.2
+ * @date October 19, 2016
+ * @version 0.9
  *
  * @return DataSet* containing histograms for all events
  *
  * @warning Pointer to original object, delete with care.
- * @warning Not filled with actual TH1 objects until DataProcessor integrated
- * raw data
+ * @warning Throws an exception, if processed (integrated) data is not yet present
  */
 DataSet* Archive::getProcessedData() const
 {
-	return _processedData;
+	if(_integralsFilled)
+	{
+		return _processedData;
+	}
+	else
+	{
+		throw DataPresenceException();
+	}
 }
 
 /**
@@ -237,15 +241,15 @@ TString Archive::getFilename() const
 }
 
 /**
- * Returns the directoryname in a TString
+ * Returns the directory name, where the original, raw data is, in a TString.
  *
- * @brief Getter method for the directoryname
+ * @brief Getter method for the directory name
  *
  * @author Stefan
  * @data October 18, 2016
  * @version 1.0
  *
- * @return TString containing directoryname
+ * @return TString containing directory name
  */
 TString Archive::getDirname() const
 {
