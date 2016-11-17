@@ -273,6 +273,23 @@ void Archive::setDifttimeSpect(TH1D* spect)
 	_drifttimeSpect = spect;
 }
 
+/**
+ * Stores a calculated derivative of a drifttime spectrum in the Archive.
+ *
+ * @brief Setter method for the derivative of the drifttime spectrum
+ *
+ * @author Stefan
+ * @date November 17, 2016
+ * @version 0.1
+ *
+ * @param spect Pointer to the TH1D histogram containing the derivative of the drifttime spectrum
+ */
+void Archive::setDiffDrifttimeSpect(TH1D* spect)
+{
+	_diffDtFilled = true;
+	_diffDtSpect = spect;
+}
+
 
 /**
  * Stores a calculated radius-drifttime relation in the Archive object.
@@ -312,6 +329,7 @@ void Archive::writeToFile(TString filename)
 	file.mkdir("integrated");
 	file.mkdir("dtSpect");
 	file.mkdir("rtRelation");
+	file.mkdir("diffDriftTime");
 
 	TH1D* hist = nullptr;
 	TH1D* integral = nullptr;
@@ -327,6 +345,8 @@ void Archive::writeToFile(TString filename)
 	}
 	file.cd("dtSpect");
 	_drifttimeSpect->Write();
+	file.cd("diffDriftTime");
+	_diffDtSpect->Write();
 	file.cd("rtRelation");
 	_rtRelation->Write();
 	file.Close();

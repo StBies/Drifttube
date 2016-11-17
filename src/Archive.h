@@ -47,6 +47,7 @@ public:
 
 	void setProcessedData(DataSet* data);
 	void setDifttimeSpect(TH1D* spect);
+	void setDiffDrifttimeSpect(TH1D* spect);
 	void setRtRelation(TH1D* data);
 
 private:
@@ -62,12 +63,14 @@ private:
 	DataSet* _processedData;
 	TH1D* _drifttimeSpect;
 	TH1D* _rtRelation;
+	TH1D* _diffDtSpect;
 	TString _directory;
 	TString _file;
 	int _numberOfEntries;
 	bool _dtFilled;
 	bool _rtFilled;
 	bool _integralsFilled;
+	bool _diffDtFilled;
 };
 
 #endif /* SRC_ARCHIVE_H_ */

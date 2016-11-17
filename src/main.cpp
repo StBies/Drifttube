@@ -56,14 +56,12 @@ int main(int argc, char** argv)
 	archive->setProcessedData(integralSet);
 	TH1D* spect = processor.calculateDriftTimeSpectrum(dataSet);
 
-	cout << "Data size is " << dataSet->getSize() << endl;
-	cout << "Integral size is " << integralSet->getSize() << endl;
-
-	TH1D* integral = integralSet->getEvent(1);
 	TH1D* rt = processor.integrate(spect);
+	TH1D* derivSpec = processor.derivate(spect);
 
 	archive->setDifttimeSpect(spect);
 	archive->setRtRelation(rt);
+	archive->setDiffDrifttimeSpect(derivSpec);
 
 	double endRuntime = omp_get_wtime();
 
