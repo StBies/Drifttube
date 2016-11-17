@@ -112,6 +112,39 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 }
 
 /**
+ * Calculate the derivative of a plot given as histogram.
+ *
+ * @author Stefan
+ * @date November 17,2016
+ * @version 0.1
+ *
+ * @param data Pointer to the histogram containing the data, on that the derivative is to be calculated
+ *
+ * @return Histogram containing the derivative
+ */
+TH1D* DataProcessor::derivate(TH1D* data) const
+{
+	Int_t nBins = data->GetNbinsX();
+	Double_t* binLowEdges = new Double_t[nBins + 1];
+	TString name = data->GetName();
+	name.Append(" (derivative)");
+
+	for (Int_t i = 0; i <= nBins; i++)
+	{
+		binLowEdges[i] = data->GetBinLowEdge(i);
+	}
+
+	TH1D* result = new TH1D(name,"derivative",nBins,binLowEdges);
+
+	for(int i = 0; i < nBins - 1; i++)
+	{
+		double differentialQuotient = (data->GetBinContent(i+1) - data->GetBinContent(i)) / (double)ADC_BINS_TO_TIME;
+		result->SetBinContent(i,differentialQuotient);
+	}
+	return result;
+}
+
+/**
  * Integrates all histograms, that are passed to this method in form of an array of
  * pointers to TH1 type objects. The resulting objects are written to the passed array
  * storage
