@@ -8,7 +8,7 @@ void findSignalEnd(TString filename)
 	TFile* file = new TFile(filename, "read");
 	TTree* tree = (TTree*) file->Get("Tfadc");
 
-	TString ofName = "converted_";
+	TString ofName = "convertedTest_";
 	ofName.Append(st);
 	TString filename_out(st2);
 	filename_out.Append(ofName);
