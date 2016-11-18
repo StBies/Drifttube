@@ -237,6 +237,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 	return result;
 }
 
+//TODO decide, if this should return the "real time" in nanoseconds instead of the bin number
 /**
  * Finds the bin number in a passed histogram, in which a passed threshold in volt is surpassed.
  * The threshold should be negative since it only checks, when signals are LOWER than the given threshold.
@@ -361,7 +362,7 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 			TH1D* rawHist = raw.getEvent(i);
 			TH1D* intHist = integrated.getEvent(i);
 
-			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE );
+			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME;
 			minimumpos = findMinimumBin(rawHist) * ADC_BINS_TO_TIME;
 			minheight = rawHist->GetBinContent(minimumpos);
 			endPos = findMinimumBin(intHist) * ADC_BINS_TO_TIME;
