@@ -363,10 +363,11 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 			TH1D* intHist = integrated.getEvent(i);
 
 			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME;
-			minimumpos = findMinimumBin(rawHist) * ADC_BINS_TO_TIME;
+			minimumpos = findMinimumBin(rawHist);
 			minheight = rawHist->GetBinContent(minimumpos);
 			endPos = findMinimumBin(intHist) * ADC_BINS_TO_TIME;
 			integralmin = intHist->GetBinContent(endPos);
+			minimumpos *= ADC_BINS_TO_TIME;
 		}
 		catch(Exception& e)
 		{
