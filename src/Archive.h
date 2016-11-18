@@ -17,6 +17,7 @@
 #include "TString.h"
 #include "DataSet.h"
 #include "DataPresenceException.h"
+#include "globals.h"
 
 using namespace std;
 
@@ -41,6 +42,7 @@ public:
 	DataSet* getProcessedData() const;
 	TH1D* getEvent(int event) const;
 	TH1D* getDrifttimeSpectrum() const;
+	TH1D* getDtDerivative() const;
 	TH1D* getRtRelation() const;
 	TString getFilename() const;
 	TString getDirname() const;

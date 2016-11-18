@@ -199,6 +199,30 @@ TH1D* Archive::getDrifttimeSpectrum() const
 	}
 }
 
+
+/**
+ * Returns the derivative of the drift time spectrum as TH1D* histogram if it is present, if not an exception is thrown.
+ *
+ * @author Stefan
+ * @date November 18, 2017
+ * @version 0.9
+ *
+ * @return Pointer to the TH1D* type histogram containing the derivative.
+ *
+ * @warning If it is not yet set, a DataPrsenceException is thrown.
+ */
+TH1D* Archive::getDtDerivative() const
+{
+	if (_diffDtFilled)
+		{
+			return _diffDtSpect;
+		}
+		else
+		{
+			throw DataPresenceException();
+		}
+}
+
 /**
  * Returns the radius-drifttime relation as TH1D* histogram if present, throws an DataPresenceException else.
  *

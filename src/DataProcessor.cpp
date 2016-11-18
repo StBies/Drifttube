@@ -1,5 +1,4 @@
 #include "DataProcessor.h"
-#include "globals.h"
 
 using namespace std;
 
@@ -141,6 +140,7 @@ TH1D* DataProcessor::derivate(TH1D* data) const
 		double differentialQuotient = (data->GetBinContent(i+1) - data->GetBinContent(i)) / (double)ADC_BINS_TO_TIME;
 		result->SetBinContent(i,differentialQuotient);
 	}
+
 	return result;
 }
 
@@ -308,7 +308,7 @@ void DataProcessor::calibrate(const TString triggerDataFile)
 	calib.Close();
 }
 
-//TODO handle filename and location where it will be saved
+
 /**
  * A method to write some parameters like drifttime, position of signalend, position of voltage minimum as well as minimum
  * height and the height of the minimum of the integral to disk. The resulting .root file will contain a tree with those
@@ -317,11 +317,13 @@ void DataProcessor::calibrate(const TString triggerDataFile)
  * @brief writes some extracted parameters to disk
  *
  * @author Stefan
- * @date August 10, 2016
- * @version 0.2
+ * @date November 18, 2016
+ * @version 0.5
  *
  * @param raw raw data DataSet
  * @param integrated integrated data DataSet
+ * @param filename parsed filename of the raw data .root file from the FADC
+ * @param dirname parsed directory name of the raw data .root file relative to the location from where the program is called
  */
 void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, const TString filename, const TString dirname) const
 {
@@ -335,13 +337,13 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 	int drifttime;
 	int endPos;
 	int minimumpos;
-	int minheight;
+	double minheight;
 	double integralmin;
 
 	params->Branch("Drifttime", &drifttime, "drifttime/I");
 	params->Branch("signalEnd", &endPos, "signalEnd/I");
 	params->Branch("minimum", &minimumpos, "minimumpos/I");
-	params->Branch("minimumheight", &minheight, "minheight/I");
+	params->Branch("minimumheight", &minheight, "minheight/D");
 	params->Branch("integralminimumheight", &integralmin, "integralmin/D");
 
 	const int nEvents = raw.getSize();
@@ -360,9 +362,9 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 			TH1D* intHist = integrated.getEvent(i);
 
 			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE );
-			minimumpos = findMinimumBin(rawHist);
+			minimumpos = findMinimumBin(rawHist) * ADC_BINS_TO_TIME;
 			minheight = rawHist->GetBinContent(minimumpos);
-			endPos = findMinimumBin(intHist);
+			endPos = findMinimumBin(intHist) * ADC_BINS_TO_TIME;
 			integralmin = intHist->GetBinContent(endPos);
 		}
 		catch(Exception& e)
