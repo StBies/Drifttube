@@ -89,9 +89,10 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 
 	TH1D* result = new TH1D(name, "Integrated FADC data", nBins, binLowEdges);
 	result->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
-	stringstream yTitle;
-	yTitle << "integral of " << data->GetYaxis()->GetTitle();
-	result->GetYaxis()->SetTitle(yTitle.str().c_str());
+//	stringstream yTitle;
+//	yTitle << "integral of " << data->GetYaxis()->GetTitle();
+//	result->GetYaxis()->SetTitle(yTitle.str().c_str());
+		result->GetYaxis()->SetTitle("a.u.");
 
 	delete[] binLowEdges;
 	//choose random bin width since all bins are the same size - might change
@@ -224,7 +225,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 	int triggerpos = 0;
 	TH1D* result = new TH1D("Drifttime spectrum","Drift time spectrum",800,0,800 * ADC_BINS_TO_TIME);
 	result->GetXaxis()->SetTitle("drift time [ns]");
-	result->GetYaxis()->SetTitle("frequency");
+	result->GetYaxis()->SetTitle("# counts");
 
 //	#pragma omp parallel for
 	for(int i = 0; i < data->getSize(); i++)
@@ -265,6 +266,31 @@ int DataProcessor::findDriftTime(const TH1D& data,double threshold) const
 		}
 	}
 	return -42;
+}
+
+/**
+ * Finds the last bin, where a threshold voltage is reached.
+ *
+ * @author Stefan
+ * @date November 20, 2016
+ * @version 0.1
+ *
+ * @param data TH1D histogram object containing the voltage, in which the last filled bin is to be found
+ * @param threshold voltage in Volt, that must be reached
+ *
+ * @return Number of the bin, where the voltage given in threshold is last reached
+ */
+int DataProcessor::findLastFilledBin(const TH1D& data, double threshold) const
+{
+	int bin = 0;
+	for(int i = 0; i <  data.GetNbinsX() - 1; i++)
+	{
+		if(data.GetBinContent(i) < threshold && data.GetBinContent(i+1) >= threshold)
+		{
+			bin = i;
+		}
+	}
+	return bin;
 }
 
 void DataProcessor::calibrate(const TString triggerDataFile)
@@ -335,14 +361,18 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 	TFile* file = new TFile(outFilename,"recreate");
 	TTree* params = new TTree("params","extracted parameters");
 
+	int triggertime = ADC_TRIGGERPOS_BIN * ADC_BINS_TO_TIME;
+
 	int drifttime;
 	int endPos;
 	int minimumpos;
+	int integralminpos;
 	double minheight;
 	double integralmin;
 
 	params->Branch("Drifttime", &drifttime, "drifttime/I");
 	params->Branch("signalEnd", &endPos, "signalEnd/I");
+	params->Branch("integralminpos",&integralminpos, "integralminpos/I");
 	params->Branch("minimum", &minimumpos, "minimumpos/I");
 	params->Branch("minimumheight", &minheight, "minheight/D");
 	params->Branch("integralminimumheight", &integralmin, "integralmin/D");
@@ -365,7 +395,8 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME;
 			minimumpos = findMinimumBin(rawHist);
 			minheight = rawHist->GetBinContent(minimumpos);
-			endPos = findMinimumBin(intHist) * ADC_BINS_TO_TIME;
+			endPos = findLastFilledBin(*rawHist,-100 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME;
+			integralminpos = findMinimumBin(intHist) * ADC_BINS_TO_TIME;
 			integralmin = intHist->GetBinContent(endPos);
 			minimumpos *= ADC_BINS_TO_TIME;
 		}

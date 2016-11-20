@@ -27,6 +27,7 @@ void findSignalEnd(TString filename)
 	params->Branch("minimum", &minimumpos, "minimumpos/I");
 	params->Branch("minimumheight", &minheight, "minheight/I");
 	params->Branch("integralminimumheight", &integralmin, "integralmin/D");
+	params->Branch("integralMinPos",&integralminpos,"integralminpos/I");
 
 	const int nch = 800;
 //	tree->SetBranchAddress("nchannels", &nch);
@@ -100,8 +101,12 @@ void findSignalEnd(TString filename)
 				pos = j;
 			}
 		}
-		//TODO overhaul
-		pos = integralminpos;
+		drifttime = drifttime * 4 - 160;
+		pos = pos * 4 - 160;
+		integralminpos = integralminpos * 4 -160;
+		minimumpos = minimumpos * 4 -160;
+
+//		pos = integralminpos;
 		if (minheight < -2175 && minheight >= -2250)
 		{
 			cout << i << endl;

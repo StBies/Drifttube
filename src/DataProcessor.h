@@ -11,8 +11,6 @@
 #include "TTree.h"
 #include "globals.h"
 
-
-
 /**
  * A class, that processes raw data measured by an FADC, that comes as
  * *.root files. It offers functions to integrate histograms, calculate
@@ -37,6 +35,7 @@ public:
 	DataSet* integrateAll(DataSet* data) const;
 	int findMinimumBin(TH1D* data) const;
 	int findDriftTime(const TH1D& data, double threshold) const;
+	int findLastFilledBin(const TH1D& data, double threshold) const;
 	TH1D* calculateDriftTimeSpectrum(DataSet* data) const;
 
 	void calibrate(TString triggerDataFile);
