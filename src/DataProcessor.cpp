@@ -75,7 +75,7 @@ Double_t DataProcessor::computeIntegral(const TH1D& data) const
 TH1D* DataProcessor::integrate(TH1D* data) const
 {
 	Int_t nBins = data->GetNbinsX();
-	Double_t* binLowEdges = new Double_t[nBins+1];
+	Double_t* binLowEdges = new Double_t[nBins + 1];
 
 //	#pragma omp parallel for
 	for (Int_t i = 0; i <= nBins; i++)
@@ -92,7 +92,7 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 //	stringstream yTitle;
 //	yTitle << "integral of " << data->GetYaxis()->GetTitle();
 //	result->GetYaxis()->SetTitle(yTitle.str().c_str());
-		result->GetYaxis()->SetTitle("a.u.");
+	result->GetYaxis()->SetTitle("a.u.");
 
 	delete[] binLowEdges;
 	//choose random bin width since all bins are the same size - might change
@@ -102,6 +102,7 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 
 	//TODO check, why this doesn't work
 //	#pragma omp parallel for reduction(+:integral) shared(result,binWidth)
+	//start at bin 1 -> do not integrate the underflow bin
 	for (int i = 1; i <= nBins; i++)
 	{
 		integral += data->GetBinContent(i) * binWidth;
@@ -134,12 +135,13 @@ TH1D* DataProcessor::derivate(TH1D* data) const
 		binLowEdges[i] = data->GetBinLowEdge(i);
 	}
 
-	TH1D* result = new TH1D(name,"derivative",nBins,binLowEdges);
+	TH1D* result = new TH1D(name, "derivative", nBins, binLowEdges);
 
-	for(int i = 0; i < nBins - 1; i++)
+	for (int i = 0; i < nBins - 1; i++)
 	{
-		double differentialQuotient = (data->GetBinContent(i+1) - data->GetBinContent(i)) / (double)ADC_BINS_TO_TIME;
-		result->SetBinContent(i,differentialQuotient);
+		double differentialQuotient = (data->GetBinContent(i + 1)
+				- data->GetBinContent(i)) / (double) ADC_BINS_TO_TIME;
+		result->SetBinContent(i, differentialQuotient);
 	}
 
 	return result;
@@ -168,8 +170,8 @@ DataSet* DataProcessor::integrateAll(DataSet* data) const
 	vector<TH1D*>* set = new vector<TH1D*>;
 	set->resize(data->getSize());
 
-	#pragma omp parallel for shared(set)
-	for(int i = 0; i < data->getSize(); i++)
+#pragma omp parallel for shared(set)
+	for (int i = 0; i < data->getSize(); i++)
 	{
 //		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;
 		try
@@ -182,15 +184,13 @@ DataSet* DataProcessor::integrateAll(DataSet* data) const
 //				result->addData(integral);
 //			}
 			(*set)[i] = integral;
-		}
-		catch(Exception& e)
+		} catch (Exception& e)
 		{
 			cerr << e.error() << endl;
 		}
 	}
 	return new DataSet(set);
 }
-
 
 /**
  * Find the position of the minimum of the given data. Will only find the absolute
@@ -224,16 +224,68 @@ inline int DataProcessor::findMinimumBin(TH1D* data) const
 TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 {
 	int triggerpos = ADC_TRIGGERPOS_BIN;
-	TH1D* result = new TH1D("Drifttime spectrum","Drift time spectrum",800,0,800 * ADC_BINS_TO_TIME);
+	TH1D* result = new TH1D("Drifttime spectrum", "Drift time spectrum", 800, 0,
+			800 * ADC_BINS_TO_TIME);
 	result->GetXaxis()->SetTitle("drift time [ns]");
 	result->GetYaxis()->SetTitle("# counts");
 
 //	#pragma omp parallel for
-	for(int i = 0; i < data->getSize(); i++)
+	for (int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);
-		int diff  = findDriftTime(*event,-50 * ADC_CHANNELS_TO_VOLTAGE) - triggerpos ;
+		int diff = findDriftTime(*event, -50 * ADC_CHANNELS_TO_VOLTAGE)
+				- triggerpos;
 		result->Fill(diff * ADC_BINS_TO_TIME);
+	}
+
+	return result;
+}
+
+/**
+ * Calculates the reation between drift time and drift radius. The relation is returned as TH1D* pointer to a histogram.
+ * It calculates the relation from a passed drift time spectrum as argument.
+ *
+ * @author Stefan Bieschke
+ * @version 1.0
+ * @date November 21, 2016
+ *
+ * @param dtSpect TH1D object reference containing the drift time spectrum
+ *
+ * @return Pointer to a TH1D object histogram containing the rt-relation plot
+ *
+ * @warning Needs drift tube data in globals.h to be set
+ */
+TH1D* DataProcessor::calculateRtRelation(TH1D& dtSpect) const
+{
+	Int_t nBins = dtSpect.GetNbinsX();
+	Double_t* binLowEdges = new Double_t[nBins + 1];
+
+	//	#pragma omp parallel for
+	for (Int_t i = 0; i <= nBins; i++)
+	{
+		binLowEdges[i] = dtSpect.GetBinLowEdge(i);
+	}
+
+	TH1D* result = new TH1D("rt-relation", "rt relation", nBins, binLowEdges);
+	result->GetXaxis()->SetTitle(dtSpect.GetXaxis()->GetTitle());
+	result->GetYaxis()->SetTitle("drift radius [mm].");
+
+	delete[] binLowEdges;
+	//choose random bin width since all bins are the same size - might change
+	Double_t binWidth = result->GetBinWidth(1);
+
+	double integral = 0.0;
+	int numberOfRealEvents = dtSpect.GetEntries() - dtSpect.GetBinContent(0);
+	cout << numberOfRealEvents << endl;
+	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)numberOfRealEvents);
+
+	//TODO check, why this doesn't work
+	//	#pragma omp parallel for reduction(+:integral) shared(result,binWidth)
+	//start at bin 1 -> do not integrate the underflow bin
+	for (int i = 1; i <= nBins; i++)
+	{
+		integral += dtSpect.GetBinContent(i) * scalingFactor;
+		result->Fill(dtSpect.GetBinLowEdge(i), integral);
 	}
 
 	return result;
@@ -254,14 +306,14 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
  *
  * @return Bin number of the first occurance of a signal larger than threshold
  */
-int DataProcessor::findDriftTime(const TH1D& data,double threshold) const
+int DataProcessor::findDriftTime(const TH1D& data, double threshold) const
 {
 	//if threshold given positive, change sign
 	threshold *= (threshold < 0 ? 1 : -1);
 
-	for(int i = 0; i < data.GetNbinsX(); i++)
+	for (int i = 0; i < data.GetNbinsX(); i++)
 	{
-		if(data.GetBinContent(i) < threshold)
+		if (data.GetBinContent(i) < threshold)
 		{
 			return i;
 		}
@@ -284,9 +336,10 @@ int DataProcessor::findDriftTime(const TH1D& data,double threshold) const
 int DataProcessor::findLastFilledBin(const TH1D& data, double threshold) const
 {
 	int bin = 0;
-	for(int i = 0; i <  data.GetNbinsX() - 1; i++)
+	for (int i = 0; i < data.GetNbinsX() - 1; i++)
 	{
-		if(data.GetBinContent(i) < threshold && data.GetBinContent(i+1) >= threshold)
+		if (data.GetBinContent(i) < threshold
+				&& data.GetBinContent(i + 1) >= threshold)
 		{
 			bin = i;
 		}
@@ -296,28 +349,28 @@ int DataProcessor::findLastFilledBin(const TH1D& data, double threshold) const
 
 void DataProcessor::calibrate(const TString triggerDataFile)
 {
-	TFile file(triggerDataFile,"read");
-	TFile calib("calib.root","recreate");
+	TFile file(triggerDataFile, "read");
+	TFile calib("calib.root", "recreate");
 
-	TTree* triggerDataTree = (TTree*)file.Get("Tfadc");
+	TTree* triggerDataTree = (TTree*) file.Get("Tfadc");
 	int nEntries = triggerDataTree->GetEntries();
 	int nChannels;
-	triggerDataTree->SetBranchAddress("nchannels",&nChannels);
+	triggerDataTree->SetBranchAddress("nchannels", &nChannels);
 	triggerDataTree->GetEntry(0);
 
 	double* voltage = new double[nChannels];
-	triggerDataTree->SetBranchAddress("Voltage",voltage);
+	triggerDataTree->SetBranchAddress("Voltage", voltage);
 
 	Double_t triggerpos = 0;
 
-	for(int i = 0; i < nEntries - 1; i++)
+	for (int i = 0; i < nEntries - 1; i++)
 	{
 		triggerDataTree->GetEntry(i);
 		int minBin = 0;
 		double minContent = voltage[0];
-		for(int j = 0; j < nChannels; j++)
+		for (int j = 0; j < nChannels; j++)
 		{
-			if(voltage[j] < minContent)
+			if (voltage[j] < minContent)
 			{
 				minBin = j;
 			}
@@ -329,13 +382,12 @@ void DataProcessor::calibrate(const TString triggerDataFile)
 	file.Close();
 	calib.cd();
 
-	TTree calibTree("trigger","triggerdata");
-	TBranch *branch = calibTree.Branch("calib",&triggerpos,"triggerpos/D");
+	TTree calibTree("trigger", "triggerdata");
+	TBranch *branch = calibTree.Branch("calib", &triggerpos, "triggerpos/D");
 	branch->Fill();
 	calibTree.Write();
 	calib.Close();
 }
-
 
 /**
  * A method to write some parameters like drifttime, position of signalend, position of voltage minimum as well as minimum
@@ -353,14 +405,15 @@ void DataProcessor::calibrate(const TString triggerDataFile)
  * @param filename parsed filename of the raw data .root file from the FADC
  * @param dirname parsed directory name of the raw data .root file relative to the location from where the program is called
  */
-void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, const TString filename, const TString dirname) const
+void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated,
+		const TString filename, const TString dirname) const
 {
 	stringstream name;
 	name << dirname << "converted_" << filename;
 	TString outFilename(name.str());
 
-	TFile* file = new TFile(outFilename,"recreate");
-	TTree* params = new TTree("params","extracted parameters");
+	TFile* file = new TFile(outFilename, "recreate");
+	TTree* params = new TTree("params", "extracted parameters");
 
 	int triggertime = ADC_TRIGGERPOS_BIN * ADC_BINS_TO_TIME;
 
@@ -373,14 +426,14 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 
 	params->Branch("Drifttime", &drifttime, "drifttime/I");
 	params->Branch("signalEnd", &endPos, "signalEnd/I");
-	params->Branch("integralminpos",&integralminpos, "integralminpos/I");
+	params->Branch("integralminpos", &integralminpos, "integralminpos/I");
 	params->Branch("minimum", &minimumpos, "minimumpos/I");
 	params->Branch("minimumheight", &minheight, "minheight/D");
 	params->Branch("integralminimumheight", &integralmin, "integralmin/D");
 
 	const int nEvents = raw.getSize();
 
-	for(int i = 0; i < nEvents; i++)
+	for (int i = 0; i < nEvents; i++)
 	{
 		drifttime = 0;
 		endPos = 0;
@@ -393,15 +446,17 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 			TH1D* rawHist = raw.getEvent(i);
 			TH1D* intHist = integrated.getEvent(i);
 
-			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME -triggertime;
-			minimumpos = findMinimumBin(rawHist)  -triggertime;
-			minheight = rawHist->GetBinContent(minimumpos) ;
-			endPos = findLastFilledBin(*rawHist,-100 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME  -triggertime;
-			integralminpos = findMinimumBin(intHist) * ADC_BINS_TO_TIME  -triggertime;
+			drifttime = findDriftTime(*rawHist, -50 * ADC_CHANNELS_TO_VOLTAGE)
+					* ADC_BINS_TO_TIME - triggertime;
+			minimumpos = findMinimumBin(rawHist) - triggertime;
+			minheight = rawHist->GetBinContent(minimumpos);
+			endPos = findLastFilledBin(*rawHist, -100 * ADC_CHANNELS_TO_VOLTAGE)
+					* ADC_BINS_TO_TIME - triggertime;
+			integralminpos = findMinimumBin(intHist) * ADC_BINS_TO_TIME
+					- triggertime;
 			integralmin = intHist->GetBinContent(endPos);
-			minimumpos *= ADC_BINS_TO_TIME  -triggertime;
-		}
-		catch(Exception& e)
+			minimumpos *= ADC_BINS_TO_TIME - triggertime;
+		} catch (Exception& e)
 		{
 			cerr << e.error() << endl;
 		}

@@ -37,6 +37,7 @@ public:
 	int findDriftTime(const TH1D& data, double threshold) const;
 	int findLastFilledBin(const TH1D& data, double threshold) const;
 	TH1D* calculateDriftTimeSpectrum(DataSet* data) const;
+	TH1D* calculateRtRelation(TH1D& dtSpect) const;
 
 	void calibrate(TString triggerDataFile);
 	void writeResults(const DataSet& raw, const DataSet& integrated, const TString filename, const TString dirname) const;
