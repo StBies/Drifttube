@@ -345,8 +345,8 @@ void DataProcessor::calibrate(const TString triggerDataFile)
  * @brief writes some extracted parameters to disk
  *
  * @author Stefan
- * @date November 18, 2016
- * @version 0.5
+ * @date November 21, 2016
+ * @version 0.8
  *
  * @param raw raw data DataSet
  * @param integrated integrated data DataSet
@@ -393,13 +393,13 @@ void DataProcessor::writeResults(const DataSet& raw, const DataSet& integrated, 
 			TH1D* rawHist = raw.getEvent(i);
 			TH1D* intHist = integrated.getEvent(i);
 
-			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME;
-			minimumpos = findMinimumBin(rawHist);
-			minheight = rawHist->GetBinContent(minimumpos);
-			endPos = findLastFilledBin(*rawHist,-100 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME;
-			integralminpos = findMinimumBin(intHist) * ADC_BINS_TO_TIME;
+			drifttime = findDriftTime(*rawHist,-50 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME -triggertime;
+			minimumpos = findMinimumBin(rawHist)  -triggertime;
+			minheight = rawHist->GetBinContent(minimumpos) ;
+			endPos = findLastFilledBin(*rawHist,-100 * ADC_CHANNELS_TO_VOLTAGE) * ADC_BINS_TO_TIME  -triggertime;
+			integralminpos = findMinimumBin(intHist) * ADC_BINS_TO_TIME  -triggertime;
 			integralmin = intHist->GetBinContent(endPos);
-			minimumpos *= ADC_BINS_TO_TIME;
+			minimumpos *= ADC_BINS_TO_TIME  -triggertime;
 		}
 		catch(Exception& e)
 		{
