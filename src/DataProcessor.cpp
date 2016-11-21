@@ -75,7 +75,7 @@ Double_t DataProcessor::computeIntegral(const TH1D& data) const
 TH1D* DataProcessor::integrate(TH1D* data) const
 {
 	Int_t nBins = data->GetNbinsX();
-	Double_t* binLowEdges = new Double_t[nBins + 1];
+	Double_t* binLowEdges = new Double_t[nBins+1];
 
 //	#pragma omp parallel for
 	for (Int_t i = 0; i <= nBins; i++)
@@ -102,7 +102,7 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 
 	//TODO check, why this doesn't work
 //	#pragma omp parallel for reduction(+:integral) shared(result,binWidth)
-	for (int i = 0; i <= nBins; i++)
+	for (int i = 1; i <= nBins; i++)
 	{
 		integral += data->GetBinContent(i) * binWidth;
 		result->Fill(data->GetBinLowEdge(i), integral);
@@ -210,11 +210,12 @@ inline int DataProcessor::findMinimumBin(TH1D* data) const
 
 /**
  * Calculates the spectrum of drifttimes for the data given in a DataSet object containing raw data.
- * The result is a histogram containing the spectrum.
+ * The result is a histogram containing the spectrum. Note, that in order to find the correct drift time spectrum, the
+ * parameters defined in globals.h must be defined for the used experiment.
  *
  * @author Stefan
- * @date October 17, 2016
- * @version 0.9
+ * @date November 21, 2016
+ * @version 1.0
  *
  * @param data Pointer to a DataSet object containing the raw data out of which the spectrum is to be calculated
  *
@@ -222,7 +223,7 @@ inline int DataProcessor::findMinimumBin(TH1D* data) const
  */
 TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 {
-	int triggerpos = 0;
+	int triggerpos = ADC_TRIGGERPOS_BIN;
 	TH1D* result = new TH1D("Drifttime spectrum","Drift time spectrum",800,0,800 * ADC_BINS_TO_TIME);
 	result->GetXaxis()->SetTitle("drift time [ns]");
 	result->GetYaxis()->SetTitle("# counts");
