@@ -148,11 +148,10 @@ TH1D* DataProcessor::derivate(TH1D* data) const
 }
 
 /**
- * Integrates all histograms, that are passed to this method in form of an array of
- * pointers to TH1 type objects. The resulting objects are written to the passed array
- * storage
+ * Integrates all histograms, that are passed to this method in a DataSet object. The resulting histograms containing the histograms
+ * are returned in a new DataSet object.
  *
- * @brief Integrate all data in an array
+ * @brief Integrate all data in a DataSet object
  *
  * @author Stefan
  * @date August 12, 2016
@@ -173,7 +172,6 @@ DataSet* DataProcessor::integrateAll(DataSet* data) const
 #pragma omp parallel for shared(set)
 	for (int i = 0; i < data->getSize(); i++)
 	{
-//		cout << "[" << i + 1 << "/" << data->getSize() << "] integrating" << endl;
 		try
 		{
 			TH1D* integral = integrate(data->getEvent(i));
@@ -268,7 +266,7 @@ TH1D* DataProcessor::calculateRtRelation(TH1D& dtSpect) const
 
 	TH1D* result = new TH1D("rt-relation", "rt relation", nBins, binLowEdges);
 	result->GetXaxis()->SetTitle(dtSpect.GetXaxis()->GetTitle());
-	result->GetYaxis()->SetTitle("drift radius [mm].");
+	result->GetYaxis()->SetTitle("drift radius [mm]");
 
 	delete[] binLowEdges;
 	//choose random bin width since all bins are the same size - might change
@@ -276,7 +274,7 @@ TH1D* DataProcessor::calculateRtRelation(TH1D& dtSpect) const
 
 	double integral = 0.0;
 	int numberOfRealEvents = dtSpect.GetEntries() - dtSpect.GetBinContent(0);
-	cout << numberOfRealEvents << endl;
+	cout << "efficiency = " << numberOfRealEvents/(double)dtSpect.GetEntries() << endl;
 	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)numberOfRealEvents);
 
 	//TODO check, why this doesn't work
