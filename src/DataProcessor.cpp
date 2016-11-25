@@ -95,9 +95,6 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 	result->GetYaxis()->SetTitle("a.u.");
 
 	delete[] binLowEdges;
-	//choose random bin width since all bins are the same size - might change
-	Double_t binWidth = result->GetBinWidth(1);
-
 	double integral = 0.0;
 
 	//TODO check, why this doesn't work
@@ -105,7 +102,7 @@ TH1D* DataProcessor::integrate(TH1D* data) const
 	//start at bin 1 -> do not integrate the underflow bin
 	for (int i = 1; i <= nBins; i++)
 	{
-		integral += data->GetBinContent(i) * binWidth;
+		integral += data->GetBinContent(i) ;
 		result->Fill(data->GetBinLowEdge(i), integral);
 	}
 

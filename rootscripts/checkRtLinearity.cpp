@@ -15,14 +15,17 @@ void checkRtLinearity(TString filename)
 
 	Int_t nBins = rtRel->GetNbinsX();
 
-	for(Int_t i = 0; i < nBins, i++)
+	Int_t end = 0;
+	for(Int_t i = 0; i < nBins; i++)
 	{
-		if(rtRel->GetBinContent(i));
+		if(rtRel->GetBinContent(i) >= 19-0.001*19)
+			{
+				end = i;
+				break;
+			}
 	}
-
-
-	rtRel->Fit("pol1");
+	cout << end * 4 << endl;
 
 	TCanvas* c1 = new TCanvas("bla","bla1",1920,1080);
-	rtRel->Draw();
+	rtRel->Draw("HIST");
 }
