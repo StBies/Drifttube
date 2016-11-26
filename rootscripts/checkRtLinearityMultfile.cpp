@@ -19,8 +19,14 @@ Int_t findDriftTimeOfLinearExtrapolation(Double_t extrapolatedRadius,
  * @data November 25, 2016
  * @version 0.1
  */
-void checkRtLinearity(TString filename)
+void checkRtLinearityMultfile(TString list)
 {
+	vector<TH1D*> histograms;
+	fstream infile(list);
+	TString filename;
+
+	while (infile >> filename)
+	{
 		TFile* file = new TFile(filename, "read");
 		file->cd("rtRelation");
 
@@ -90,10 +96,15 @@ void checkRtLinearity(TString filename)
 			timediff = (measuredTime - fitExtrapolationTime[i])
 					/ fitExtrapolationTime[i];
 			differenceFromLinear->Fill(yBinLowerEdge[i], timediff);
+			histograms.push_back(differenceFromLinear);
 		}
+	}
 
 	TCanvas* c1 = new TCanvas("bla", "bla1", 1920, 1080);
-	differenceFromLinear->Draw("HIST");
+	for(TH1D* hist : histograms)
+	{
+		hist->Draw("HIST SAME");
+	}
 }
 
 Double_t findLinearFitExtrapolationValue(Int_t driftTime, Double_t par0,
