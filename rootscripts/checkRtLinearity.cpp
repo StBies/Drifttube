@@ -37,6 +37,18 @@ void checkRtLinearity(TString filename)
 			}
 	}
 
+	Int_t maxDriftTime = 0;
+
+	for(Int_t i = 0; i < nBins; i++)
+	{
+		if(rtRel->GetBinContent(i) >= 19 - 19*0.001)
+		{
+			maxDriftTime = i * 4;
+			cout << maxDriftTime << endl;
+			break;
+		}
+	}
+
 	TFitResultPtr res= rtRel->Fit("pol1","S","",25,end);
 
 	Double_t par0 = res->Parameter(0);
@@ -52,7 +64,7 @@ void checkRtLinearity(TString filename)
 
 	TH1D* differenceFromLinear = new TH1D("linearityCheck","rt-Relation deviation from linearity",nYBins,0,19);
 	differenceFromLinear->GetXaxis()->SetTitle("drift radius [mm]");
-	differenceFromLinear->GetYaxis()->SetTitle("time difference [ns]");
+	differenceFromLinear->GetYaxis()->SetTitle("deviation from linear fit [a.u]");
 
 	for(Int_t i = 0; i < nYBins; i++)
 	{
@@ -69,7 +81,7 @@ void checkRtLinearity(TString filename)
 				break;
 			}
 		}
-		timediff = measuredTime - fitExtrapolationTime[i];
+		timediff = (measuredTime - fitExtrapolationTime[i]) / fitExtrapolationTime[i];
 		differenceFromLinear->Fill(yBinLowerEdge[i],timediff);
 	}
 
