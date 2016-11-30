@@ -2,6 +2,7 @@
 #include "TH1.h"
 #include "TCanvas.h"
 #include "TString.h"
+#include "THStack.h"
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -24,6 +25,9 @@ void checkRtLinearityMultfile(TString list)
 	vector<TH1D*> histograms;
 	fstream infile(list);
 	TString filename;
+//	THStack* stack = new THStack("stack","sometitle");
+//	stack->GetXAxis()->SetTitle("drift radius [mm]");
+//	stack->GetYAxis()->SetTitle("deviation from linear fit [a.u]");
 
 	while (infile >> filename)
 	{
@@ -74,8 +78,7 @@ void checkRtLinearityMultfile(TString list)
 		TH1D* differenceFromLinear = new TH1D("linearityCheck",
 				"rt-Relation deviation from linearity", nYBins, 0, 19);
 		differenceFromLinear->GetXaxis()->SetTitle("drift radius [mm]");
-		differenceFromLinear->GetYaxis()->SetTitle(
-				"deviation from linear fit [a.u]");
+		differenceFromLinear->GetYaxis()->SetTitle("deviation from linear fit [a.u]");
 
 		for (Int_t i = 0; i < nYBins; i++)
 		{
@@ -104,7 +107,9 @@ void checkRtLinearityMultfile(TString list)
 	for(TH1D* hist : histograms)
 	{
 		hist->Draw("HIST SAME");
+//		stack->Add(hist,"HIST");
 	}
+//	stack->Draw("nostack");
 }
 
 Double_t findLinearFitExtrapolationValue(Int_t driftTime, Double_t par0,
