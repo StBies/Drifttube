@@ -286,6 +286,51 @@ TH1D* DataProcessor::calculateRtRelation(TH1D& dtSpect) const
 	return result;
 }
 
+int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelation) const
+{
+	int maxDriftTimeBin = 0;
+	int nAfterPulses = 0;
+
+	//calculate maxDriftTime
+	for(int i = 1; i <=rtRelation.GetNbinsX(); i++)
+	{
+		if(rtRelation.GetBinContent(i) >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.001)
+		{
+			maxDriftTimeBin = i;
+			cout << "maxDriftTime: " << maxDriftTimeBin * 4 << endl;
+			break;
+		}
+	}
+
+	for(int i = 0; i < rawData.getSize(); i++)
+	{
+		bool pulseEnded = true;
+		TH1D* voltage = rawData.getEvent(i);
+		int nBins = voltage->GetNbinsX();
+
+		//check, if the signal already ended at max drift time
+		if(voltage->GetBinContent(maxDriftTimeBin) <= -50*ADC_CHANNELS_TO_VOLTAGE)
+		{
+			pulseEnded = false;
+		}
+
+		for(int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins; j++)
+		{
+			if(voltage->GetBinContent(j) <= -50*ADC_CHANNELS_TO_VOLTAGE && pulseEnded)
+			{
+				cout << "event " <<i << "time: " << j*4 << endl;
+				++nAfterPulses;
+				pulseEnded = false;
+			}
+			else if(voltage->GetBinContent(j) > -50*ADC_CHANNELS_TO_VOLTAGE && !pulseEnded)
+			{
+				pulseEnded = true;
+			}
+		}
+	}
+	return nAfterPulses;
+}
+
 //TODO decide, if this should return the "real time" in nanoseconds instead of the bin number
 /**
  * Finds the bin number in a passed histogram, in which a passed threshold in volt is surpassed.

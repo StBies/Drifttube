@@ -38,6 +38,7 @@ public:
 	int findLastFilledBin(const TH1D& data, double threshold) const;
 	TH1D* calculateDriftTimeSpectrum(DataSet* data) const;
 	TH1D* calculateRtRelation(TH1D& dtSpect) const;
+	int countAfterpulses(const DataSet& rawData, const TH1D& rtRelation) const;
 
 	void calibrate(TString triggerDataFile);
 	void writeResults(const DataSet& raw, const DataSet& integrated, const TString filename, const TString dirname) const;

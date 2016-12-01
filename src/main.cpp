@@ -62,6 +62,8 @@ int main(int argc, char** argv)
 	archive->setDifttimeSpect(spect);
 	archive->setRtRelation(rt);
 	archive->setDiffDrifttimeSpect(derivSpec);
+	int nAfterPulses = processor.countAfterpulses(*dataSet,*rt);
+	cout <<"# afterpulses: " << nAfterPulses << endl;
 
 	double endRuntime = omp_get_wtime();
 
