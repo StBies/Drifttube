@@ -294,7 +294,7 @@ int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelati
 	//calculate maxDriftTime
 	for(int i = 1; i <=rtRelation.GetNbinsX(); i++)
 	{
-		if(rtRelation.GetBinContent(i) >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.001)
+		if(rtRelation.GetBinContent(i) >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
 		{
 			maxDriftTimeBin = i;
 			cout << "maxDriftTime: " << maxDriftTimeBin * 4 << endl;
@@ -318,7 +318,7 @@ int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelati
 		{
 			if(voltage->GetBinContent(j) <= -50*ADC_CHANNELS_TO_VOLTAGE && pulseEnded)
 			{
-				cout << "event " <<i << "time: " << j*4 << endl;
+//				cout << "event " <<i << " time: " << j*4 << endl;
 				++nAfterPulses;
 				pulseEnded = false;
 			}

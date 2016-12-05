@@ -22,6 +22,6 @@ static const short ADC_BINS_TO_TIME = 4; //ns
 static const unsigned short ADC_TRIGGERPOS_BIN = 40;
 
 //variables describing the drift tube
-static const unsigned short DRIFT_TUBE_RADIUS = 19;//mm
+static const double DRIFT_TUBE_RADIUS = 18.15;//mm
 
 #endif /* GLOBALS_H_ */

@@ -27,11 +27,12 @@ void checkRtLinearityChi2(TString filename)
 
 		Int_t nBins = rtRel->GetNbinsX();
 		Int_t maxDriftTime = 0;
+		Double_t rTube = 18.15;
 
 		//find the drifttime, correlated to a drift radius of 99.9% of the tubes radius
 		for (Int_t i = 0; i < nBins; i++)
 		{
-			if (rtRel->GetBinContent(i) >= 19 - 19 * 0.001)
+			if (rtRel->GetBinContent(i) >= rTube - rTube * 0.0005)
 			{
 				maxDriftTime = i * 4;
 				cout << maxDriftTime << endl;
@@ -40,13 +41,12 @@ void checkRtLinearityChi2(TString filename)
 		}
 
 		Double_t par0 =0;
-		Double_t par1 =19.0 / maxDriftTime;
-		cout << "par1: " << par1 << endl;
+		Double_t par1 =rTube / maxDriftTime;
 
 		Double_t chi2 = 0;
 
 		Double_t yBinning = 0.1; //mm
-		Int_t nYBins = (Int_t)(19.0 / yBinning);
+		Int_t nYBins = (Int_t)(rTube / yBinning);
 		cout << "nYBins: " << nYBins << endl;
 
 		Double_t yBinLowerEdge;
