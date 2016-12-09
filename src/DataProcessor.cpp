@@ -228,7 +228,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 	for (int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);
-		int diff = findDriftTime(*event, -50 * ADC_CHANNELS_TO_VOLTAGE)
+		int diff = findDriftTime(*event, -50* ADC_CHANNELS_TO_VOLTAGE)
 				- triggerpos;
 		result->Fill(diff * ADC_BINS_TO_TIME);
 	}
