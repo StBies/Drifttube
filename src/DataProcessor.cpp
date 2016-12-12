@@ -270,8 +270,10 @@ TH1D* DataProcessor::calculateRtRelation(TH1D& dtSpect) const
 	Double_t binWidth = result->GetBinWidth(1);
 
 	double integral = 0.0;
+	//TODO own method
 	int numberOfRealEvents = dtSpect.GetEntries() - dtSpect.GetBinContent(0);
-	cout << "efficiency = " << numberOfRealEvents/(double)dtSpect.GetEntries() << endl;
+	double eff = numberOfRealEvents/(double)dtSpect.GetEntries();
+	cout << "efficiency = " << eff << " +- " << sqrt(eff*(1-eff)/(double)dtSpect.GetEntries()) << endl;
 	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)numberOfRealEvents);
 
 	//TODO check, why this doesn't work

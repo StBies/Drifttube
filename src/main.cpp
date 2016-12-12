@@ -6,6 +6,7 @@
 #include "Archive.h"
 #include "TFile.h"
 #include "omp.h"
+#include <cmath>
 
 
 using namespace std;
@@ -63,7 +64,12 @@ int main(int argc, char** argv)
 	archive->setRtRelation(rt);
 	archive->setDiffDrifttimeSpect(derivSpec);
 	int nAfterPulses = processor.countAfterpulses(*dataSet,*rt);
-	cout <<"# afterpulses: " << nAfterPulses << " probability: " << (double)(nAfterPulses/(spect->GetEntries() - spect->GetBinContent(0))) << endl;
+	int nEvents = spect->GetEntries() - spect->GetBinContent(0);
+
+	cout <<"# afterpulses: " << nAfterPulses
+			<< " probability: " << (double)nAfterPulses/nEvents
+			<< " +- " << sqrt(nAfterPulses/pow(nEvents,2) + pow(nAfterPulses * sqrt(nEvents),2)/pow(nEvents,4))
+			<< endl;
 
 	double endRuntime = omp_get_wtime();
 

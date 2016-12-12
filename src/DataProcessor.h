@@ -4,6 +4,7 @@
 #include <omp.h>
 #include <iostream>
 #include <sstream>
+#include <cmath>
 #include "TH1D.h"
 #include "DataSet.h"
 #include "EventSizeException.h"
