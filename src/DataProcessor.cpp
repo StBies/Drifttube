@@ -228,7 +228,7 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 	for (int i = 0; i < data->getSize(); i++)
 	{
 		TH1D* event = data->getEvent(i);
-		int diff = findDriftTime(*event, -50* ADC_CHANNELS_TO_VOLTAGE)
+		int diff = findDriftTime(*event, -50 * ADC_CHANNELS_TO_VOLTAGE)
 				- triggerpos;
 		result->Fill(diff * ADC_BINS_TO_TIME);
 	}
@@ -288,6 +288,24 @@ TH1D* DataProcessor::calculateRtRelation(TH1D& dtSpect) const
 	return result;
 }
 
+//TODO threshold as parameter?
+//TODO possibility to use any other t_max as parameter
+/**
+ * Count the number of afterpulses in a DataSet containing voltage pulses. An afterpulse is counted,
+ * if the after the maximum drift time, a threshold voltage is undershot. This maximum drift time is
+ * calculated from the rtRelation as the time, at which it reaches 99.95% of the tube's inner radius.
+ *
+ * @brief Count afterpulses. Multiple afterpulses per event are allowed.
+ *
+ * @author Stefan Bieschke
+ * @version 0.9
+ * @date Dec. 15, 2016
+ *
+ * @param rawData DataSet object containing voltage pulses
+ * @param rtRelation TH1D histogram object containing the rt-Relation.
+ *
+ * @return number of afterpulses
+ */
 int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelation) const
 {
 	int maxDriftTimeBin = 0;
@@ -304,6 +322,7 @@ int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelati
 		}
 	}
 
+	//counting loop
 	for(int i = 0; i < rawData.getSize(); i++)
 	{
 		bool pulseEnded = true;
@@ -318,6 +337,7 @@ int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelati
 
 		for(int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins; j++)
 		{
+			//if-else switches a variable in order not to count a single pulse bin per bin
 			if(voltage->GetBinContent(j) <= -50*ADC_CHANNELS_TO_VOLTAGE && pulseEnded)
 			{
 //				cout << "event " <<i << " time: " << j*4 << endl;
@@ -330,6 +350,7 @@ int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelati
 			}
 		}
 	}
+
 	return nAfterPulses;
 }
 
@@ -445,6 +466,11 @@ int DataProcessor::findLastFilledBin(const TH1D& data, double threshold) const
 	return bin;
 }
 
+/**
+ * Consider deprecated
+ * @author Stefan Bieschke
+ * @version 0.1 (discontinued for now)
+ */
 void DataProcessor::calibrate(const TString triggerDataFile)
 {
 	TFile file(triggerDataFile, "read");

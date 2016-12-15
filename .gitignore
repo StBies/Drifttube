@@ -16,3 +16,4 @@ data/
 testdata/*
 spectra/*
 rootscripts/*.dat
+*.dat

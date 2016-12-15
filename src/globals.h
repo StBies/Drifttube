@@ -7,7 +7,8 @@
 
 
 /**
- * Header containing globally available data constants, that are needed within the program
+ * Header containing globally available data constants, that are needed within the program.
+ * These variables are used throughout any analysis where results are hardware-specific.
  *
  * @author Stefan
  * @date October 18, 2016
