@@ -29,6 +29,7 @@ class DataSet
 public:
 	DataSet();
 	DataSet(vector<TH1D*>* data);
+	DataSet(const DataSet& original);
 	virtual ~DataSet();
 
 	void addData(TH1D* histogram);

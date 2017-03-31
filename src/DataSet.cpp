@@ -7,16 +7,55 @@
 
 #include "DataSet.h"
 
+/**
+ * Default constructor, initializes an empty DataSet object containing no raw data and with size 0
+ *
+ * @author Stefan
+ * @date Dec 31, 2016
+ * @version 0.1
+ */
 DataSet::DataSet()
 {
 	_data.resize(0);
 	_size = 0;
 }
 
+/**
+ *  Constructor, that takes a vector containing raw data in TH1D* format
+ *
+ *  @author Stefan
+ *  @date Dec 31, 2016
+ *  @version 0.2
+ */
 DataSet::DataSet(vector<TH1D*>* data)
 {
 	_size = data->size();
 	_data = *data;
+}
+
+/**
+ * First implementation of a copy constructor for DataSets in order to enable DataSet operators to work
+ *
+ * @author Stefan
+ * @date March 31, 2017
+ * @version 0.1
+ *
+ * @param original Original DataSet object that is to be copied
+ */
+DataSet::DataSet(const DataSet& original)
+{
+	//copy size of original DataSet
+	_size = original._size;
+	//create new vector containing the raw data and go into deep copy of its content
+	_data = vector<TH1D*>();
+
+	//deep copy
+	for(TH1D* data: original._data)
+	{
+		_data.push_back(new TH1D(*data));
+	}
+
+	_data.shrink_to_fit();
 }
 
 /**
