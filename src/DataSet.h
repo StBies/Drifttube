@@ -36,7 +36,8 @@ public:
 	int getSize() const;
 	TH1D* getEvent(int event) const;
 
-//	DataSet& operator+(DataSet& data) const;
+//	const DataSet& operator+(const DataSet& data) const;
+	const TH1D*  const operator[](int event) const;
 
 private:
 	int _size;

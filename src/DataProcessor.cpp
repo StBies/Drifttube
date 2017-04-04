@@ -227,7 +227,10 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
 //	#pragma omp parallel for
 	for (int i = 0; i < data->getSize(); i++)
 	{
-		TH1D* event = data->getEvent(i);
+//		TH1D* event = data->getEvent(i);
+		//TODO hint, that the operator[] of DataSet seems not quite to work, const return is a problem and operator does not work on pointer to object
+		//TODO maybe last mention is intended
+		const TH1D* event = (*data)[i];
 		int diff = findDriftTime(*event, -50 * ADC_CHANNELS_TO_VOLTAGE)
 				- triggerpos;
 		result->Fill(diff * ADC_BINS_TO_TIME);

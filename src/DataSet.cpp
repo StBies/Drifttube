@@ -147,4 +147,47 @@ TH1D* DataSet::getEvent(int event) const
 	return _data[event];
 }
 
+//operators
+/**
+ * Enables the usage of the binary operator + so that one can write thinks like:
+ * DataSet result = dataset1 + dataset2;
+ * with the result containing all the events, that are stored in both, the DataSets one and two.
+ *
+ * @author Stefan
+ * @date March 31, 2017
+ * @version 0.1
+ *
+ *@TODO does not yet work as intended
+ * @param data DataSet object on the right hand side of the binary operator
+ * @return DataSet object as a const reference
+ */
+//const DataSet& DataSet::operator+(const DataSet& data) const
+//{
+//	//TODO fix: operator+ not implemented for std::vector - makes sense...
+//	DataSet* result = new DataSet((this->_data + data._data));
+//	result->_size = this->_size + data._size;
+//	return *result;
+//}
+
+/**
+ * Implementation of the [] operator enabling on to use the common dataset[event] statement to access individual events
+ * of the DataSet object. Note, that the usage of this operator does not allow the caller to do certain things with the returned object:
+ * 1. One can not move the returned histogram in memory
+ * 2. One can not change the content of the histogram
+ * 3. The call may not change the DataSet object for which data shall be accessed
+ *
+ * @author Stefan
+ * @date March 31, 2017
+ * @version 0.1
+ *
+ * @param event Eventnumber to be accessed.
+ * @return TH1D type pointer to histogram containing the raw data
+ *
+ *@TODO check, if the operator works as intended on reference, value and pointer type objects
+ * @warning can throw an EventSizeException
+ */
+const TH1D*  const DataSet::operator[](int event) const
+{
+	return this->getEvent(event);
+}
 
