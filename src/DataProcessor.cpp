@@ -166,18 +166,12 @@ DataSet* DataProcessor::integrateAll(DataSet* data) const
 	vector<TH1D*>* set = new vector<TH1D*>;
 	set->resize(data->getSize());
 
-#pragma omp parallel for shared(set)
+	#pragma omp parallel for shared(set)
 	for (int i = 0; i < data->getSize(); i++)
 	{
 		try
 		{
 			TH1D* integral = integrate(data->getEvent(i));
-			//Writing with dynamic memory allocation needs to be critical flagged
-			//TODO change to index based writing
-//			#pragma omp critical
-//			{
-//				result->addData(integral);
-//			}
 			(*set)[i] = integral;
 		} catch (Exception& e)
 		{
@@ -470,53 +464,6 @@ int DataProcessor::findLastFilledBin(const TH1D& data, double threshold) const
 }
 
 /**
- * Consider deprecated
- * @author Stefan Bieschke
- * @version 0.1 (discontinued for now)
- */
-void DataProcessor::calibrate(const TString triggerDataFile)
-{
-	TFile file(triggerDataFile, "read");
-	TFile calib("calib.root", "recreate");
-
-	TTree* triggerDataTree = (TTree*) file.Get("Tfadc");
-	int nEntries = triggerDataTree->GetEntries();
-	int nChannels;
-	triggerDataTree->SetBranchAddress("nchannels", &nChannels);
-	triggerDataTree->GetEntry(0);
-
-	double* voltage = new double[nChannels];
-	triggerDataTree->SetBranchAddress("Voltage", voltage);
-
-	Double_t triggerpos = 0;
-
-	for (int i = 0; i < nEntries - 1; i++)
-	{
-		triggerDataTree->GetEntry(i);
-		int minBin = 0;
-		double minContent = voltage[0];
-		for (int j = 0; j < nChannels; j++)
-		{
-			if (voltage[j] < minContent)
-			{
-				minBin = j;
-			}
-		}
-		triggerpos += minBin;
-	}
-	triggerpos /= nEntries;
-
-	file.Close();
-	calib.cd();
-
-	TTree calibTree("trigger", "triggerdata");
-	TBranch *branch = calibTree.Branch("calib", &triggerpos, "triggerpos/D");
-	branch->Fill();
-	calibTree.Write();
-	calib.Close();
-}
-
-/**
  * A method to write some parameters like drifttime, position of signalend, position of voltage minimum as well as minimum
  * height and the height of the minimum of the integral to disk. The resulting .root file will contain a tree with those
  * parameters for each event in the given DataSets.
@@ -526,6 +473,8 @@ void DataProcessor::calibrate(const TString triggerDataFile)
  * @author Stefan
  * @date November 21, 2016
  * @version 0.8
+ *
+ * @TODO refactor
  *
  * @param raw raw data DataSet
  * @param integrated integrated data DataSet

@@ -116,8 +116,8 @@ int DataSet::getSize() const
 
 
 /**
- * Getter method for an Event in this DataSet. Returns a pointer to an Event struct
- * containing both the raw, as well as the integrated Data for an Event with number
+ * Getter method for an Event in this DataSet. Returns a pointer to an TH1D histogram
+ * containing the raw data for an Event with number
  * event. Can throw an exception if the requested eventnumber is greater than the
  * total number of events in the DataSet. See warning and requirements for details.
  *
@@ -149,7 +149,7 @@ TH1D* DataSet::getEvent(int event) const
 
 //operators
 /**
- * Enables the usage of the binary operator + so that one can write thinks like:
+ * Enables the usage of the binary operator + so that one can write things like:
  * DataSet result = dataset1 + dataset2;
  * with the result containing all the events, that are stored in both, the DataSets one and two.
  *
@@ -183,7 +183,7 @@ TH1D* DataSet::getEvent(int event) const
  * @param event Eventnumber to be accessed.
  * @return TH1D type pointer to histogram containing the raw data
  *
- *@TODO check, if the operator works as intended on reference, value and pointer type objects
+ * @TODO check, if the operator works as intended on reference, value and pointer type objects
  * @warning can throw an EventSizeException
  */
 const TH1D*  const DataSet::operator[](int event) const
