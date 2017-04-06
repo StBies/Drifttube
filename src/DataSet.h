@@ -8,40 +8,39 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
-#include "TH1D.h"
 #include "EventSizeException.h"
 #include <vector>
-
-using namespace std;
+#include <array>
 
 /**
- * A class representing a DataSet. This is a collection of many histograms
- * showing FADC read raw voltage.
+ * A class representing a DataSet. This is a collection of raw data arrays
+ * showing FADC read raw voltage. It contains a vector container that holds as many data arrays as
+ * there are triggered events from the FADC.
  *
  * @brief Collection of data
  *
- * @author Stefan
- * @date July 2, 2016
- * @version 0.3
+ * @author Stefan Bieschke
+ * @date April 6, 2017
+ * @version Alpha 2.0
  */
 class DataSet
 {
 public:
 	DataSet();
-	DataSet(vector<TH1D*>* data);
+	DataSet(const vector<std::array<int,800>>& data);
 	DataSet(const DataSet& original);
 	virtual ~DataSet();
 
-	void addData(TH1D* histogram);
-	int getSize() const;
-	TH1D* getEvent(int event) const;
+	void addData(std::array<int,800>);
+	unsigned int getSize() const;
+	const std::array<int,800>& getEvent(unsigned int event) const;
 
 //	const DataSet& operator+(const DataSet& data) const;
-	const TH1D* const operator[](int event) const;
+	const std::array<int,800>& const operator[](int event) const;
 
 private:
-	int _size;
-	vector<TH1D*> _data;
+	unsigned int _size;
+	std::vector<std::array<int,800>> _data;
 };
 
 #endif /* DATASET_H_ */

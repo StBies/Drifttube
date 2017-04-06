@@ -28,12 +28,12 @@ public:
 	DataStreamManager();
 	virtual ~DataStreamManager();
 
-	bool startup(std::string dataPath);
-	bool writeToRootFile(Archive& archive);
-
-private:
-	Archive _archive;
-	DataProcessor _processor;
+//	bool startup(std::string dataPath);
+//	bool writeToRootFile(Archive& archive);
+//
+//private:
+//	Archive _archive;
+//	DataProcessor _processor;
 };
 
 #endif /* DATASTREAMMANAGER_H_ */

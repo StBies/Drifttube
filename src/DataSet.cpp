@@ -27,10 +27,10 @@ DataSet::DataSet()
  *  @date Dec 31, 2016
  *  @version 0.2
  */
-DataSet::DataSet(vector<TH1D*>* data)
+DataSet::DataSet(const vector<std::array<int,800>>& data)
 {
-	_size = data->size();
-	_data = *data;
+	_size = data.size();
+	_data = data;
 }
 
 /**
