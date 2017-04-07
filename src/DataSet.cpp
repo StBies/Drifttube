@@ -17,7 +17,6 @@
 DataSet::DataSet()
 {
 	_data.resize(0);
-	_size = 0;
 }
 
 /**
@@ -29,7 +28,6 @@ DataSet::DataSet()
  */
 DataSet::DataSet(const vector<std::array<int,800>>& data)
 {
-	_size = data.size();
 	_data = data;
 }
 
@@ -45,14 +43,13 @@ DataSet::DataSet(const vector<std::array<int,800>>& data)
 DataSet::DataSet(const DataSet& original)
 {
 	//copy size of original DataSet
-	_size = original._size;
 	//create new vector containing the raw data and go into deep copy of its content
-	_data = vector<TH1D*>();
+	_data = vector<array<int,800>>();
 
 	//deep copy
-	for(TH1D* data: original._data)
+	for(array<int,800> data: original._data)
 	{
-		_data.push_back(new TH1D(*data));
+		_data.push_back(data);
 	}
 
 	_data.shrink_to_fit();
@@ -69,10 +66,10 @@ DataSet::DataSet(const DataSet& original)
  */
 DataSet::~DataSet()
 {
-	for(TH1D* data : _data)
-	{
-		delete data;
-	}
+//	for(array<int,800> data : _data)
+//	{
+//		delete data;
+//	}
 }
 
 
@@ -90,10 +87,9 @@ DataSet::~DataSet()
  * @require histgram != nullptr
  * @ensure new size = old size + 1
  */
-void DataSet::addData(TH1D* histogram)
+void DataSet::addData(array<int,800>& data)
 {
-	_data.push_back(histogram);
-	_size++;
+	_data.push_back(data);
 }
 
 /**
@@ -109,9 +105,9 @@ void DataSet::addData(TH1D* histogram)
  *
  * @ensure size >= 0
  */
-int DataSet::getSize() const
+unsigned int DataSet::getSize() const
 {
-	return _size;
+	return _data.size();
 }
 
 
@@ -137,10 +133,10 @@ int DataSet::getSize() const
  * @warning Heap object returned, memory management to be done by caller
  *
  */
-TH1D* DataSet::getEvent(int event) const
+const array<int,800>& DataSet::getEvent(const unsigned int event) const
 {
 	//only give an event if requirements are met, else throw requirement exception
-	if(event > _size)
+	if(event > getSize())
 	{
 		throw EventSizeException(event);
 	}
@@ -186,8 +182,8 @@ TH1D* DataSet::getEvent(int event) const
  * @TODO check, if the operator works as intended on reference, value and pointer type objects
  * @warning can throw an EventSizeException
  */
-const TH1D*  const DataSet::operator[](int event) const
+const array<int,800>& DataSet::operator[](unsigned int event) const
 {
-	return this->getEvent(event);
+	return getEvent(event);
 }
 

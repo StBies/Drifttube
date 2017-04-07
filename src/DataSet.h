@@ -31,15 +31,14 @@ public:
 	DataSet(const DataSet& original);
 	virtual ~DataSet();
 
-	void addData(std::array<int,800>);
+	void addData(std::array<int,800>& data);
 	unsigned int getSize() const;
-	const std::array<int,800>& getEvent(unsigned int event) const;
+	const std::array<int,800>& getEvent(const unsigned int event) const;
 
 //	const DataSet& operator+(const DataSet& data) const;
-	const std::array<int,800>& const operator[](int event) const;
+	const std::array<int,800>& operator[](unsigned int event) const;
 
 private:
-	unsigned int _size;
 	std::vector<std::array<int,800>> _data;
 };
 
