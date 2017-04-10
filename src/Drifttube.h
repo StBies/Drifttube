@@ -27,8 +27,9 @@ public:
 	virtual ~Drifttube();
 
 private:
-	std::array<int,2> _position;
-	DataSet _data;
+	unsigned int m_radius;
+	std::array<int,2> m_position;
+	DataSet m_data;
 };
 
 #endif /* DRIFTTUBE_H_ */

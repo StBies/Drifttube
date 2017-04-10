@@ -27,7 +27,7 @@ class DataSet
 {
 public:
 	DataSet();
-	DataSet(const vector<std::array<int,800>>& data);
+	DataSet(const std::vector<std::array<int,800>>& data);
 	DataSet(const DataSet& original);
 	virtual ~DataSet();
 

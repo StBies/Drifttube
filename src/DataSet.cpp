@@ -26,7 +26,7 @@ DataSet::DataSet()
  *  @date Dec 31, 2016
  *  @version 0.2
  */
-DataSet::DataSet(const vector<std::array<int,800>>& data)
+DataSet::DataSet(const std::vector<std::array<int,800>>& data)
 {
 	_data = data;
 }

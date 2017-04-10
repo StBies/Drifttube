@@ -1,7 +1,5 @@
 #include "DataProcessor.h"
 
-using namespace std;
-
 /**
  * Constructor, initializes the DataProcessor object.
  * 
@@ -34,113 +32,77 @@ DataProcessor::~DataProcessor()
  * Computes the integral of the data given as parameter. It will count positive as well as
  * negative entries and sum up the bin content.
  *
- * @author Bene9
- * @date June 15, 2016
- * @version 0.2
+ * @author Bene9, Stefan Bieschke (refactoring)
+ * @date April 10, 2017
+ * @version Alpha 2.0
  *
- * @param data TH1 family object containing the data to be integrated.
+ * @param data std::array<int,800> of which the integral is to be calculated
  * @return Value of the integral over all bins
  */
-Double_t DataProcessor::computeIntegral(const TH1D& data) const
+int DataProcessor::computeIntegral(const std::array<int,800>& data) const
 {
-	Double_t counter = 0;
+	int integral = 0;
 
-	//TODO check if parallelization is of use here
-
-	for (int i = 0; i < data.GetNbinsX(); i++)
+	for (int i = 0; i < data.size(); i++)
 	{
-		counter += data.GetBinContent(i);
+		integral += data[i];
 	}
 
-	return counter * data.GetBinWidth(1);
+	return integral;
 }
 
 /**
- * Integrates the given data, which is in a histogram. This method will return
- * a new histogram of type TH1* containing the integrated original data.
+ * Computes the integral of a passed array containing raw FADC data. The result is an array again, which contains the
+ * integral per bin
  * 
- * @brief histogram integrator
+ * @brief integrator
  * 
  * @author Stefan
  * @date June 16, 2016
  * @version 0.3
  * 
- * @param data Data, that is to be integrated
+ * @param data Reference to a std::array<int,800>, that is to be integrated
  * 
- * @return TH1D* pointer to a new heap-object histogram containing the integral of data
+ * @return std::array<int,800> containing the integral
  * 
  * @warning Does integrate the whole interval, that the data object provides data.
- * @warning Returned object must be destroyed by the user
  */
-TH1D* DataProcessor::integrate(TH1D* data) const
+const std::array<int,800> DataProcessor::integrate(const std::array<int,800>& data) const
 {
-	Int_t nBins = data->GetNbinsX();
-	Double_t* binLowEdges = new Double_t[nBins + 1];
+	std::array<int,800> result;
 
-//	#pragma omp parallel for
-	for (Int_t i = 0; i <= nBins; i++)
+	//do the integration (stepsize is one)
+	//TODO check for correctness
+	result[0] = data[0];
+	for(int i = 1; i < data.size(); i++)
 	{
-		binLowEdges[i] = data->GetBinLowEdge(i);
+		result[i] = data[i] + result[i-1];
 	}
-
-	//TODO Check the actual parameter type and and return the correct object accordingly
-	TString name = data->GetName();
-	name.Append(" (integrated)");
-
-	TH1D* result = new TH1D(name, "Integrated FADC data", nBins, binLowEdges);
-	result->GetXaxis()->SetTitle(data->GetXaxis()->GetTitle());
-//	stringstream yTitle;
-//	yTitle << "integral of " << data->GetYaxis()->GetTitle();
-//	result->GetYaxis()->SetTitle(yTitle.str().c_str());
-	result->GetYaxis()->SetTitle("a.u.");
-
-	delete[] binLowEdges;
-	double integral = 0.0;
-
-	//TODO check, why this doesn't work
-//	#pragma omp parallel for reduction(+:integral) shared(result,binWidth)
-	//start at bin 1 -> do not integrate the underflow bin
-	for (int i = 1; i <= nBins; i++)
-	{
-		integral += data->GetBinContent(i) ;
-		result->Fill(data->GetBinLowEdge(i), integral);
-	}
-
+	//TODO check if returning a copy isn't too slow
 	return result;
 }
 
 /**
- * Calculate the derivative of a plot given as histogram.
+ * Calculate the derivative of an event data sample given as std::array<int,800> so 800 FADC bins containing the
+ * raw FADC resolved measurement steps.
  *
- * @author Stefan
- * @date November 17,2016
- * @version 0.1
+ * @author Stefan Bieschke
+ * @date April 10,2017
+ * @version Alpha 2.0
  *
- * @param data Pointer to the histogram containing the data, on that the derivative is to be calculated
+ * @param data Reference to a std::array containing the data, for which the derivative is to be calculated
  *
- * @return Histogram containing the derivative
+ * @return std::array containing the derivative
  */
-TH1D* DataProcessor::derivate(TH1D* data) const
+const std::array<int,800> DataProcessor::derivate(const std::array<int,800>& data) const
 {
-	Int_t nBins = data->GetNbinsX();
-	Double_t* binLowEdges = new Double_t[nBins + 1];
-	TString name = data->GetName();
-	name.Append(" (derivative)");
-
-	for (Int_t i = 0; i <= nBins; i++)
+	std::array<int,800> result;
+	for (int i = 0; i < data.size() - 1; i++)
 	{
-		binLowEdges[i] = data->GetBinLowEdge(i);
+		result[i] = data[i + 1]- data[i];
 	}
-
-	TH1D* result = new TH1D(name, "derivative", nBins, binLowEdges);
-
-	for (int i = 0; i < nBins - 1; i++)
-	{
-		double differentialQuotient = (data->GetBinContent(i + 1)
-				- data->GetBinContent(i)) / (double) ADC_BINS_TO_TIME;
-		result->SetBinContent(i, differentialQuotient);
-	}
-
+	//TODO what happens to the last bin in the derivative?
+	//TODO does the qualitative result remain the same after scaling to mV and ns?
 	return result;
 }
 
@@ -150,35 +112,34 @@ TH1D* DataProcessor::derivate(TH1D* data) const
  *
  * @brief Integrate all data in a DataSet object
  *
- * @author Stefan
- * @date August 12, 2016
- * @version 0.8
+ * @author Stefan Bieschke
+ * @date April 10, 2017
+ * @version Alpha 2.0
  *
- * @param data Pointer to the DataSet object that is to be integrated
+ * @param data reference to the DataSet object that is to be integrated
  *
- * @return Pointer to a DataSet type object containing the processed data
+ * @return Reference to a DataSet type object containing the processed data
  *
  * @warning Heap object returned, caller needs to handle memory
  */
-DataSet* DataProcessor::integrateAll(DataSet* data) const
+std::unique_ptr<DataSet> DataProcessor::integrateAll(const DataSet& data) const
 {
-//	DataSet* result = new DataSet();
-	vector<TH1D*>* set = new vector<TH1D*>;
-	set->resize(data->getSize());
+	std::vector<std::array<int,800>>* set = new std::vector<std::array<int,800>>();
+	set->resize(data.getSize());
 
 	#pragma omp parallel for shared(set)
-	for (int i = 0; i < data->getSize(); i++)
+	for (int i = 0; i < data.getSize(); i++)
 	{
 		try
 		{
-			TH1D* integral = integrate(data->getEvent(i));
-			(*set)[i] = integral;
+			std::array<int,800> integral = integrate(data.getEvent(i));
+			set[i] = integral;
 		} catch (Exception& e)
 		{
 			cerr << e.error() << endl;
 		}
 	}
-	return new DataSet(set);
+	return std::unique:ptr<DataSet>(new DataSet(*set));
 }
 
 /**
@@ -186,15 +147,20 @@ DataSet* DataProcessor::integrateAll(DataSet* data) const
  * minimum. Can not yet find more than one negative peak.
  *
  * @author Stefan
- * @date July 2, 2016
- * @version 0.1
+ * @date April 10, 2017
+ * @version Alpha 2.0
  *
- * @param data Data as a pointer to a TH1D histogram containing the data
+ * @param data Reference to a std::array containing the raw data
  * @return bin containing the data minimum
  */
-inline int DataProcessor::findMinimumBin(TH1D* data) const
+inline int DataProcessor::findMinimumBin(const std::array<int,800>& data) const
 {
-	return data->GetMinimumBin();
+	int minBin = 0;
+	for(int i = 0; i < data.size(); i++)
+	{
+		minBin = data[i] < data[minBin] ? i : minBin;
+	}
+	return minBin;
 }
 
 /**
@@ -210,7 +176,7 @@ inline int DataProcessor::findMinimumBin(TH1D* data) const
  *
  * @return TH1D* histogram containing the spectrum of drifttimes
  */
-TH1D* DataProcessor::calculateDriftTimeSpectrum(DataSet* data) const
+TH1D* DataProcessor::calculateDriftTimeSpectrum(const DataSet& data) const
 {
 	int triggerpos = ADC_TRIGGERPOS_BIN;
 	TH1D* result = new TH1D("Drifttime spectrum", "Drift time spectrum", 800, 0,
