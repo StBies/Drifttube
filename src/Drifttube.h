@@ -14,11 +14,13 @@
 
 /**
  * Basic implementation of a drifttube. This contains the coordinates of the drift tube as well as
- * a DataSet object containing its raw data
+ * a DataSet object containing its raw data.
+ *
+ * @brief Representation of a tube detector.
  *
  * @author Stefan Bieschke
  * @date April 6, 2017
- * @version 0.1
+ * @version Alpha 2.0
  */
 class Drifttube
 {

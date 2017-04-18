@@ -76,15 +76,15 @@ DataSet::~DataSet()
 
 
 /**
- * Adds a raw data histogram to the DataSet. Does increment the size of the DataSet as well
+ * Adds a raw data histogram to the DataSet. Does increment the size of the DataSet as well.
  *
  * @brief Add raw data histogram
  *
- * @author Stefan
+ * @author Stefan Bieschke
  * @date April 18, 2017
  * @version Alpha 2.0
  *
- * @param histogram the histogram to add to the DataSet
+ * @param data the histogram to add to the DataSet
  *
  * @require data != nullptr
  * @ensure new size = old size + 1
