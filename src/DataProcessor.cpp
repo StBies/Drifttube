@@ -118,7 +118,7 @@ const std::array<int,800> DataProcessor::derivate(const std::array<int,800>& dat
  *
  * @param data reference to the DataSet object that is to be integrated
  *
- * @return Reference to a DataSet type object containing the processed data
+ * @return std::unique pointer to the new DataSet on heap. Be aware that ownership is transferred to caller
  *
  * @warning Heap object returned, caller needs to handle memory
  */
@@ -139,7 +139,7 @@ std::unique_ptr<DataSet> DataProcessor::integrateAll(const DataSet& data) const
 			cerr << e.error() << endl;
 		}
 	}
-	return std::unique:ptr<DataSet>(new DataSet(*set));
+	return std::unique_ptr<DataSet>(new DataSet(*set));
 }
 
 /**
@@ -179,15 +179,10 @@ inline int DataProcessor::findMinimumBin(const std::array<int,800>& data) const
 TH1D* DataProcessor::calculateDriftTimeSpectrum(const DataSet& data) const
 {
 	int triggerpos = ADC_TRIGGERPOS_BIN;
-	TH1D* result = new TH1D("Drifttime spectrum", "Drift time spectrum", 800, 0,
-			800 * ADC_BINS_TO_TIME);
-	result->GetXaxis()->SetTitle("drift time [ns]");
-	result->GetYaxis()->SetTitle("# counts");
 
 //	#pragma omp parallel for
 	for (int i = 0; i < data->getSize(); i++)
 	{
-//		TH1D* event = data->getEvent(i);
 		//TODO hint, that the operator[] of DataSet seems not quite to work, const return is a problem and operator does not work on pointer to object
 		//TODO maybe last mention is intended
 		const TH1D* event = (*data)[i];
@@ -215,22 +210,8 @@ TH1D* DataProcessor::calculateDriftTimeSpectrum(const DataSet& data) const
  */
 TH1D* DataProcessor::calculateRtRelation(TH1D& dtSpect) const
 {
-	Int_t nBins = dtSpect.GetNbinsX();
+	int nBins = dtSpect.GetNbinsX();
 	Double_t* binLowEdges = new Double_t[nBins + 1];
-
-	//	#pragma omp parallel for
-	for (Int_t i = 0; i <= nBins; i++)
-	{
-		binLowEdges[i] = dtSpect.GetBinLowEdge(i);
-	}
-
-	TH1D* result = new TH1D("rt-relation", "rt relation", nBins, binLowEdges);
-	result->GetXaxis()->SetTitle(dtSpect.GetXaxis()->GetTitle());
-	result->GetYaxis()->SetTitle("drift radius [mm]");
-
-	delete[] binLowEdges;
-	//choose random bin width since all bins are the same size - might change
-	Double_t binWidth = result->GetBinWidth(1);
 
 	double integral = 0.0;
 	//TODO own method

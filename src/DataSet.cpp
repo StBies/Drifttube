@@ -20,12 +20,15 @@ DataSet::DataSet()
 }
 
 /**
- *  Constructor, that takes a vector containing raw data in TH1D* format
+ *  Constructor, that takes a vector containing raw data that is stored in a std::array<int,800>
  *
- *  @author Stefan
- *  @date Dec 31, 2016
- *  @version 0.2
+ *  @brief constructor with a data-vector as argument
+ *
+ *  @author Stefan Bieschke
+ *  @date April 10, 2017
+ *  @version Alpha 2.0
  */
+//TODO might not work this way - at least not as intended. Might not come around working with pointers if copying is not an option
 DataSet::DataSet(const std::vector<std::array<int,800>>& data)
 {
 	_data = data;
@@ -44,15 +47,14 @@ DataSet::DataSet(const DataSet& original)
 {
 	//copy size of original DataSet
 	//create new vector containing the raw data and go into deep copy of its content
-	_data = vector<array<int,800>>();
+	_data = std::vector<array<int,800>>();
+	_data.resize(original.getSize());
 
 	//deep copy
 	for(array<int,800> data: original._data)
 	{
 		_data.push_back(data);
 	}
-
-	_data.shrink_to_fit();
 }
 
 /**
@@ -79,15 +81,15 @@ DataSet::~DataSet()
  * @brief Add raw data histogram
  *
  * @author Stefan
- * @date June 30, 2016
- * @version 0.1
+ * @date April 18, 2017
+ * @version Alpha 2.0
  *
  * @param histogram the histogram to add to the DataSet
  *
- * @require histgram != nullptr
+ * @require data != nullptr
  * @ensure new size = old size + 1
  */
-void DataSet::addData(array<int,800>& data)
+void DataSet::addData(std::unique_ptr<std::array<int,800> > data)
 {
 	_data.push_back(data);
 }
@@ -112,26 +114,23 @@ unsigned int DataSet::getSize() const
 
 
 /**
- * Getter method for an Event in this DataSet. Returns a pointer to an TH1D histogram
- * containing the raw data for an Event with number
- * event. Can throw an exception if the requested eventnumber is greater than the
+ * Getter method for an event in this DataSet. Returns the raw data as a reference to an std::array, containing the bin entries as
+ * integers. Can throw an exception if the requested eventnumber is greater than the
  * total number of events in the DataSet. See warning and requirements for details.
  *
  * @brief Getter method for an event
  *
  * @author Stefan
- * @date June 30, 2016
- * @version 0.1
+ * @date April 10, 2017
+ * @version Alpha 2.0
  *
  * @param event Number of the requested Event
  *
- * @return Pointer to a TH1D containing the data
+ * @return Reference to a std::array containing the data for the requested event
  *
- * @require event < this.getSize()
+ * @require event < this->getSize()
  *
  * @warning Throws an Exception if the above mentioned requirements are not met
- * @warning Heap object returned, memory management to be done by caller
- *
  */
 const array<int,800>& DataSet::getEvent(const unsigned int event) const
 {
@@ -140,7 +139,7 @@ const array<int,800>& DataSet::getEvent(const unsigned int event) const
 	{
 		throw EventSizeException(event);
 	}
-	return _data[event];
+	return *(_data[event]);
 }
 
 //operators

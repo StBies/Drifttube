@@ -11,6 +11,7 @@
 #include "EventSizeException.h"
 #include <vector>
 #include <array>
+#include <memory>
 
 /**
  * A class representing a DataSet. This is a collection of raw data arrays
@@ -31,7 +32,7 @@ public:
 	DataSet(const DataSet& original);
 	virtual ~DataSet();
 
-	void addData(std::array<int,800>& data);
+	void addData(std::unique_ptr<std::array<int,800> > data);
 	unsigned int getSize() const;
 	const std::array<int,800>& getEvent(const unsigned int event) const;
 
@@ -39,7 +40,8 @@ public:
 	const std::array<int,800>& operator[](unsigned int event) const;
 
 private:
-	std::vector<std::array<int,800>> _data;
+	//TODO check, if I should store raw pointers here to minimize overhead and avoid copies of large objects
+	std::vector< std::unique_ptr< std::array<int,800> > > _data;
 };
 
 #endif /* DATASET_H_ */

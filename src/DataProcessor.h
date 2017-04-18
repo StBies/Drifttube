@@ -40,8 +40,8 @@ public:
 	int findLastFilledBin(const std::array<int,800>& data, double threshold) const;
 	const std::array<int,800> calculateDriftTimeSpectrum(const DataSet& data) const;
 	const std::array<int,800> calculateRtRelation(const std::array<int,800>& dtSpect) const;
-	int countAfterpulses(const DataSet& rawData, const TH1D& rtRelation) const;
-	int countAfterpulsesDt(const DataSet& rawData, const TH1D& rtRelation) const;
+	int countAfterpulses(const DataSet& rawData, const std::array<int,800>& rtRelation) const;
+	int countAfterpulsesDt(const DataSet& rawData, const std::array<int,800>& rtRelation) const;
 
 	void calibrate(TString triggerDataFile);
 	void writeResults(const DataSet& raw, const DataSet& integrated, const TString filename, const TString dirname) const;

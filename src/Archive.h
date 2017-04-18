@@ -54,8 +54,10 @@ public:
 
 private:
 	TH1D* convertEntryToHistogram(int entry,TTree* tree);
+	std::unique_ptr<std::array<int,800> > convertEntry(int entry,TTree* tree);
 
 	void convertAllEntriesToHistograms(TTree* tree);
+	void convertAllEntries(TTree* tree);
 	void writeToFile(TString filename);
 	TString parseDir(TString filename);
 	TString parseFile(TString filename);

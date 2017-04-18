@@ -6,7 +6,6 @@
 
 #include "Archive.h"
 
-
 using namespace std;
 
 /**
@@ -25,8 +24,8 @@ Archive::Archive(TString filename)
 	_rtFilled = false;
 	_dtFilled = false;
 	_integralsFilled = false;
-	TFile file(filename,"read");
-	TTree* tree = (TTree*)file.Get("Tfadc");
+	TFile file(filename, "read");
+	TTree* tree = (TTree*) file.Get("Tfadc");
 	cout << "Reading tree" << endl;
 
 	_rawData = new DataSet();
@@ -42,7 +41,6 @@ Archive::Archive(TString filename)
 	_file = parseFile(filename);
 	file.Close();
 }
-
 
 /**
  * Destructor, that MUST be called when destroying the archive. Destructor
@@ -64,7 +62,6 @@ Archive::~Archive()
 	delete _rawData;
 	delete _processedData;
 }
-
 
 /**
  * Method to return the total number of events that are stored in this archive.
@@ -117,7 +114,7 @@ DataSet* Archive::getRawData() const
  */
 DataSet* Archive::getProcessedData() const
 {
-	if(_integralsFilled)
+	if (_integralsFilled)
 	{
 		return _processedData;
 	}
@@ -166,8 +163,7 @@ TH1D* Archive::getEvent(int event) const
 	try
 	{
 		return _rawData->getEvent(event);
-	}
-	catch(Exception& e)
+	} catch (Exception& e)
 	{
 		cerr << e.error() << endl;
 		return nullptr;
@@ -199,7 +195,6 @@ TH1D* Archive::getDrifttimeSpectrum() const
 	}
 }
 
-
 /**
  * Returns the derivative of the drift time spectrum as TH1D* histogram if it is present, if not an exception is thrown.
  *
@@ -214,13 +209,13 @@ TH1D* Archive::getDrifttimeSpectrum() const
 TH1D* Archive::getDtDerivative() const
 {
 	if (_diffDtFilled)
-		{
-			return _diffDtSpect;
-		}
-		else
-		{
-			throw DataPresenceException();
-		}
+	{
+		return _diffDtSpect;
+	}
+	else
+	{
+		throw DataPresenceException();
+	}
 }
 
 /**
@@ -314,7 +309,6 @@ void Archive::setDiffDrifttimeSpect(TH1D* spect)
 	_diffDtSpect = spect;
 }
 
-
 /**
  * Stores a calculated radius-drifttime relation in the Archive object.
  *
@@ -348,7 +342,7 @@ void Archive::setRtRelation(TH1D* data)
  */
 void Archive::writeToFile(TString filename)
 {
-	TFile file(filename,"recreate");
+	TFile file(filename, "recreate");
 	file.mkdir("rawData");
 	file.mkdir("integrated");
 	file.mkdir("dtSpect");
@@ -358,7 +352,7 @@ void Archive::writeToFile(TString filename)
 	TH1D* hist = nullptr;
 	TH1D* integral = nullptr;
 
-	for(int i = 0; i < _numberOfEntries; i++)
+	for (int i = 0; i < _numberOfEntries; i++)
 	{
 		hist = _rawData->getEvent(i);
 		integral = _processedData->getEvent(i);
@@ -376,7 +370,6 @@ void Archive::writeToFile(TString filename)
 	file.Close();
 	cout << "Saving complete" << endl;
 }
-
 
 /**
  * Converts the raw data, that is contained in the TTree tree to a one dimensional histogram
@@ -407,13 +400,14 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 	s << "Event #" << entry;
 	TString name(s.str());
 
-	TH1D* rawData = new TH1D(name,"FADC data", numberOfChannels, 0,
+	TH1D* rawData = new TH1D(name, "FADC data", numberOfChannels, 0,
 			numberOfChannels * ADC_BINS_TO_TIME);
 
 	//#pragma omp parallel for
 	for (int i = 0; i < numberOfChannels; i++)
 	{
-		rawData->SetBinContent(i, (voltage[i] - 2200)*ADC_CHANNELS_TO_VOLTAGE); //minus offset
+		rawData->SetBinContent(i,
+				(voltage[i] - 2200) * ADC_CHANNELS_TO_VOLTAGE); //minus offset
 	}
 	rawData->GetXaxis()->SetTitle("time [ns]");
 	rawData->GetYaxis()->SetTitle("voltage [V]");
@@ -422,22 +416,74 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
 }
 
 /**
- * Converts all event data stored in a tree to histograms of type TH1*.
+ * Converts the entry from the TTree in the root file to the data type used internally. The resulting objects are created
+ * on the heap and ownership is managed via a std::unique_ptr. After this method finished, it returns the unique ptr and transfers
+ * ownership with the return.
+ *
+ * @brief Convert from root-file to internally used data
+ *
+ * @author Stefan Bieschke
+ * @date April 18, 2017
+ * @version Alpha 2.0
+ *
+ * @return unique pointer to an std::array<int,800> containing the data. The ownership is transferred to caller after this method.
+ */
+std::unique_ptr < std::array<int, 800> > Archive::convertEntry(int entry, TTree* tree)
+{
+	const int numberOfChannels = 800;
+
+	double voltage[800];
+	tree->SetBranchAddress("Voltage", &voltage);
+	tree->GetEntry(entry);
+
+	std::unique_ptr < std::array<int, 800> > rawData(new std::array<int, 800>);
+
+	#pragma omp parallel for
+	for (int i = 0; i < numberOfChannels; i++)
+	{
+		(*rawData)[i] = voltage[i];
+	}
+
+	return std::move(rawData);
+}
+
+///**
+// * Converts all event data stored in a tree to histograms of type TH1*.
+// * The converted histograms are stored in the member variable _rawData.
+// *
+// * @brief Convert all data in tree
+// *
+// * @author Stefan
+// * @date June 28, 2016
+// * @version 0.1
+// *
+// * @param tree TTree object, that contains the data to be converted
+// */
+//void Archive::convertAllEntriesToHistograms(TTree* tree)
+//{
+//	for (int i = 0; i < _numberOfEntries; i++)
+//	{
+//		_rawData->addData(convertEntryToHistogram(i, tree));
+//	}
+//}
+
+/**
+ * Converts all event data stored in a tree to unique pointers to std::arrays containing the data.
  * The converted histograms are stored in the member variable _rawData.
  *
- * @brief Convert all data in tree
+ * @brief Convert all data in tree to datatypes used internally
  *
- * @author Stefan
- * @date June 28, 2016
- * @version 0.1
+ * @author Stefan Bieschke
+ * @date April 18, 2017
+ * @version Alpha 2.0
  *
  * @param tree TTree object, that contains the data to be converted
  */
-void Archive::convertAllEntriesToHistograms(TTree* tree)
+void Archive::convertAllEntries(TTree* tree)
 {
 	for (int i = 0; i < _numberOfEntries; i++)
 	{
-		_rawData->addData(convertEntryToHistogram(i, tree));
+		_rawData->addData(std::move(convertEntry(i, tree)));
 	}
 }
 
@@ -460,7 +506,7 @@ void Archive::convertAllEntriesToHistograms(TTree* tree)
 TString Archive::parseDir(TString filename)
 {
 	int positionOfLastSlash = filename.Last('/');
-	TSubString dir = filename(0,positionOfLastSlash+1);
+	TSubString dir = filename(0, positionOfLastSlash + 1);
 	return TString(dir);
 }
 
@@ -484,6 +530,6 @@ TString Archive::parseDir(TString filename)
 TString Archive::parseFile(TString filename)
 {
 	int positionOfLastSlash = filename.Last('/');
-	TSubString file = filename(positionOfLastSlash+1,filename.Length());
+	TSubString file = filename(positionOfLastSlash + 1, filename.Length());
 	return TString(file);
 }
