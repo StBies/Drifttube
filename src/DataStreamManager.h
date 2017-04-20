@@ -32,8 +32,8 @@ public:
 	bool writeToRootFile(Archive& archive);
 
 private:
-	Archive _archive;
-	DataProcessor _processor;
+//	Archive _archive;
+//	DataProcessor _processor;
 };
 
 #endif /* DATASTREAMMANAGER_H_ */
