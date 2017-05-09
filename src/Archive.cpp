@@ -59,8 +59,6 @@ Archive::~Archive()
 	TString filename(name.str());
 	cout << "Saving data to: " << filename << endl;
 	writeToFile(filename);
-	delete _rawData;
-	delete _processedData;
 }
 
 /**
@@ -69,50 +67,47 @@ Archive::~Archive()
  * @brief Getter method for #events
  *
  * @author Stefan
- * @date June 28, 2016
- * @version 0.1
+ * @date April 20, 2017
+ * @version Alpha 2.0
  *
  * @return integer number of events that are stored in this archive
  */
-int Archive::getSize() const
+const unsigned int Archive::getSize() const
 {
 	return _numberOfEntries;
 }
 
 /**
- * Getter method for the raw data histograms. Returns a DataSet* object pointer
+ * Getter method for the raw data histograms. Returns a DataSet object reference
  *
  * @brief raw data getter method
  *
- * @author Stefan
- * @date June 20, 2016
- * @version 0.2
+ * @author Stefan Bieschke
+ * @date April 20, 2017
+ * @version Alpha 2.0
  *
  * @return DataSet* containing histograms for all events
- *
- * @warning Pointer to original DataSet, delete with care.
  */
-DataSet* Archive::getRawData() const
+const DataSet& Archive::getRawData() const
 {
 	return _rawData;
 }
 
 /**
- * Getter method for the processed data DataSet. Returns a DataSet* object pointer
+ * Getter method for the processed data DataSet. Returns a DataSet object reference
  * containing the processed data
  *
  * @brief raw data getter method
  *
- * @author Stefan
- * @date October 19, 2016
- * @version 0.9
+ * @author Stefan Bieschke
+ * @date April 20, 2017
+ * @version Alpha 2.0
  *
- * @return DataSet* containing histograms for all events
+ * @return DataSet containing histograms for all events
  *
- * @warning Pointer to original object, delete with care.
  * @warning Throws an exception, if processed (integrated) data is not yet present
  */
-DataSet* Archive::getProcessedData() const
+DataSet& Archive::getProcessedData() const
 {
 	if (_integralsFilled)
 	{
@@ -142,7 +137,7 @@ void Archive::setProcessedData(DataSet* data)
 }
 
 /**
- * Method, that returns a histogram for a single event.
+ * Method, that returns a data for a single event.
  *
  * @brief Getter method for single event
  *
@@ -152,21 +147,18 @@ void Archive::setProcessedData(DataSet* data)
  *
  * @param event Number of the event to be returned
  *
- * @return TH1* type object histogram containing the data of the event.
- *
- * @warning Might be casted to TH1D* type object.
+ * @return array type object containing the data of the event.
  *
  * @require event < #events_total
  */
-TH1D* Archive::getEvent(int event) const
+const std::array<int,800>& Archive::getEvent(const unsigned int event) const
 {
 	try
 	{
-		return _rawData->getEvent(event);
+		return _rawData.getEvent(event);
 	} catch (Exception& e)
 	{
 		cerr << e.error() << endl;
-		return nullptr;
 	}
 }
 
@@ -183,7 +175,7 @@ TH1D* Archive::getEvent(int event) const
  *
  * @warning If the spectrum was not yet set, a DataPresenceException is thrown.
  */
-TH1D* Archive::getDrifttimeSpectrum() const
+const std::array<int,800>& Archive::getDrifttimeSpectrum() const
 {
 	if (_dtFilled)
 	{
@@ -206,7 +198,7 @@ TH1D* Archive::getDrifttimeSpectrum() const
  *
  * @warning If it is not yet set, a DataPrsenceException is thrown.
  */
-TH1D* Archive::getDtDerivative() const
+const std::array<int,800>& Archive::getDtDerivative() const
 {
 	if (_diffDtFilled)
 	{
@@ -231,7 +223,7 @@ TH1D* Archive::getDtDerivative() const
  *
  * @warning If the relation was not yet set, a DataPresenceException is thrown.
  */
-TH1D* Archive::getRtRelation() const
+const std::array<int,800>& Archive::getRtRelation() const
 {
 	if (_rtFilled)
 	{

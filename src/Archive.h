@@ -34,27 +34,27 @@ using namespace std;
 class Archive
 {
 public:
-	Archive(TString filename);
+	Archive(std::string filename);
 	virtual ~Archive();
 
-	int getSize() const;
-	DataSet* getRawData() const;
-	DataSet* getProcessedData() const;
-	TH1D* getEvent(int event) const;
-	TH1D* getDrifttimeSpectrum() const;
-	TH1D* getDtDerivative() const;
-	TH1D* getRtRelation() const;
+	const unsigned int getSize() const;
+	const DataSet& getRawData() const;
+	const DataSet& getProcessedData() const;
+	const std::array<int,800>& getEvent(int event) const;
+	const std::array<int,800>& getDrifttimeSpectrum() const;
+	const std::array<int,800>& getDtDerivative() const;
+	const std::array<int,800>& getRtRelation() const;
 	TString getFilename() const;
 	TString getDirname() const;
 
 	void setProcessedData(DataSet* data);
-	void setDifttimeSpect(TH1D* spect);
-	void setDiffDrifttimeSpect(TH1D* spect);
-	void setRtRelation(TH1D* data);
+	void setDifttimeSpect(const std::array<int,800> spect);
+	void setDiffDrifttimeSpect(const std::array<int,800> spect);
+	void setRtRelation(const std::array<int,800> data);
 
 private:
-	TH1D* convertEntryToHistogram(int entry,TTree* tree);
-	std::unique_ptr<std::array<int,800> > convertEntry(int entry,TTree* tree);
+	TH1D* convertEntryToHistogram(const unsigned int entry,TTree* tree);
+	std::unique_ptr<std::array<int,800> > convertEntry(const unsigned int entry,TTree* tree);
 
 	void convertAllEntriesToHistograms(TTree* tree);
 	void convertAllEntries(TTree* tree);
@@ -63,14 +63,14 @@ private:
 	TString parseFile(TString filename);
 
 
-	DataSet* _rawData;
-	DataSet* _processedData;
-	TH1D* _drifttimeSpect;
-	TH1D* _rtRelation;
-	TH1D* _diffDtSpect;
+	DataSet _rawData;
+	DataSet _processedData;
+	std::array<int,800> _drifttimeSpect;
+	std::array<int,800> _rtRelation;
+	std::array<int,800> _diffDtSpect;
 	TString _directory;
 	TString _file;
-	int _numberOfEntries;
+	unsigned int _numberOfEntries;
 	bool _dtFilled;
 	bool _rtFilled;
 	bool _integralsFilled;

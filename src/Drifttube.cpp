@@ -7,14 +7,28 @@
 
 #include "Drifttube.h"
 
-Drifttube::Drifttube()
+Drifttube::Drifttube(int posX, int posY)
 {
-	// TODO Auto-generated constructor stub
-
+	m_position[0] = posX;
+	m_position[1] = posY;
+//	m_data = DataSet();
 }
 
 Drifttube::~Drifttube()
 {
-	// TODO Auto-generated destructor stub
+
 }
 
+const unsigned int Drifttube::getRadius()
+{
+	return m_radius;
+}
+
+int Drifttube::getPositionX()
+{
+	return m_position[0];
+}
+int Drifttube::getPositionY()
+{
+	return m_position[1];
+}

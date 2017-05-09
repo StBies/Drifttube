@@ -25,13 +25,17 @@
 class Drifttube
 {
 public:
-	Drifttube();
+	Drifttube(int posX, int posY);
 	virtual ~Drifttube();
 
+	const unsigned int getRadius();
+	int getPositionX();
+	int getPositionY();
+
 private:
-	unsigned int m_radius;
+	static const unsigned int m_radius = 18150; //micron
 	std::array<int,2> m_position;
-	DataSet m_data;
+//	DataSet m_data;
 };
 
 #endif /* DRIFTTUBE_H_ */
