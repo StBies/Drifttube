@@ -58,20 +58,20 @@ DataSet::DataSet(const DataSet& original)
 }
 
 /**
- * Destructor of a DataSet, deletes this object as well as all histograms it holds
+ * Destructor of a DataSet, deletes this object as well as all data it holds
  *
  * @brief Dtor
  *
- * @author Stefan
- * @date July 02, 2016
- * @version 0.1
+ * @author Stefan Bieschke
+ * @date May 9, 2017
+ * @version Alpha 2.0
  */
 DataSet::~DataSet()
 {
-//	for(array<int,800> data : _data)
-//	{
-//		delete data;
-//	}
+	for(std::array<int,800>* data : _data)
+	{
+		delete [] data;
+	}
 }
 
 
@@ -89,7 +89,7 @@ DataSet::~DataSet()
  * @require data != nullptr
  * @ensure new size = old size + 1
  */
-void DataSet::addData(std::unique_ptr<std::array<int,800> > data)
+void DataSet::addData(std::array<int,800>* data)
 {
 	_data.push_back(data);
 }

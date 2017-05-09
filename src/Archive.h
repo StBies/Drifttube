@@ -62,7 +62,6 @@ private:
 	TString parseDir(TString filename);
 	TString parseFile(TString filename);
 
-
 	DataSet _rawData;
 	DataSet _processedData;
 	std::array<int,800> _drifttimeSpect;
@@ -71,10 +70,13 @@ private:
 	TString _directory;
 	TString _file;
 	unsigned int _numberOfEntries;
+
 	bool _dtFilled;
 	bool _rtFilled;
 	bool _integralsFilled;
 	bool _diffDtFilled;
+	//bitpattern to store information, if things are set
+	char m_filled_bitpattern;
 };
 
 #endif /* SRC_ARCHIVE_H_ */

@@ -41,7 +41,7 @@ public:
 
 private:
 	//TODO check, if I should store raw pointers here to minimize overhead and avoid copies of large objects
-	std::vector< std::unique_ptr< std::array<int,800> > > _data;
+	std::vector<std::array<int,800>* > _data;
 };
 
 #endif /* DATASET_H_ */

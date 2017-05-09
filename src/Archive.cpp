@@ -21,9 +21,10 @@ using namespace std;
  */
 Archive::Archive(TString filename)
 {
-	_rtFilled = false;
 	_dtFilled = false;
+	_rtFilled = false;
 	_integralsFilled = false;
+	m_filled_bitpattern = 0;
 	TFile file(filename, "read");
 	TTree* tree = (TTree*) file.Get("Tfadc");
 	cout << "Reading tree" << endl;
@@ -109,7 +110,7 @@ const DataSet& Archive::getRawData() const
  */
 DataSet& Archive::getProcessedData() const
 {
-	if (_integralsFilled)
+	if (m_filled_bitpattern & 0b00100000)
 	{
 		return _processedData;
 	}
@@ -132,8 +133,9 @@ DataSet& Archive::getProcessedData() const
  */
 void Archive::setProcessedData(DataSet* data)
 {
-	_processedData = data;
 	_integralsFilled = true;
+	m_filled_bitpattern |= 0b00100000;
+	_processedData = data;
 }
 
 /**
@@ -177,7 +179,7 @@ const std::array<int,800>& Archive::getEvent(const unsigned int event) const
  */
 const std::array<int,800>& Archive::getDrifttimeSpectrum() const
 {
-	if (_dtFilled)
+	if (m_filled_bitpattern & 0b10000000)
 	{
 		return _drifttimeSpect;
 	}
@@ -200,7 +202,7 @@ const std::array<int,800>& Archive::getDrifttimeSpectrum() const
  */
 const std::array<int,800>& Archive::getDtDerivative() const
 {
-	if (_diffDtFilled)
+	if (m_filled_bitpattern & 0b00010000)
 	{
 		return _diffDtSpect;
 	}
@@ -225,7 +227,7 @@ const std::array<int,800>& Archive::getDtDerivative() const
  */
 const std::array<int,800>& Archive::getRtRelation() const
 {
-	if (_rtFilled)
+	if (m_filled_bitpattern & 0b01000000)
 	{
 		return _rtRelation;
 	}
@@ -280,6 +282,7 @@ TString Archive::getDirname() const
  */
 void Archive::setDifttimeSpect(TH1D* spect)
 {
+	m_filled_bitpattern |= 0b10000000;
 	_dtFilled = true;
 	_drifttimeSpect = spect;
 }
@@ -297,6 +300,7 @@ void Archive::setDifttimeSpect(TH1D* spect)
  */
 void Archive::setDiffDrifttimeSpect(TH1D* spect)
 {
+	m_filled_bitpattern |= 0b00010000;
 	_diffDtFilled = true;
 	_diffDtSpect = spect;
 }
@@ -315,6 +319,7 @@ void Archive::setDiffDrifttimeSpect(TH1D* spect)
  */
 void Archive::setRtRelation(TH1D* data)
 {
+	m_filled_bitpattern |= 0b01000000;
 	_rtFilled = true;
 	_rtRelation = data;
 }
