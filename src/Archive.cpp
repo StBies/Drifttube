@@ -161,7 +161,7 @@ void Archive::setProcessedData(DataSet* data)
  *
  * @require event < #events_total
  */
-TH1D* Archive::getEvent(int event) const
+TH1D* Archive::getEvent(const unsigned int event) const
 {
 	try
 	{

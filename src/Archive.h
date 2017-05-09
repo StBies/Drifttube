@@ -40,7 +40,7 @@ public:
 	int getSize() const;
 	DataSet* getRawData() const;
 	DataSet* getProcessedData() const;
-	TH1D* getEvent(int event) const;
+	TH1D* getEvent(const unsigned  int event) const;
 	TH1D* getDrifttimeSpectrum() const;
 	TH1D* getDtDerivative() const;
 	TH1D* getRtRelation() const;
