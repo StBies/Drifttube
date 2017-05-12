@@ -28,7 +28,7 @@ class DataSet
 {
 public:
 	DataSet();
-	DataSet(const std::vector<std::array<int,800>>& data);
+//	DataSet(const std::vector<std::unique_ptr<std::array<int,800>>>& data);
 	DataSet(const DataSet& original);
 	virtual ~DataSet();
 
@@ -37,11 +37,11 @@ public:
 	const std::array<int,800>& getEvent(const unsigned int event) const;
 
 //	const DataSet& operator+(const DataSet& data) const;
-	const std::array<int,800>& operator[](unsigned int event) const;
+	const std::array<int,800>& operator[](const unsigned int event) const;
 
 private:
-	//TODO check, if I should store raw pointers here to minimize overhead and avoid copies of large objects
-	std::vector<std::array<int,800>* > _data;
+	//standard library vector, that stores unique pointers to the raw data arrays
+	std::vector< std::unique_ptr<std::array<int,800> > > m_data;
 };
 
 #endif /* DATASET_H_ */

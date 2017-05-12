@@ -16,7 +16,7 @@
  */
 DataSet::DataSet()
 {
-	_data.resize(0);
+	m_data.resize(0);
 }
 
 /**
@@ -28,11 +28,11 @@ DataSet::DataSet()
  *  @date April 10, 2017
  *  @version Alpha 2.0
  */
-//TODO might not work this way - at least not as intended. Might not come around working with pointers if copying is not an option
-DataSet::DataSet(const std::vector<std::array<int,800>>& data)
-{
-	_data = data;
-}
+//TODO Overhaul this constructor to work with unique_pointers
+//DataSet::DataSet(const std::vector<unique_ptr<array<int,800>>>& data)
+//{
+//	m_data = data;
+//}
 
 /**
  * First implementation of a copy constructor for DataSets in order to enable DataSet operators to work
@@ -47,13 +47,22 @@ DataSet::DataSet(const DataSet& original)
 {
 	//copy size of original DataSet
 	//create new vector containing the raw data and go into deep copy of its content
-	_data = std::vector<array<int,800>>();
-	_data.resize(original.getSize());
+	m_data = std::vector<unique_ptr<array<int,800>>>(original.getSize());
 
 	//deep copy
-	for(array<int,800> data: original._data)
+	//note: range based for (aka for each) does not work, since that would be a copy of the unique pointer
+//	for(unique_ptr<array<int,800>> data: original.m_data)
+	for(int j = 0; j < original.m_data.size(); j++)
 	{
-		_data.push_back(data);
+
+		unique_ptr<array<int,800>> temp(new array<int,800>());
+
+		//copy contents of the unique pointer to the contents of the new temp heap object
+		for(int i = 0; i < original.m_data[j]->size(); i++)
+		{
+			(*temp)[i] = (*original.m_data[j])[i];
+		}
+		m_data.push_back(move(temp));
 	}
 }
 
@@ -63,15 +72,15 @@ DataSet::DataSet(const DataSet& original)
  * @brief Dtor
  *
  * @author Stefan Bieschke
- * @date May 9, 2017
- * @version Alpha 2.0
+ * @date May 12, 2017
+ * @version Alpha 2.0.1
  */
 DataSet::~DataSet()
 {
-	for(std::array<int,800>* data : _data)
-	{
-		delete [] data;
-	}
+	/*
+	 * Meant to be empty, the unique_ptr's in the stored vector are automatically deleted when the vector goes out of scope,
+	 * so when this DataSet object is deleted
+	 */
 }
 
 
@@ -89,9 +98,10 @@ DataSet::~DataSet()
  * @require data != nullptr
  * @ensure new size = old size + 1
  */
-void DataSet::addData(std::array<int,800>* data)
+void DataSet::addData(std::unique_ptr<std::array<int,800> > data)
 {
-	_data.push_back(data);
+	//move the ownership of the data array to the vector m_data, that should finally store it
+	m_data.push_back(move(data));
 }
 
 /**
@@ -109,7 +119,7 @@ void DataSet::addData(std::array<int,800>* data)
  */
 unsigned int DataSet::getSize() const
 {
-	return _data.size();
+	return m_data.size();
 }
 
 
@@ -139,7 +149,7 @@ const array<int,800>& DataSet::getEvent(const unsigned int event) const
 	{
 		throw EventSizeException(event);
 	}
-	return *(_data[event]);
+	return *(m_data[event]);
 }
 
 //operators
@@ -152,7 +162,7 @@ const array<int,800>& DataSet::getEvent(const unsigned int event) const
  * @date March 31, 2017
  * @version 0.1
  *
- *@TODO does not yet work as intended
+ * @TODO does not yet work as intended
  * @param data DataSet object on the right hand side of the binary operator
  * @return DataSet object as a const reference
  */
@@ -181,7 +191,7 @@ const array<int,800>& DataSet::getEvent(const unsigned int event) const
  * @TODO check, if the operator works as intended on reference, value and pointer type objects
  * @warning can throw an EventSizeException
  */
-const array<int,800>& DataSet::operator[](unsigned int event) const
+const array<int,800>& DataSet::operator[](const unsigned int event) const
 {
 	return getEvent(event);
 }
