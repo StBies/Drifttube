@@ -153,29 +153,9 @@ const array<int,800>& DataSet::getEvent(const unsigned int event) const
 }
 
 //operators
-/**
- * Enables the usage of the binary operator + so that one can write things like:
- * DataSet result = dataset1 + dataset2;
- * with the result containing all the events, that are stored in both, the DataSets one and two.
- *
- * @author Stefan
- * @date March 31, 2017
- * @version 0.1
- *
- * @TODO does not yet work as intended
- * @param data DataSet object on the right hand side of the binary operator
- * @return DataSet object as a const reference
- */
-//const DataSet& DataSet::operator+(const DataSet& data) const
-//{
-//	//TODO fix: operator+ not implemented for std::vector - makes sense...
-//	DataSet* result = new DataSet((this->_data + data._data));
-//	result->_size = this->_size + data._size;
-//	return *result;
-//}
 
 /**
- * Implementation of the [] operator enabling on to use the common dataset[event] statement to access individual events
+ * Implementation of the [] operator enabling on to use the common DataSet[event] statement to access individual events
  * of the DataSet object. Note, that the usage of this operator does not allow the caller to do certain things with the returned object:
  * 1. One can not move the returned histogram in memory
  * 2. One can not change the content of the histogram
@@ -183,14 +163,14 @@ const array<int,800>& DataSet::getEvent(const unsigned int event) const
  *
  * @author Stefan
  * @date March 31, 2017
- * @version 0.1
+ * @version Alpha 2.0
  *
  * @param event Eventnumber to be accessed.
- * @return TH1D type pointer to histogram containing the raw data
+ * @return array containing the raw data as reference
  *
- * @TODO check, if the operator works as intended on reference, value and pointer type objects
  * @warning can throw an EventSizeException
  */
+//TODO check, if the operator works as intended on reference, value and pointer type objects
 const array<int,800>& DataSet::operator[](const unsigned int event) const
 {
 	return getEvent(event);
