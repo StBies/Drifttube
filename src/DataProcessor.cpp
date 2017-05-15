@@ -1,5 +1,7 @@
 #include "DataProcessor.h"
 
+using namespace std;
+
 /**
  * Constructor, initializes the DataProcessor object.
  * 
@@ -122,24 +124,24 @@ const std::array<int,800> DataProcessor::derivate(const std::array<int,800>& dat
  *
  * @warning Heap object returned, caller needs to handle memory
  */
-std::unique_ptr<DataSet> DataProcessor::integrateAll(const DataSet& data) const
+DataSet* DataProcessor::integrateAll(const DataSet& data) const
 {
-	std::vector<std::array<int,800>>* set = new std::vector<std::array<int,800>>();
-	set->resize(data.getSize());
+	vector<vector<unique_ptr<array<int,800>>>> set(data.getSize());
 
 	#pragma omp parallel for shared(set)
 	for (int i = 0; i < data.getSize(); i++)
 	{
 		try
 		{
-			std::array<int,800> integral = integrate(data.getEvent(i));
+			unique_ptr<array<int,800>> integral(new array<int,800>());
+			*integral =  integrate(data.getEvent(i));
 			set[i] = integral;
 		} catch (Exception& e)
 		{
 			cerr << e.error() << endl;
 		}
 	}
-	return std::unique_ptr<DataSet>(new DataSet(*set));
+	return unique_ptr<DataSet>(new DataSet(set));
 }
 
 /**
