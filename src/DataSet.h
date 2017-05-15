@@ -33,12 +33,11 @@ class DataSet
 {
 public:
 	DataSet();
-	//TODO the constructor below needs yet to be implemented using smart pointers
-//	DataSet(const std::vector<std::unique_ptr<std::array<int,800>>>& data);
+	DataSet(std::vector<std::unique_ptr<std::array<int,800>>>& data);
 	DataSet(const DataSet& original);
 	virtual ~DataSet();
 
-	void addData(std::unique_ptr<std::array<int,800> > data);
+	void addData(std::unique_ptr<std::array<int,800>> data);
 	unsigned int getSize() const;
 	const std::array<int,800>& getEvent(const unsigned int event) const;
 
@@ -47,7 +46,7 @@ public:
 
 private:
 	//standard library vector, that stores unique pointers to the raw data arrays
-	std::vector< std::unique_ptr<std::array<int,800> > > m_data;
+	std::vector< std::unique_ptr<std::array<int,800>>> m_data;
 };
 
 #endif /* DATASET_H_ */

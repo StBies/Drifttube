@@ -19,20 +19,39 @@ DataSet::DataSet()
 	m_data.resize(0);
 }
 
+
 /**
- *  Constructor, that takes a vector containing raw data that is stored in a std::array<int,800>
+ * Constructor that takes a vector containing raw data that is stored in a std::array<int,800>.
+ * This method passes ownership of the unique pointers in the vector, that is passed as argument to the constructed DataSet.
+ * Please note that the passed vector WILL be changed during the execution of this method. It will do the following:
+ *  1.) Pass ownership of the unique pointers in the vector to the DataSet member m_data and overwrite with nullpointers
+ *  2.) Resize the passed vector data to a size of 0 and clear the contents
  *
- *  @brief constructor with a data-vector as argument
  *
- *  @author Stefan Bieschke
- *  @date April 10, 2017
- *  @version Alpha 2.0
+ * @brief constructor with a data-vector as argument
+ *
+ * @author Stefan Bieschke
+ * @date May 15, 2017
+ * @version Alpha 2.0
+ *
+ * @param data Reference to a vector containing unique pointers to data arrays. Those will be transferred to the DataSet member.
+ *
+ * @warning After finishing of this method, the passed vector will be empty and size 0, if it lives on heap, it needs to be deleted manually.
  */
-//TODO Overhaul this constructor to work with unique_pointers
-//DataSet::DataSet(const std::vector<unique_ptr<array<int,800>>>& data)
-//{
-//	m_data = data;
-//}
+DataSet::DataSet(std::vector<unique_ptr<array<int,800>>>& data)
+{
+//TODO Think about design of this method, might be unclear to caller, what happens here.
+//TODO Excessive testing needed.
+	int size = data.size();
+	m_data.resize(size);
+
+	for(int i = 0; i < size; i++)
+	{
+		m_data[i] = move(data[i]);
+	}
+	data.clear();
+	data.resize(0);
+}
 
 /**
  * First implementation of a copy constructor for DataSets in order to enable DataSet operators to work
@@ -52,15 +71,15 @@ DataSet::DataSet(const DataSet& original)
 	//deep copy
 	//note: range based for (aka for each) does not work, since that would be a copy of the unique pointer
 //	for(unique_ptr<array<int,800>> data: original.m_data)
-	for(int j = 0; j < original.m_data.size(); j++)
+	for(int i = 0; i < original.m_data.size(); i++)
 	{
 
 		unique_ptr<array<int,800>> temp(new array<int,800>());
 
 		//copy contents of the unique pointer to the contents of the new temp heap object
-		for(int i = 0; i < original.m_data[j]->size(); i++)
+		for(int j = 0; j < original.m_data[i]->size(); j++)
 		{
-			(*temp)[i] = (*original.m_data[j])[i];
+			(*temp)[j] = (*original.m_data[i])[j];
 		}
 		m_data.push_back(move(temp));
 	}
