@@ -17,3 +17,6 @@ testdata/*
 spectra/*
 rootscripts/*.dat
 *.dat
+
+#Google test
+gtest/

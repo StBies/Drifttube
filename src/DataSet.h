@@ -12,6 +12,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include "Event.h"
 
 /**
  * A class representing a DataSet. This is a collection of raw data arrays
@@ -33,20 +34,19 @@ class DataSet
 {
 public:
 	DataSet();
-	DataSet(std::vector<std::unique_ptr<std::array<int,800>>>& data);
+	DataSet(std::vector<std::unique_ptr<Event>>& data);
 	DataSet(const DataSet& original);
 	virtual ~DataSet();
 
-	void addData(std::unique_ptr<std::array<int,800>> data);
+	void addData(std::unique_ptr<Event> data);
 	unsigned int getSize() const;
-	const std::array<int,800>& getEvent(const unsigned int event) const;
+	const Event& getEvent(const unsigned int event) const;
 
-//	const DataSet& operator+(const DataSet& data) const;
-	const std::array<int,800>& operator[](const unsigned int event) const;
+	const Event& operator[](const unsigned int event) const;
 
 private:
 	//standard library vector, that stores unique pointers to the raw data arrays
-	std::vector< std::unique_ptr<std::array<int,800>>> m_data;
+	std::vector< std::unique_ptr<Event>> m_data;
 };
 
 #endif /* DATASET_H_ */

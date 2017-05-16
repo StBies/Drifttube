@@ -47,7 +47,7 @@ TEST_F(EventTest, TestEventNumber)
 TEST_F(EventTest, TestEventEntries)
 {
 	ASSERT_EQ(42,e1->getData().at(0));
-	ASSERT_EQ(1337,e1->getData().at(5));
+	ASSERT_EQ(1337,e2->getData().at(5));
 }
 
 TEST_F(EventTest, TestEventSize)
@@ -65,6 +65,37 @@ TEST_F(EventTest, TestAccessLvalue)
 {
 	(*e1)[42] = 43;
 	ASSERT_EQ(43, (*e1)[42]);
+}
+
+TEST_F(EventTest, TestSize)
+{
+	ASSERT_EQ(800,e1->getData().size());
+	ASSERT_EQ(800,e2->getData().size());
+}
+
+TEST_F(EventTest, TestForEach)
+{
+	unsigned int i = 0;
+	for(uint16_t number : e1->getData() )
+	{
+		i++;
+	}
+	ASSERT_EQ(800,i);
+}
+
+TEST_F(EventTest, TestCopyConstructor)
+{
+	Event copied1(*e1);
+	Event copied2(*e2);
+
+	ASSERT_FALSE(&copied1 == e1);
+	ASSERT_FALSE(&copied2 == e2);
+	ASSERT_FALSE(&copied1.getData() == &e1->getData());
+	ASSERT_FALSE(&copied2.getData() == &e2->getData());
+	ASSERT_TRUE(copied1.getData() == e1->getData());
+	ASSERT_TRUE(copied2.getData() == e2->getData());
+	ASSERT_EQ(42,copied1[1]);
+	ASSERT_EQ(1337,copied2[0]);
 }
 
 int main(int argc, char **argv)

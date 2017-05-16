@@ -29,9 +29,11 @@ class Event
 public:
 	Event(const unsigned int eventNumber, std::unique_ptr<std::array<uint16_t,800>> data);
 	~Event();
+	Event(const Event& original);
 
-	const std::array<uint16_t,800>& getData();
+	const std::array<uint16_t,800>& getData() const;
 	const unsigned int getEventNumber();
+	const double getDriftTime() const;
 
 	//TODO check if offering this is bad design and if getData() should be all that is available
 	uint16_t& operator[](const unsigned short bin) const;
@@ -39,6 +41,7 @@ public:
 private:
 	std::unique_ptr<std::array<uint16_t,800>> m_data;
 	unsigned int m_event_number;
+	double m_drift_time;
 };
 
 #endif /* EVENT_H_ */

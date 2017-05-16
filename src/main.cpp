@@ -42,7 +42,6 @@ ParsedArgs parseCmdArgs(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	ParsedArgs args = parseCmdArgs(argc,argv);
-	TH1::AddDirectory(kFALSE);
 	DataProcessor processor;
 
 	TString filename = args.infilename;

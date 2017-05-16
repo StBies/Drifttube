@@ -18,11 +18,38 @@ Event::Event(unsigned int eventNumber, unique_ptr<array<uint16_t,800>> data)
 {
 	m_event_number = eventNumber;
 	m_data = move(data);
+	//TODO implement drift time initialization
+	m_drift_time = 0;
 }
 
 Event::~Event()
 {
 
+}
+
+
+/**
+ * Copy constructor
+ *
+ * @author Stefan Bieschke
+ * @date May 16, 2017
+ * @version Alpha 2.0
+ *
+ * @param original Event that shall be copied
+ */
+Event::Event(const Event& original)
+{
+	m_event_number = original.m_event_number;
+	m_drift_time = original.m_drift_time;
+	unique_ptr<array<uint16_t,800>> temp(new array<uint16_t,800>);
+
+	//deep copy
+	for(int i = 0; i < original.m_data->size(); i++)
+	{
+		(*temp)[i] = (*original.m_data)[i];
+	}
+
+	m_data = move(temp);
 }
 
 /**
@@ -36,7 +63,7 @@ Event::~Event()
  *
  * @return Reference to the array that is contained
  */
-const std::array<uint16_t,800>& Event::getData()
+const std::array<uint16_t,800>& Event::getData() const
 {
 	return *m_data;
 }
@@ -53,6 +80,15 @@ const std::array<uint16_t,800>& Event::getData()
 const unsigned int Event::getEventNumber()
 {
 	return m_event_number;
+}
+
+/**
+ * Getter method for the drift time of the event in nanoseconds.
+ * @return
+ */
+const double Event::getDriftTime() const
+{
+	return m_drift_time;
 }
 
 

@@ -21,7 +21,7 @@ DataSet::DataSet()
 
 
 /**
- * Constructor that takes a vector containing raw data that is stored in a std::array<int,800>.
+ * Constructor that takes a vector containing raw data that is stored in a Event objects.
  * This method passes ownership of the unique pointers in the vector, that is passed as argument to the constructed DataSet.
  * Please note that the passed vector WILL be changed during the execution of this method. It will do the following:
  *  1.) Pass ownership of the unique pointers in the vector to the DataSet member m_data and overwrite with nullpointers
@@ -34,17 +34,18 @@ DataSet::DataSet()
  * @date May 15, 2017
  * @version Alpha 2.0
  *
- * @param data Reference to a vector containing unique pointers to data arrays. Those will be transferred to the DataSet member.
+ * @param data Reference to a vector containing unique pointers to Events. Those will be transferred to the DataSet member.
  *
  * @warning After finishing of this method, the passed vector will be empty and size 0, if it lives on heap, it needs to be deleted manually.
  */
-DataSet::DataSet(std::vector<unique_ptr<array<int,800>>>& data)
+DataSet::DataSet(std::vector<unique_ptr<Event>>& data)
 {
 //TODO Think about design of this method, might be unclear to caller, what happens here.
 //TODO Excessive testing needed.
-	int size = data.size();
+	size_t size = data.size();
 	m_data.resize(size);
 
+	#pragma omp parallel for
 	for(int i = 0; i < size; i++)
 	{
 		m_data[i] = move(data[i]);
@@ -66,21 +67,14 @@ DataSet::DataSet(const DataSet& original)
 {
 	//copy size of original DataSet
 	//create new vector containing the raw data and go into deep copy of its content
-	m_data = std::vector<unique_ptr<array<int,800>>>(original.getSize());
+	m_data = std::vector<unique_ptr<Event>>(original.getSize());
 
 	//deep copy
 	//note: range based for (aka for each) does not work, since that would be a copy of the unique pointer
-//	for(unique_ptr<array<int,800>> data: original.m_data)
-	for(int i = 0; i < original.m_data.size(); i++)
+	for(int i = 0; i < original.getSize(); i++)
 	{
+		unique_ptr<Event> temp(new Event(original[i]));
 
-		unique_ptr<array<int,800>> temp(new array<int,800>());
-
-		//copy contents of the unique pointer to the contents of the new temp heap object
-		for(int j = 0; j < original.m_data[i]->size(); j++)
-		{
-			(*temp)[j] = (*original.m_data[i])[j];
-		}
 		m_data.push_back(move(temp));
 	}
 }
@@ -104,20 +98,20 @@ DataSet::~DataSet()
 
 
 /**
- * Adds a raw data histogram to the DataSet. Does increment the size of the DataSet as well.
+ * Adds an Event to the DataSet. Does increment the size of the DataSet as well.
  *
- * @brief Add raw data histogram
+ * @brief Add Event to the DataSet
  *
  * @author Stefan Bieschke
  * @date April 18, 2017
  * @version Alpha 2.0
  *
- * @param data the histogram to add to the DataSet
+ * @param data the Event to add to the DataSet
  *
  * @require data != nullptr
  * @ensure new size = old size + 1
  */
-void DataSet::addData(std::unique_ptr<std::array<int,800> > data)
+void DataSet::addData(std::unique_ptr<Event> data)
 {
 	//move the ownership of the data array to the vector m_data, that should finally store it
 	m_data.push_back(move(data));
@@ -161,7 +155,7 @@ unsigned int DataSet::getSize() const
  *
  * @warning Throws an Exception if the above mentioned requirements are not met
  */
-const array<int,800>& DataSet::getEvent(const unsigned int event) const
+const Event& DataSet::getEvent(const unsigned int event) const
 {
 	//only give an event if requirements are met, else throw requirement exception
 	if(event > getSize())
@@ -190,7 +184,7 @@ const array<int,800>& DataSet::getEvent(const unsigned int event) const
  * @warning can throw an EventSizeException
  */
 //TODO check, if the operator works as intended on reference, value and pointer type objects
-const array<int,800>& DataSet::operator[](const unsigned int event) const
+const Event& DataSet::operator[](const unsigned int event) const
 {
 	return getEvent(event);
 }
