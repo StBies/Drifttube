@@ -25,6 +25,7 @@
  */
 class Event
 {
+	//TODO TESTING
 public:
 	Event(const unsigned int eventNumber, std::unique_ptr<std::array<uint16_t,800>> data);
 	~Event();

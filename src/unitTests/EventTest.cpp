@@ -1,6 +1,9 @@
 #include "../Event.h"
 #include <gtest/gtest.h>
 
+/**
+ * Unit test for the Event class utilizing the Google Test Framework (see https://github.com/google/googletest )
+ */
 class EventTest : public ::testing::Test
 {
 public:
@@ -51,6 +54,17 @@ TEST_F(EventTest, TestEventSize)
 {
 	ASSERT_EQ(800,e1->getData().size());
 	ASSERT_EQ(800,e2->getData().size());
+}
+
+TEST_F(EventTest, TestAccessOperator)
+{
+	ASSERT_TRUE(e1->getData()[42] == (*e1)[42]);
+}
+
+TEST_F(EventTest, TestAccessLvalue)
+{
+	(*e1)[42] = 43;
+	ASSERT_EQ(43, (*e1)[42]);
 }
 
 int main(int argc, char **argv)
