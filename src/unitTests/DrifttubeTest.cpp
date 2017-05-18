@@ -1,22 +1,22 @@
 #include "../Drifttube.h"
+#include <gtest/gtest.h>
 
-class DrifttubeTest : public CppUnit::TestFixture
+class DrifttubeTest : public ::testing::Test
 {
 public:
 	DrifttubeTest()
 	{
+		d1.Drifttube(1,2,new DataSet());
+		d2.Drifttube(3,4,new DataSet());
 	}
 
-	virtual void SetUp()
+	~DrifttubeTest()
 	{
 
 	}
 
-	virtual void TearDown()
-	{
-
-	}
-
-	private
+protected:
+	Drifttube d1;
+	Drifttube d2;
 
 };
