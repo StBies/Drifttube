@@ -10,7 +10,6 @@
 
 #include "EventSizeException.h"
 #include <vector>
-#include <array>
 #include <memory>
 #include "Event.h"
 
@@ -46,7 +45,7 @@ public:
 
 private:
 	//standard library vector, that stores unique pointers to the raw data arrays
-	std::vector< std::unique_ptr<Event>> m_data;
+	std::vector<std::unique_ptr<Event>> m_data;
 };
 
 #endif /* DATASET_H_ */

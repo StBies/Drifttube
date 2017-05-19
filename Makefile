@@ -9,10 +9,11 @@ SRC			=	$(wildcard src/*.cpp)
 OBJ			=	$(addprefix obj/,$(notdir $(SRC:.cpp=.o)))
 OBJDIR		=	obj
 MKDIR		=	mkdir -p
+TESTOBJ		= 	obj/Drifttube.o obj/DataSet.o obj/Event.o obj/Exception.o obj/EventSizeException.o
 
 .PHONY :	directories
 
-all: directories prog
+all: directories prog test
 
 prog: $(OBJ)
 	$(CC) -o prog.out $^ $(LDFLAGS) $(ROOTLDFLAGS)
@@ -22,6 +23,10 @@ obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) $(ROOTCFLAGS) -c -o $@ $<
 	
 directories: ${OBJDIR}
+
+test: $(TESTOBJ)
+	$(CC) -std=c++11 -I./gtest/include -L./gtest/lib src/unitTests/DrifttubeTest.cpp $(TESTOBJ) -o DrifttubeTest.out -lgtest -lgtest_main -lpthread
+	$(CC) -std=c++11 -I./gtest/include -L./gtest/lib src/unitTests/EventTest.cpp $(TESTOBJ) -o EventTest.out -lgtest -lgtest_main -lpthread
 
 ${OBJDIR}:
 	$(MKDIR) ${OBJDIR}

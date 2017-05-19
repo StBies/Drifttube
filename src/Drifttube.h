@@ -9,6 +9,7 @@
 #define DRIFTTUBE_H_
 
 #include <array>
+#include <memory>
 #include "DataSet.h"
 
 
@@ -25,17 +26,20 @@
 class Drifttube
 {
 public:
-	Drifttube(int posX, int posY, DataSet* data);
-	virtual ~Drifttube();
+	Drifttube(const int posX, const int posY, unique_ptr<DataSet> data);
+	~Drifttube();
 
-	const unsigned int getRadius();
-	int getPositionX();
-	int getPositionY();
+	const unsigned int getRadius() const;
+	const int getPositionX() const;
+	const int getPositionY() const;
+	const std::array<int,2>& getPosition() const;
+
+	const DataSet& getDataSet() const;
 
 private:
 	const unsigned int m_radius = 18150; //micron
 	std::array<int,2> m_position;
-	DataSet m_data;
+	std::unique_ptr<DataSet> m_data;
 };
 
 #endif /* DRIFTTUBE_H_ */
