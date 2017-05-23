@@ -38,7 +38,7 @@ DataSet::DataSet()
  *
  * @warning After finishing of this method, the passed vector will be empty and size 0, if it lives on heap, it needs to be deleted manually.
  */
-DataSet::DataSet(std::vector<unique_ptr<Event>>& data)
+DataSet::DataSet(vector<unique_ptr<Event>>& data)
 {
 //TODO Think about design of this method, might be unclear to caller, what happens here.
 //TODO Excessive testing needed.
@@ -75,7 +75,7 @@ DataSet::DataSet(const DataSet& original)
 	{
 		unique_ptr<Event> temp(new Event(original[i]));
 
-		m_data.push_back(move(temp));
+		m_data[i] = move(temp);
 	}
 }
 
