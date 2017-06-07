@@ -49,10 +49,13 @@ TEST_F(DataSetTest,TestCopyConstruction)
 	DataSet copyOfD2(*d2);
 
 	ASSERT_EQ(15,copyOfD2.getSize());
+	ASSERT_FALSE(d2 == &copyOfD2);
 	ASSERT_TRUE(d2->getSize() == copyOfD2.getSize());
 
 	for(unsigned int i = 0; i < d2->getSize(); i++)
 	{
+		ASSERT_FALSE(&(*d2)[i] == &copyOfD2[i]);
+		ASSERT_FALSE(&copyOfD2[i].getData() == &(*d2)[i].getData());
 		ASSERT_TRUE(copyOfD2[i].getData() == (*d2)[i].getData());
 	}
 

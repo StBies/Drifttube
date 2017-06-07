@@ -38,7 +38,7 @@ public:
 	virtual ~DataSet();
 
 	void addData(std::unique_ptr<Event> data);
-	unsigned int getSize() const;
+	size_t getSize() const;
 	const Event& getEvent(const unsigned int event) const;
 
 	const Event& operator[](const unsigned int event) const;

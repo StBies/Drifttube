@@ -11,7 +11,6 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
-#include "TH1D.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
@@ -35,9 +34,9 @@ class Archive
 {
 public:
 	Archive(std::string filename);
-	virtual ~Archive();
+	~Archive();
 
-	const unsigned int getSize() const;
+	const size_t getSize() const;
 	const DataSet& getRawData() const;
 	const DataSet& getProcessedData() const;
 	const std::array<int,800>& getEvent(int event) const;
@@ -53,14 +52,14 @@ public:
 	void setRtRelation(const std::array<int,800> data);
 
 private:
-	TH1D* convertEntryToHistogram(const unsigned int entry,TTree* tree);
-	std::unique_ptr<std::array<int,800> > convertEntry(const unsigned int entry,TTree* tree);
-
-	void convertAllEntriesToHistograms(TTree* tree);
-	void convertAllEntries(TTree* tree);
-	void writeToFile(TString filename);
-	TString parseDir(TString filename);
-	TString parseFile(TString filename);
+//	TH1D* convertEntryToHistogram(const unsigned int entry,TTree* tree);
+//	std::unique_ptr<std::array<int,800> > convertEntry(const unsigned int entry,TTree* tree);
+//
+//	void convertAllEntriesToHistograms(TTree* tree);
+//	void convertAllEntries(TTree* tree);
+	void writeToFile(string filename);
+	string parseDir(string filename);
+	string parseFile(string filename);
 
 	DataSet _rawData;
 	DataSet _processedData;

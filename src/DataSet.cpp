@@ -130,7 +130,7 @@ void DataSet::addData(std::unique_ptr<Event> data)
  *
  * @ensure size >= 0
  */
-unsigned int DataSet::getSize() const
+size_t DataSet::getSize() const
 {
 	return m_data.size();
 }
