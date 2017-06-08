@@ -1,0 +1,88 @@
+#include "../DataProcessor.h"
+#include <gtest/gtest.h>
+#include <array>
+#include "../Event.h"
+
+using namespace std;
+
+class DataProcessorTest : public ::testing::Test
+{
+public:
+	DataProcessorTest()
+	{
+		unique_ptr<array<uint16_t,800>> sine_array(new array<uint16_t,800>);
+		unique_ptr<array<uint16_t,800>> const1_array(new array<uint16_t,800>);
+		unique_ptr<array<uint16_t,800>> const0_array(new array<uint16_t,800>);
+		unique_ptr<array<uint16_t,800>> max_uint_array(new array<uint16_t,800>);
+
+		double sine_range_to_bins = M_PI / 800;
+
+		for(int i = 0; i < 800; i++)
+		{
+			(*sine_array)[i] = (uint16_t)(sin(i * sine_range_to_bins) * 0xFFFF);
+			(*const1_array)[i] = 1;
+			(*const0_array)[i] = 0;
+			(*max_uint_array)[i] = 0xFFFF;
+		}
+
+		sine = new Event(0,move(sine_array));
+		const1 = new Event(1,move(const1_array));
+		const0 = new Event(2,move(const0_array));
+		max_uint = new Event(1,move(max_uint_array));
+	}
+
+	~DataProcessorTest()
+	{
+	}
+
+protected:
+	Event* sine;
+	Event* const1;
+	Event* const0;
+	Event* max_uint;
+};
+
+TEST_F(DataProcessorTest,TestComputeIntegral)
+{
+	ASSERT_EQ(0,DataProcessor::computeIntegral(*const0));
+	ASSERT_EQ(800,DataProcessor::computeIntegral(*const1));
+
+	uint64_t expected_sine_halfwave_integral = (uint64_t)(0xFFFF * 2 * 800 / M_PI);
+	int actualValue = DataProcessor::computeIntegral(*sine);
+	bool not_smaller = actualValue >= expected_sine_halfwave_integral - 0.00005 * expected_sine_halfwave_integral;
+	bool not_larger = actualValue <= expected_sine_halfwave_integral + 0.00005 * expected_sine_halfwave_integral;
+
+	ASSERT_TRUE(not_smaller && not_larger);
+
+}
+
+TEST_F(DataProcessorTest,TestComputerIntegralOverflow)
+{
+	unsigned long result = 800 * 0xFFFF;
+	ASSERT_EQ(result, DataProcessor::computeIntegral(*max_uint));
+}
+
+TEST_F(DataProcessorTest,TestComputerIntegrate)
+{
+	array<int,800> const1_int_exp;
+	array<int,800> const0_int_exp;
+	array<int,800> max_uint_int_exp;
+
+	for(int i = 0; i < 800; i++)
+	{
+		const1_int_exp[i] = i + 1;
+		const0_int_exp[i] = 0;
+		max_uint_int_exp[i] = (i + 1) * 0xFFFF;
+	}
+
+	ASSERT_EQ(const1_int_exp,DataProcessor::integrate(*const1));
+	ASSERT_EQ(const0_int_exp,DataProcessor::integrate(*const0));
+	ASSERT_EQ(max_uint_int_exp,DataProcessor::integrate(*max_uint));
+}
+
+
+int main(int argc, char **argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

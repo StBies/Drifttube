@@ -149,7 +149,7 @@ size_t DataSet::getSize() const
  *
  * @param event Number of the requested Event
  *
- * @return Reference to a std::array containing the data for the requested event
+ * @return Reference to an Event object containing the data for the requested event
  *
  * @require event < this->getSize()
  *
@@ -183,7 +183,6 @@ const Event& DataSet::getEvent(const unsigned int event) const
  *
  * @warning can throw an EventSizeException
  */
-//TODO check, if the operator works as intended on reference, value and pointer type objects
 const Event& DataSet::operator[](const unsigned int event) const
 {
 	return getEvent(event);

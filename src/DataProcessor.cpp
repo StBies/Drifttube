@@ -109,41 +109,41 @@ const array<int,800> DataProcessor::integrate(const Event& data)
 //	return result;
 //}
 
-/**
- * Integrates all histograms, that are passed to this method in a DataSet object. The resulting histograms containing the histograms
- * are returned in a new DataSet object.
- *
- * @brief Integrate all data in a DataSet object
- *
- * @author Stefan Bieschke
- * @date April 10, 2017
- * @version Alpha 2.0
- *
- * @param data reference to the DataSet object that is to be integrated
- *
- * @return std::unique pointer to the new DataSet on heap. Be aware that ownership is transferred to caller
- *
- * @warning Heap object returned, caller needs to handle memory
- */
-unique_ptr<DataSet> DataProcessor::integrateAll(const DataSet& data)
-{
-	vector<unique_ptr<Event>> set(data.getSize());
-
-	#pragma omp parallel for shared(set)
-	for (int i = 0; i < data.getSize(); i++)
-	{
-		try
-		{
-			unique_ptr<array<int,800>> integral(new array<int,800>());
-			*integral =  integrate(data.getEvent(i));
-			set[i] = integral;
-		} catch (Exception& e)
-		{
-			cerr << e.error() << endl;
-		}
-	}
-	return move(unique_ptr<DataSet>(new DataSet(set)));
-}
+///**
+// * Integrates all histograms, that are passed to this method in a DataSet object. The resulting histograms containing the histograms
+// * are returned in a new DataSet object.
+// *
+// * @brief Integrate all data in a DataSet object
+// *
+// * @author Stefan Bieschke
+// * @date April 10, 2017
+// * @version Alpha 2.0
+// *
+// * @param data reference to the DataSet object that is to be integrated
+// *
+// * @return std::unique pointer to the new DataSet on heap. Be aware that ownership is transferred to caller
+// *
+// * @warning Heap object returned, caller needs to handle memory
+// */
+//unique_ptr<DataSet> DataProcessor::integrateAll(const DataSet& data)
+//{
+//	vector<unique_ptr<Event>> set(data.getSize());
+//
+//	#pragma omp parallel for shared(set)
+//	for (int i = 0; i < data.getSize(); i++)
+//	{
+//		try
+//		{
+//			unique_ptr<array<int,800>> integral(new array<int,800>());
+//			*integral = integrate(data.getEvent(i));
+//			set[i] = integral;
+//		} catch (Exception& e)
+//		{
+//			cerr << e.error() << endl;
+//		}
+//	}
+//	return move(unique_ptr<DataSet>(new DataSet(set)));
+//}
 
 ///**
 // * Find the position of the minimum of the given data. Will only find the absolute

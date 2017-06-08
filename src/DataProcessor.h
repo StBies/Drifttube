@@ -30,7 +30,7 @@ public:
 	static int computeIntegral(const Event& data);
 	static const std::array<int,800> integrate(const Event& data);
 //	static const std::array<uint16_t,800> derivate(const Event& data) const;
-	static std::unique_ptr<DataSet> integrateAll(const DataSet& data) const;
+//	static std::unique_ptr<DataSet> integrateAll(const DataSet& data) const;
 //	static unsigned short findMinimumBin(const Event& data) const;
 //	static double findDriftTime(const Event& data, uint16_t threshold) const;
 //	static short findLastFilledBin(const Event& data, uint16_t threshold) const;
