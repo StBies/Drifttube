@@ -8,13 +8,24 @@
 #ifndef ARGSPARSER_H_
 #define ARGSPARSER_H_
 
+#include <string>
+#include <vector>
+
+typedef struct
+{
+	std::string path;
+	std::string filename;
+	std::vector<std::string> options;
+
+} Parsed;
+
 class ArgsParser
 {
 public:
 	ArgsParser();
 	~ArgsParser();
 
-	parseArguments(int argc, char* args);
+	Parsed parseArguments(int argc, char* args);
 };
 
 #endif /* ARGSPARSER_H_ */

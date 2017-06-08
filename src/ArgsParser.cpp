@@ -18,3 +18,9 @@ ArgsParser::~ArgsParser()
 	// TODO Auto-generated destructor stub
 }
 
+Parsed ArgsParser::parseArguments(int argc, char* args)
+{
+	//TODO implement
+	return Parsed();
+}
+

@@ -5,5 +5,5 @@
  *      Author: stefan
  */
 
-#include "/home/stefan/workspace/Drifttube/src/ArgsParser.h"
+#include "../ArgsParser.h"
 
