@@ -14,6 +14,7 @@ public:
 		unique_ptr<array<uint16_t,800>> const1_array(new array<uint16_t,800>);
 		unique_ptr<array<uint16_t,800>> const0_array(new array<uint16_t,800>);
 		unique_ptr<array<uint16_t,800>> max_uint_array(new array<uint16_t,800>);
+		unique_ptr<array<uint16_t,800>> min_at_400_array(new array<uint16_t,800>);
 
 		double sine_range_to_bins = M_PI / 800;
 
@@ -23,12 +24,15 @@ public:
 			(*const1_array)[i] = 1;
 			(*const0_array)[i] = 0;
 			(*max_uint_array)[i] = 0xFFFF;
+			(*min_at_400_array)[i] = 10;
 		}
+		(*min_at_400_array)[400] = 5;
 
 		sine = new Event(0,move(sine_array));
 		const1 = new Event(1,move(const1_array));
 		const0 = new Event(2,move(const0_array));
-		max_uint = new Event(1,move(max_uint_array));
+		max_uint = new Event(3,move(max_uint_array));
+		min_at_400 = new Event(4,move(min_at_400_array));
 	}
 
 	~DataProcessorTest()
@@ -40,6 +44,7 @@ protected:
 	Event* const1;
 	Event* const0;
 	Event* max_uint;
+	Event* min_at_400;
 };
 
 TEST_F(DataProcessorTest,TestComputeIntegral)
@@ -56,13 +61,13 @@ TEST_F(DataProcessorTest,TestComputeIntegral)
 
 }
 
-TEST_F(DataProcessorTest,TestComputerIntegralOverflow)
+TEST_F(DataProcessorTest,TestComputeIntegralOverflow)
 {
 	unsigned long result = 800 * 0xFFFF;
 	ASSERT_EQ(result, DataProcessor::computeIntegral(*max_uint));
 }
 
-TEST_F(DataProcessorTest,TestComputerIntegrate)
+TEST_F(DataProcessorTest,TestIntegrate)
 {
 	array<int,800> const1_int_exp;
 	array<int,800> const0_int_exp;
@@ -78,6 +83,27 @@ TEST_F(DataProcessorTest,TestComputerIntegrate)
 	ASSERT_EQ(const1_int_exp,DataProcessor::integrate(*const1));
 	ASSERT_EQ(const0_int_exp,DataProcessor::integrate(*const0));
 	ASSERT_EQ(max_uint_int_exp,DataProcessor::integrate(*max_uint));
+}
+
+TEST_F(DataProcessorTest,TestFindMinumumBin)
+{
+
+	ASSERT_EQ(0,DataProcessor::findMinimumBin(*const0));
+	ASSERT_EQ(0,DataProcessor::findMinimumBin(*const1));
+	ASSERT_EQ(400,DataProcessor::findMinimumBin(*min_at_400));
+}
+
+TEST_F(DataProcessorTest,TestFindDriftTime)
+{
+	ASSERT_EQ(400,DataProcessor::findDriftTime(*min_at_400,6));
+	ASSERT_EQ(-42,DataProcessor::findDriftTime(*max_uint,100));
+}
+
+TEST_F(DataProcessorTest,TestFindLastFilledBin)
+{
+	ASSERT_EQ(400,DataProcessor::findLastFilledBin(*min_at_400,6));
+	ASSERT_EQ(799,DataProcessor::findLastFilledBin(*const1,1));
+	ASSERT_EQ(0,DataProcessor::findLastFilledBin(*const1,0));
 }
 
 

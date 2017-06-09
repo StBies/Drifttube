@@ -31,10 +31,10 @@ public:
 	static const std::array<int,800> integrate(const Event& data);
 //	static const std::array<uint16_t,800> derivate(const Event& data) const;
 //	static std::unique_ptr<DataSet> integrateAll(const DataSet& data) const;
-//	static unsigned short findMinimumBin(const Event& data) const;
-//	static double findDriftTime(const Event& data, uint16_t threshold) const;
-//	static short findLastFilledBin(const Event& data, uint16_t threshold) const;
-//	static const std::array<uint16_t,800> calculateDriftTimeSpectrum(const DataSet& data) const;
+	static unsigned short findMinimumBin(const Event& data);
+	static short findDriftTime(const Event& data, unsigned short threshold);
+	static unsigned short findLastFilledBin(const Event& data, unsigned short threshold);
+	static const std::array<uint16_t,800> calculateDriftTimeSpectrum(const DataSet& data);
 //	static const std::array<uint16_t,800> calculateRtRelation(const std::array<int,800>& dtSpect) const;
 //	static unsigned int countAfterpulses(const DataSet& rawData, const std::array<int,800>& rtRelation) const;
 

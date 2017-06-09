@@ -145,58 +145,56 @@ const array<int,800> DataProcessor::integrate(const Event& data)
 //	return move(unique_ptr<DataSet>(new DataSet(set)));
 //}
 
-///**
-// * Find the position of the minimum of the given data. Will only find the absolute
-// * minimum. Can not yet find more than one negative peak.
-// *
-// * @author Stefan
-// * @date April 10, 2017
-// * @version Alpha 2.0
-// *
-// * @param data Reference to a std::array containing the raw data
-// * @return bin containing the data minimum
-// */
-//static inline int DataProcessor::findMinimumBin(const array<int,800>& data) const
-//{
-//	int minBin = 0;
-//	for(int i = 0; i < data.size(); i++)
-//	{
-//		minBin = data[i] < data[minBin] ? i : minBin;
-//	}
-//	return minBin;
-//}
-//
-///**
-// * Calculates the spectrum of drifttimes for the data given in a DataSet object containing raw data.
-// * The result is a histogram containing the spectrum. Note, that in order to find the correct drift time spectrum, the
-// * parameters defined in globals.h must be defined for the used experiment.
-// *
-// * @author Stefan
-// * @date November 21, 2016
-// * @version 1.0
-// *
-// * @param data Pointer to a DataSet object containing the raw data out of which the spectrum is to be calculated
-// *
-// * @return TH1D* histogram containing the spectrum of drifttimes
-// */
-//static TH1D* DataProcessor::calculateDriftTimeSpectrum(const DataSet& data) const
-//{
-//	int triggerpos = ADC_TRIGGERPOS_BIN;
-//
-////	#pragma omp parallel for
-//	for (int i = 0; i < data->getSize(); i++)
-//	{
-//		//TODO hint, that the operator[] of DataSet seems not quite to work, const return is a problem and operator does not work on pointer to object
-//		//TODO maybe last mention is intended
-//		const TH1D* event = (*data)[i];
-//		int diff = findDriftTime(*event, -50 * ADC_CHANNELS_TO_VOLTAGE)
-//				- triggerpos;
-//		result->Fill(diff * ADC_BINS_TO_TIME);
-//	}
-//
-//	return result;
-//}
-//
+/**
+ * Find the position of the minimum of the given data. Will only find the absolute
+ * minimum. Can not yet find more than one negative peak.
+ *
+ * @author Stefan
+ * @date June 8, 2017
+ * @version Alpha 2.0
+ *
+ * @param data Reference to an Event object containing the data
+ * @return bin containing the data minimum
+ */
+unsigned short DataProcessor::findMinimumBin(const Event& data)
+{
+	int minBin = 0;
+	for(unsigned short i = 0; i < data.getData().size(); i++)
+	{
+		minBin = data[i] < data[minBin] ? i : minBin;
+	}
+	return minBin;
+}
+
+/**
+ * Calculates the spectrum of drifttimes for the data given in a DataSet object containing raw data.
+ * The result is a histogram containing the spectrum. Note, that in order to find the correct drift time spectrum, the
+ * parameters defined in globals.h must be defined for the used experiment.
+ *
+ * @author Stefan
+ * @date November 21, 2016
+ * @version 1.0
+ *
+ * @param data DataSet object for which the drift time spectrum is to be calculated
+ *
+ * @return array<uint16_t,800> containing the drift time spectrum
+ */
+const array<uint16_t,800> DataProcessor::calculateDriftTimeSpectrum(const DataSet& data)
+{
+	unsigned short triggerpos = ADC_TRIGGERPOS_BIN;
+
+	array<uint16_t,800> result;
+
+//	#pragma omp parallel for
+	for (size_t i = 0; i < data.getSize(); i++)
+	{
+		unsigned short diff = findDriftTime(data[i], -50)- triggerpos;
+		result[diff]++;
+	}
+
+	return result;
+}
+
 ///**
 // * Calculates the reation between drift time and drift radius. The relation is returned as TH1D* pointer to a histogram.
 // * It calculates the relation from a passed drift time spectrum as argument.
@@ -301,58 +299,60 @@ const array<int,800> DataProcessor::integrate(const Event& data)
 //	return nAfterPulses;
 //}
 //
-////TODO decide, if this should return the "real time" in nanoseconds instead of the bin number
-///**
-// * Finds the bin number in a passed histogram, in which a passed threshold in volt is surpassed.
-// * The threshold should be negative since it only checks, when signals are LOWER than the given threshold.
-// * However, a positive threshold will be multiplied with -1 internally.
-// *
-// * @author Stefan
-// * @data October 17, 2016
-// * @version 0.9
-// *
-// * @param data Pointer to a TH1D histogram where the first occurance of a signal bigger than threshold is to be found
-// * @param threshold in volt that is to be surpassed. Should be given negative, positive values are multiplied by -1 internally
-// *
-// * @return Bin number of the first occurance of a signal larger than threshold
-// */
-//static int DataProcessor::findDriftTime(const TH1D& data, double threshold) const
-//{
-//	//if threshold given positive, change sign
+//TODO decide, if this should return the "real time" in nanoseconds instead of the bin number
+/**
+ * Finds the bin number in a passed Event, in which a passed threshold is first surpassed.
+ * Note that this method finds the bin number, in which the drift time is.
+ *
+ * @author Stefan Bieschke
+ * @data June 8, 2017
+ * @version Alpha 2.0
+ *
+ * @param data Event in which the drift time is to be found
+ * @param threshold threshold in FADC units (arbitrary). This must be UNDERSHOT if a drift time exists.
+ *
+ * @return Bin number of the first occurance of a signal larger than threshold
+ */
+short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
+{
+	//if threshold given positive, change sign
 //	threshold *= (threshold < 0 ? 1 : -1);
-//
-//	for (int i = 0; i < data.GetNbinsX(); i++)
-//	{
-//		if (data.GetBinContent(i) < threshold)
-//		{
-//			return i;
-//		}
-//	}
-//	return -42;
-//}
-//
-///**
-// * Finds the last bin, where a threshold voltage is reached.
-// *
-// * @author Stefan
-// * @date November 20, 2016
-// * @version 0.1
-// *
-// * @param data TH1D histogram object containing the voltage, in which the last filled bin is to be found
-// * @param threshold voltage in Volt, that must be reached
-// *
-// * @return Number of the bin, where the voltage given in threshold is last reached
-// */
-//static int DataProcessor::findLastFilledBin(const TH1D& data, double threshold) const
-//{
-//	int bin = 0;
-//	for (int i = 0; i < data.GetNbinsX() - 1; i++)
-//	{
-//		if (data.GetBinContent(i) < threshold
-//				&& data.GetBinContent(i + 1) >= threshold)
-//		{
-//			bin = i;
-//		}
-//	}
-//	return bin;
-//}
+
+	for (unsigned short i = 0; i < data.getData().size(); i++)
+	{
+		if (data[i] < threshold)
+		{
+			return i;
+		}
+	}
+	return -42;
+}
+
+/**
+ * Finds the last bin, where a threshold voltage is reached.
+ *
+ * @author Stefan Bieschke
+ * @date June 9, 2017
+ * @version Alpha 2.0
+ *
+ * @param data Event object reference, containing the data on which the last filled bin is to be found
+ * @param threshold Threshold in FADC units. The last time will be found, for that the data entry is SMALLER THAN the threshold.
+ *
+ * @return Number of the bin, where the voltage given in threshold is last undershot
+ */
+unsigned short DataProcessor::findLastFilledBin(const Event& data, unsigned short threshold)
+{
+	unsigned short bin = 0;
+	if(data[data.getData().size()-1] <= threshold)
+	{
+		return data.getData().size()-1;
+	}
+	for (unsigned short i = 0; i < data.getData().size() - 1; i++)
+	{
+		if (data[i] <= threshold && data[i + 1] >= threshold)
+		{
+			bin = i;
+		}
+	}
+	return bin;
+}
