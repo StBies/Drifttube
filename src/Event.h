@@ -12,6 +12,7 @@
 #include <memory>
 #include <cstdlib>
 
+//TODO make this inherit from a new base class - something like data this should have everything the event has except the event number
 /**
  * Class that represents the data for one event.
  * This is basically a wrapper class for a std::array. It contains an array and an integer which holds the number of the event. So for the third
@@ -25,10 +26,9 @@
  */
 class Event
 {
-	//TODO TESTING
 public:
 	Event(const unsigned int eventNumber, std::unique_ptr<std::array<uint16_t,800>> data);
-	~Event();
+	virtual ~Event();
 	Event(const Event& original);
 
 	const std::array<uint16_t,800>& getData() const;

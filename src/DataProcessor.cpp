@@ -233,72 +233,72 @@ const array<uint16_t,800> DataProcessor::calculateDriftTimeSpectrum(const DataSe
 //	return result;
 //}
 //
-////TODO threshold as parameter?
-////TODO possibility to use any other t_max as parameter
-///**
-// * Count the number of afterpulses in a DataSet containing voltage pulses. An afterpulse is counted,
-// * if the after the maximum drift time, a threshold voltage is undershot. This maximum drift time is
-// * calculated from the rtRelation as the time, at which it reaches 99.95% of the tube's inner radius.
-// *
-// * @brief Count afterpulses. Multiple afterpulses per event are allowed.
-// *
-// * @author Stefan Bieschke
-// * @version 0.9
-// * @date Dec. 15, 2016
-// *
-// * @param rawData DataSet object containing voltage pulses
-// * @param rtRelation TH1D histogram object containing the rt-Relation.
-// *
-// * @return number of afterpulses
-// */
-//static int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelation) const
-//{
-//	int maxDriftTimeBin = 0;
-//	int nAfterPulses = 0;
-//
-//	//calculate maxDriftTime
-//	for(int i = 1; i <=rtRelation.GetNbinsX(); i++)
-//	{
-//		if(rtRelation.GetBinContent(i) >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
-//		{
-//			maxDriftTimeBin = i;
-//			cout << "maxDriftTime: " << maxDriftTimeBin * 4 << endl;
-//			break;
-//		}
-//	}
-//
-//	//counting loop
-//	for(int i = 0; i < rawData.getSize(); i++)
-//	{
-//		bool pulseEnded = true;
-//		TH1D* voltage = rawData.getEvent(i);
-//		int nBins = voltage->GetNbinsX();
-//
-//		//check, if the signal already ended at max drift time
-//		if(voltage->GetBinContent(maxDriftTimeBin) <= -50*ADC_CHANNELS_TO_VOLTAGE)
-//		{
-//			pulseEnded = false;
-//		}
-//
-//		for(int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins; j++)
-//		{
-//			//if-else switches a variable in order not to count a single pulse bin per bin
-//			if(voltage->GetBinContent(j) <= -50*ADC_CHANNELS_TO_VOLTAGE && pulseEnded)
-//			{
-////				cout << "event " <<i << " time: " << j*4 << endl;
-//				++nAfterPulses;
-//				pulseEnded = false;
-//			}
-//			else if(voltage->GetBinContent(j) > -50*ADC_CHANNELS_TO_VOLTAGE && !pulseEnded)
-//			{
-//				pulseEnded = true;
-//			}
-//		}
-//	}
-//
-//	return nAfterPulses;
-//}
-//
+//TODO threshold as parameter?
+//TODO possibility to use any other t_max as parameter
+/**
+ * Count the number of afterpulses in a DataSet containing voltage pulses. An afterpulse is counted,
+ * if the after the maximum drift time, a threshold voltage is undershot. This maximum drift time is
+ * calculated from the rtRelation as the time, at which it reaches 99.95% of the tube's inner radius.
+ *
+ * @brief Count afterpulses. Multiple afterpulses per event are allowed.
+ *
+ * @author Stefan Bieschke
+ * @version 0.9
+ * @date Dec. 15, 2016
+ *
+ * @param rawData DataSet object containing voltage pulses
+ * @param rtRelation TH1D histogram object containing the rt-Relation.
+ *
+ * @return number of afterpulses
+ */
+int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelation) const
+{
+	unsigned int maxDriftTimeBin = 0;
+	unsigned int nAfterPulses = 0;
+
+	//calculate maxDriftTime
+	for(int i = 1; i <=rtRelation.GetNbinsX(); i++)
+	{
+		if(rtRelation.GetBinContent(i) >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
+		{
+			maxDriftTimeBin = i;
+			cout << "maxDriftTime: " << maxDriftTimeBin * 4 << endl;
+			break;
+		}
+	}
+
+	//counting loop
+	for(int i = 0; i < rawData.getSize(); i++)
+	{
+		bool pulseEnded = true;
+		TH1D* voltage = rawData.getEvent(i);
+		int nBins = voltage->GetNbinsX();
+
+		//check, if the signal already ended at max drift time
+		if(voltage->GetBinContent(maxDriftTimeBin) <= -50*ADC_CHANNELS_TO_VOLTAGE)
+		{
+			pulseEnded = false;
+		}
+
+		for(int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins; j++)
+		{
+			//if-else switches a variable in order not to count a single pulse bin per bin
+			if(voltage->GetBinContent(j) <= -50*ADC_CHANNELS_TO_VOLTAGE && pulseEnded)
+			{
+//				cout << "event " <<i << " time: " << j*4 << endl;
+				++nAfterPulses;
+				pulseEnded = false;
+			}
+			else if(voltage->GetBinContent(j) > -50*ADC_CHANNELS_TO_VOLTAGE && !pulseEnded)
+			{
+				pulseEnded = true;
+			}
+		}
+	}
+
+	return nAfterPulses;
+}
+
 //TODO decide, if this should return the "real time" in nanoseconds instead of the bin number
 /**
  * Finds the bin number in a passed Event, in which a passed threshold is first surpassed.
