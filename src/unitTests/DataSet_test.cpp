@@ -52,6 +52,7 @@ TEST_F(DataSetTest,TestCopyConstruction)
 	ASSERT_FALSE(d2 == &copyOfD2);
 	ASSERT_TRUE(d2->getSize() == copyOfD2.getSize());
 
+
 	for(unsigned int i = 0; i < d2->getSize(); i++)
 	{
 		ASSERT_FALSE(&(*d2)[i] == &copyOfD2[i]);
