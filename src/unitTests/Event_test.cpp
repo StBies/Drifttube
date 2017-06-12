@@ -98,6 +98,13 @@ TEST_F(EventTest, TestCopyConstructor)
 	ASSERT_EQ(1337,copied2[0]);
 }
 
+TEST_F(EventTest, TestPolymorphism)
+{
+	Event* e = new Event(*e1);
+	Data<uint16_t>* data = e;
+	ASSERT_TRUE(data != nullptr);
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
