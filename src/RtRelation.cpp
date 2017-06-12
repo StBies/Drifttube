@@ -9,6 +9,7 @@
 
 RtRelation::RtRelation(std::unique_ptr<std::array<unsigned double,800>> data) : Data(data)
 {
+
 }
 
 RtRelation::~RtRelation()
