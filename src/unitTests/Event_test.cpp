@@ -103,6 +103,7 @@ TEST_F(EventTest, TestPolymorphism)
 	Event* e = new Event(*e1);
 	Data<uint16_t>* data = e;
 	ASSERT_TRUE(data != nullptr);
+	delete data;
 }
 
 int main(int argc, char **argv)

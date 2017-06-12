@@ -7,10 +7,8 @@
 
 #include "RtRelation.h"
 
-RtRelation::RtRelation()
+RtRelation::RtRelation(std::unique_ptr<std::array<unsigned double,800>> data) : Data(data)
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 RtRelation::~RtRelation()

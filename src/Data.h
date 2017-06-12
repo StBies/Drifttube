@@ -30,7 +30,8 @@ template<typename T = uint16_t>
 class Data
 {
 public:
-	virtual ~Data();
+	virtual ~Data(); //comment for pure virtual / abstract class
+//	virtual ~Data() = 0; //uncomment for pure virtual / abstract class
 
 	const std::array<T,800>& getData() const;
 	T& operator[](const unsigned short bin) const;

@@ -10,11 +10,11 @@
 
 #include "Data.cpp"
 
-class DriftTimeSpectrum: public Data<>
+class DriftTimeSpectrum: public Data<uint32_t>
 {
 public:
-	DriftTimeSpectrum(std::unique_ptr<std::array<uint16_t,800>>,unsigned int nEntries);
-	~DriftTimeSpectrum();
+	DriftTimeSpectrum(std::unique_ptr<std::array<uint32_t,800>>,unsigned int nEntries);
+	virtual ~DriftTimeSpectrum();
 
 	unsigned int getEntries();
 

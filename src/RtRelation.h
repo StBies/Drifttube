@@ -13,9 +13,8 @@
 class RtRelation: public Data<unsigned double>
 {
 public:
-	RtRelation();
-	~RtRelation();
-
+	RtRelation(std::unique_ptr<std::array<unsigned double,800>> data);
+	virtual ~RtRelation();
 };
 
 #endif /* RTRELATION_H_ */
