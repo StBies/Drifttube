@@ -5,12 +5,50 @@
  *      Author: bieschke
  */
 
-#include "Data.h"
+//#include "Data.h" //not included as this is a templete - header remains there for deriving classes
+
+#ifndef DATA_H_
+#define DATA_H_
+
+#include <array>
+#include <memory>
+#include <cstdlib>
+
+
+//TODO update comment
+/**
+ * A class for basic data types. This is basically a wrapper for arrays of any primitive data type values. The Data class is a base class for Events and drift time spectra.
+ *
+ * @brief Data class, wrapper for arrays
+ *
+ * @author Stefan Bieschke
+ * @date June 12, 2017
+ * @version Alpha 2.0
+ *
+ * @warning This is not meant for instantiation.
+ */
+template<typename T = uint16_t>
+class Data
+{
+public:
+	virtual ~Data();
+
+	const std::array<T,800>& getData() const;
+	T& operator[](const unsigned short bin) const;
+
+protected:
+	//TODO check, if constructor should be private instead of protected
+	Data(std::unique_ptr<std::array<T,800>> data); //not meant for instantiation
+	Data(const Data& data);
+	std::unique_ptr<std::array<T,800>> m_data;
+};
+
+#endif /* DATA_H_ */
 
 using namespace std;
 
 /**
- * Constructor of the Data class. This is protected, Data objects are not meant to be instanciated. This transferres ownership of the passed
+ * Constructor of the Data class. This is protected, Data objects are not meant to be instantiated. This transferres ownership of the passed
  * array to the member m_data.
  *
  * @brief Constructor (protected)
@@ -23,14 +61,15 @@ using namespace std;
  *
  * @warning Protected: should only be called by inheriting class' constructors
  */
-Data::Data(unique_ptr<array<uint16_t,800>> data)
+template<typename T>
+Data<T>::Data(unique_ptr<array<T,800>> data)
 {
 	m_data = move(data);
 }
 
 
 /**
- * Copy constructor of the Data class. This is protected, Data objects are not meant to be instanciated. This copies a Data object
+ * Copy constructor of the Data class. This is protected, Data objects are not meant to be instantiated. This copies a Data object
  *
  * @author Stefan Bieschke
  * @date June 12, 2017
@@ -40,9 +79,10 @@ Data::Data(unique_ptr<array<uint16_t,800>> data)
  *
  * @warning Protected: should only be called by inheriting class' constructors
  */
-Data::Data(const Data& data)
+template<typename T>
+Data<T>::Data(const Data& data)
 {
-	unique_ptr<array<uint16_t,800>> temp(new array<uint16_t,800>);
+	unique_ptr<array<T,800>> temp(new array<T,800>);
 
 	//deep copy
 	for(int i = 0; i < data.m_data->size(); i++)
@@ -56,7 +96,8 @@ Data::Data(const Data& data)
 /**
  * Virtual destructor. Does nothing, object tears down automatically when out of scope.
  */
-Data::~Data()
+template<typename T>
+Data<T>::~Data()
 {
 }
 
@@ -71,7 +112,8 @@ Data::~Data()
  *
  * @return Reference to the array that is contained
  */
-const std::array<uint16_t,800>& Data::getData() const
+template<typename T>
+const std::array<T,800>& Data<T>::getData() const
 {
 	return *m_data;
 }
@@ -89,7 +131,8 @@ const std::array<uint16_t,800>& Data::getData() const
  * @param bin
  * @return Content of the requested bin. This is a reference to the content so that it can be used as lvalue. E.g. data[i] = 5;
  */
-uint16_t& Data::operator[](const unsigned short bin) const
+template<typename T>
+T& Data<T>::operator[](const unsigned short bin) const
 {
 	if(bin < m_data->size())
 	{

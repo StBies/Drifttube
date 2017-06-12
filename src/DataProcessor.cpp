@@ -257,7 +257,7 @@ int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelati
 	unsigned int nAfterPulses = 0;
 
 	//calculate maxDriftTime
-	for(int i = 1; i <=rtRelation.GetNbinsX(); i++)
+	for(int i = 1; i <= rtRelation.GetNbinsX(); i++)
 	{
 		if(rtRelation.GetBinContent(i) >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
 		{

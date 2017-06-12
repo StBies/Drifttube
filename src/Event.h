@@ -11,7 +11,7 @@
 #include <array>
 #include <memory>
 #include <cstdlib>
-#include "Data.h"
+#include "Data.cpp" //.cpp file inclusion needed as Data is a template class
 
 /**
  * Class that represents the data for one event.
@@ -24,7 +24,7 @@
  * @version 0.1
  * @date May 15, 2017
  */
-class Event : public Data
+class Event : public Data<>
 {
 public:
 	Event(const unsigned int eventNumber, std::unique_ptr<std::array<uint16_t,800>> data);
