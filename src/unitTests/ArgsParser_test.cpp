@@ -16,7 +16,6 @@ class ArgsParserTest : public ::testing::Test
 public:
 	ArgsParserTest()
 	{
-
 	}
 
 	~ArgsParserTest()
@@ -24,7 +23,6 @@ public:
 	}
 
 protected:
-
 };
 
 TEST_F(ArgsParserTest,TestBla)

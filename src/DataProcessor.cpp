@@ -166,6 +166,7 @@ unsigned short DataProcessor::findMinimumBin(const Event& data)
 	return minBin;
 }
 
+//TODO overhaul - use drifttime stored in events
 /**
  * Calculates the spectrum of drifttimes for the data given in a DataSet object containing raw data.
  * The result is a histogram containing the spectrum. Note, that in order to find the correct drift time spectrum, the
@@ -177,22 +178,25 @@ unsigned short DataProcessor::findMinimumBin(const Event& data)
  *
  * @param data DataSet object for which the drift time spectrum is to be calculated
  *
- * @return array<uint16_t,800> containing the drift time spectrum
+ * @return DriftTimeSpectrum object containing the spectrum
  */
-const array<uint16_t,800> DataProcessor::calculateDriftTimeSpectrum(const DataSet& data)
+const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet& data)
 {
 	unsigned short triggerpos = ADC_TRIGGERPOS_BIN;
 
-	array<uint16_t,800> result;
+	unique_ptr<array<uint32_t,800>> result(new array<uint32_t,800>);
 
 //	#pragma omp parallel for
 	for (size_t i = 0; i < data.getSize(); i++)
 	{
-		unsigned short diff = findDriftTime(data[i], -50)- triggerpos;
-		result[diff]++;
+		short driftTimeBin = findDriftTime(data[i], -50 + OFFSET_ZERO_VOLTAGE);
+		if(driftTimeBin >= 0)
+		{
+			(*result)[driftTimeBin]++;
+		}
 	}
 
-	return result;
+	return DriftTimeSpectrum(move(result),data.getSize());
 }
 
 ///**
