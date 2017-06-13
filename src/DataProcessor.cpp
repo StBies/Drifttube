@@ -251,15 +251,15 @@ const array<uint16_t,800> DataProcessor::calculateDriftTimeSpectrum(const DataSe
  *
  * @return number of afterpulses
  */
-int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelation) const
+const unsigned int DataProcessor::countAfterpulses(const DataSet& rawData, const RtRelation& rtRelation)
 {
-	unsigned int maxDriftTimeBin = 0;
+	unsigned short maxDriftTimeBin = 0;
 	unsigned int nAfterPulses = 0;
 
 	//calculate maxDriftTime
-	for(int i = 1; i <= rtRelation.GetNbinsX(); i++)
+	for(unsigned short i = 1; i <= rtRelation.getData().size(); i++)
 	{
-		if(rtRelation.GetBinContent(i) >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
+		if(rtRelation.getData()[i] >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
 		{
 			maxDriftTimeBin = i;
 			cout << "maxDriftTime: " << maxDriftTimeBin * 4 << endl;
@@ -268,28 +268,28 @@ int DataProcessor::countAfterpulses(const DataSet& rawData, const TH1D& rtRelati
 	}
 
 	//counting loop
-	for(int i = 0; i < rawData.getSize(); i++)
+	for(unsigned int i = 0; i < rawData.getSize(); i++)
 	{
 		bool pulseEnded = true;
-		TH1D* voltage = rawData.getEvent(i);
-		int nBins = voltage->GetNbinsX();
+		Event voltage = rawData.getEvent(i);
+		int nBins = voltage.getData().size();
 
 		//check, if the signal already ended at max drift time
-		if(voltage->GetBinContent(maxDriftTimeBin) <= -50*ADC_CHANNELS_TO_VOLTAGE)
+		if(voltage[maxDriftTimeBin] <= -50*ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE)
 		{
 			pulseEnded = false;
 		}
 
-		for(int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins; j++)
+		for(unsigned int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins; j++)
 		{
 			//if-else switches a variable in order not to count a single pulse bin per bin
-			if(voltage->GetBinContent(j) <= -50*ADC_CHANNELS_TO_VOLTAGE && pulseEnded)
+			if(voltage[j] <= -50*ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE && pulseEnded)
 			{
 //				cout << "event " <<i << " time: " << j*4 << endl;
 				++nAfterPulses;
 				pulseEnded = false;
 			}
-			else if(voltage->GetBinContent(j) > -50*ADC_CHANNELS_TO_VOLTAGE && !pulseEnded)
+			else if(voltage[j] > -50*ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE && !pulseEnded)
 			{
 				pulseEnded = true;
 			}

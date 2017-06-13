@@ -8,12 +8,13 @@
 #ifndef RTRELATION_H_
 #define RTRELATION_H_
 
-#include "Data.cpp"
+#include "Data.h"
 
-class RtRelation: public Data<unsigned double>
+class RtRelation: public Data<double>
 {
 public:
-	RtRelation(std::unique_ptr<std::array<unsigned double,800>> data);
+	RtRelation(std::unique_ptr<std::array<double,800>> data);
+	RtRelation(const RtRelation& original);
 	virtual ~RtRelation();
 };
 

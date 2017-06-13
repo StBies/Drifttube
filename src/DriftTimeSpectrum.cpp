@@ -9,7 +9,7 @@
 
 using namespace std;
 
-DriftTimeSpectrum::DriftTimeSpectrum(unique_ptr<array<uint16_t,800>> spect,unsigned int nEntries) : Data(move(spect))
+DriftTimeSpectrum::DriftTimeSpectrum(unique_ptr<array<uint32_t,800>> spect, unsigned int nEntries) : Data(move(spect))
 {
 	m_entries = nEntries;
 }

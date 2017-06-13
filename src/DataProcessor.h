@@ -12,6 +12,7 @@
 #include <array>
 #include <memory>
 #include "Event.h"
+#include "RtRelation.h"
 
 /**
  * A class, that processes raw data measured by an FADC, that comes as
@@ -36,7 +37,7 @@ public:
 	static unsigned short findLastFilledBin(const Event& data, unsigned short threshold);
 	static const std::array<uint16_t,800> calculateDriftTimeSpectrum(const DataSet& data);
 //	static const std::array<uint16_t,800> calculateRtRelation(const std::array<int,800>& dtSpect) const;
-	static unsigned int countAfterpulses(const DataSet& rawData, const std::array<int,800>& rtRelation);
+	static const unsigned int countAfterpulses(const DataSet& rawData, const RtRelation& rtRelation);
 
 private:
 	DataProcessor();

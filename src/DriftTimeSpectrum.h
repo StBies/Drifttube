@@ -8,7 +8,9 @@
 #ifndef DRIFTTIMESPECTRUM_H_
 #define DRIFTTIMESPECTRUM_H_
 
-#include "Data.cpp"
+#include <array>
+#include <cstdlib>
+#include "Data.h"
 
 class DriftTimeSpectrum: public Data<uint32_t>
 {
