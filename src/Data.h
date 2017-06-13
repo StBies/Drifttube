@@ -41,7 +41,6 @@ protected:
 	std::unique_ptr<std::array<T,800>> m_data;
 };
 
-#endif /* DATA_H_ */
 
 using namespace std;
 
@@ -142,3 +141,5 @@ T& Data<T>::operator[](const unsigned short bin) const
 		throw 'i';
 	}
 }
+
+#endif /* DATA_H_ */
