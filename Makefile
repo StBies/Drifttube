@@ -2,11 +2,13 @@ CC			=	g++
 CFLAGS		=	-std=c++11 -O3 -fopenmp
 ROOTCFLAGS	=	$(shell root-config --cflags)
 ROOTLDFLAGS	=	$(shell root-config --libs)
+TESTINC		=	-I./gtest/include
+TESTLIB		=	-L./gtest/lib
 LDFLAGS		=	-fopenmp
 TESTLDFLAGS = 	-lgtest -lgtest_main -lpthread
 SRC			=	$(wildcard src/*.cpp)
 TESTSRC		=	$(wildcard src/unitTests/*.cpp)
-TESTOBJS	=	$(addprefix obj/,$(notdir $(TESTSRC:.cpp=.o)))
+TESTFILES	=	$(notdir $(TESTSRC:.cpp=))
 TESTEDOBJS	=	$(addprefix obj/,$(notdir $(TESTSRC:_test.cpp=.o)))
 TESTEDOBJS 	+= 	obj/Exception.o obj/EventSizeException.o
 OBJ			=	$(addprefix obj/,$(notdir $(SRC:.cpp=.o)))
@@ -25,7 +27,10 @@ obj/%.o: src/%.cpp
 	
 %_test.out:  $(TESTOBJS)
 	
-	
+test: $(TESTSRC) $(TESTEDOBJS)
+	for i in $(TESTSRC); do \
+		$(CC) $(CFLAGS) $(TESTINC) $(TESTLIB) $$i $(TESTEDOBJS) -o $(notdir $$i.out) $(LDFLAGS) $(TESTLDFLAGS); \
+	done	
 	
 directories: ${OBJDIR}
 	
@@ -33,7 +38,7 @@ ${OBJDIR}:
 	$(MKDIR) ${OBJDIR}
 	
 testTest:
-	@echo $(TESTEDOBJS)
+	@echo $(TESTFILES)
 	
 clean: directories
 	rm -r ${OBJDIR}
