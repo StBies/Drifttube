@@ -106,6 +106,15 @@ TEST_F(EventTest, TestPolymorphism)
 	delete data;
 }
 
+TEST_F(EventTest, TestConstCorrectness)
+{
+	const Event copy1(*e1);
+	Event copy2(*e2);
+//	copy1[0]++; //doesn't compile since for a const object, the const method is used
+	copy2[0]++;
+	ASSERT_EQ(1338,copy2[0]);
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

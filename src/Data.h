@@ -32,7 +32,9 @@ public:
 	virtual ~Data();
 
 	const std::array<T,800>& getData() const;
+	//TODO fix const correctness - methods const qualifier needed, else an event can not be passed as const reference
 	T& operator[](const unsigned short bin);
+	const T& operator[](const unsigned short bin) const;
 
 protected:
 	//TODO check, if constructor should be private instead of protected
@@ -113,6 +115,33 @@ template<typename T>
 const std::array<T,800>& Data<T>::getData() const
 {
 	return *m_data;
+}
+
+/**
+ * Implementation of the bracket operator [] commonly used to address a single element of an array. This returns a reference to the requested
+ * value so that data[i] can be used as lvalue.
+ *
+ * @brief Bracket operator for addressing
+ *
+ * @author Stefan Bieschke
+ * @version 0.1
+ * @date May 15, 2017
+ *
+ * @param bin
+ * @return Content of the requested bin. This is a reference to the content so that it can be used as lvalue. E.g. data[i] = 5;
+ */
+template<typename T>
+const T& Data<T>::operator[](const unsigned short bin) const
+{
+	if(bin < m_data->size())
+	{
+		return (*m_data)[bin];
+	}
+	else
+	{
+		//TODO throw an Exception for index out of bounds
+		throw 'i';
+	}
 }
 
 /**
