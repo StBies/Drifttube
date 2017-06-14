@@ -112,6 +112,7 @@ TEST_F(EventTest, TestConstCorrectness)
 	Event copy2(*e2);
 //	copy1[0]++; //doesn't compile since for a const object, the const method is used
 	copy2[0]++;
+//	copy2.getData()[1] = 1; //doesn't compile, getData() is a const return
 	ASSERT_EQ(1338,copy2[0]);
 }
 

@@ -31,7 +31,7 @@ public:
 	virtual ~Event();
 	Event(const Event& original);
 
-	const unsigned int getEventNumber();
+	const unsigned int getEventNumber() const;
 	const double getDriftTime() const;
 
 	//TODO check if offering this is bad design and if getData() should be all that is available

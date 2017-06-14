@@ -51,7 +51,7 @@ Event::Event(const Event& original) : Data(original)
  *
  * @return Number of the event
  */
-const unsigned int Event::getEventNumber()
+const unsigned int Event::getEventNumber() const
 {
 	return m_event_number;
 }
