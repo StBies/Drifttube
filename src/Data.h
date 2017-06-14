@@ -32,7 +32,7 @@ public:
 	virtual ~Data();
 
 	const std::array<T,800>& getData() const;
-	T& operator[](const unsigned short bin) const;
+	T& operator[](const unsigned short bin);
 
 protected:
 	//TODO check, if constructor should be private instead of protected
@@ -129,7 +129,7 @@ const std::array<T,800>& Data<T>::getData() const
  * @return Content of the requested bin. This is a reference to the content so that it can be used as lvalue. E.g. data[i] = 5;
  */
 template<typename T>
-T& Data<T>::operator[](const unsigned short bin) const
+T& Data<T>::operator[](const unsigned short bin)
 {
 	if(bin < m_data->size())
 	{

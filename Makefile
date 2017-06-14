@@ -27,7 +27,7 @@ obj/%.o: src/%.cpp
 	
 %_test.out:  $(TESTOBJS)
 	
-test: $(TESTEDOBJS)
+test: directories $(TESTEDOBJS) 
 	for i in $(TESTFILES); do \
 		$(CC) $(CFLAGS) $(TESTINC) $(TESTLIB) src/unitTests/$$i.cpp $(TESTEDOBJS) -o $$i.out $(LDFLAGS) $(TESTLDFLAGS); \
 	done	
@@ -42,4 +42,4 @@ testTest:
 	
 clean: directories
 	rm -r ${OBJDIR}
-	rm prog.out
+	rm *.out
