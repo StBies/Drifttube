@@ -33,6 +33,7 @@ public:
 		const0 = new Event(2,move(const0_array));
 		max_uint = new Event(3,move(max_uint_array));
 		min_at_400 = new Event(4,move(min_at_400_array));
+
 	}
 
 	~DataProcessorTest()
@@ -105,7 +106,6 @@ TEST_F(DataProcessorTest,TestFindLastFilledBin)
 	ASSERT_EQ(799,DataProcessor::findLastFilledBin(*const1,1));
 	ASSERT_EQ(0,DataProcessor::findLastFilledBin(*const1,0));
 }
-
 
 int main(int argc, char **argv)
 {

@@ -106,6 +106,21 @@ TEST_F(EventTest, TestPolymorphism)
 	delete data;
 }
 
+TEST_F(EventTest, TestPointerToEvent)
+{
+	//TEST, if unique pointer in Data detects, if another pointer to the Event object is created - it doesn't
+	Event* e = e1;
+	Event** arr = new Event*[2];
+	arr[0] = e1;
+	arr[1] = e;
+	ASSERT_EQ(e,e1);
+	ASSERT_EQ(e->getData(),e1->getData());
+	for(size_t i = 0; i < e->getData().size(); i++)
+	{
+		ASSERT_EQ((*e)[i],(*e1)[i]);
+	}
+}
+
 TEST_F(EventTest, TestConstCorrectness)
 {
 	const Event copy1(*e1);
