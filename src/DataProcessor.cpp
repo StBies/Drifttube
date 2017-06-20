@@ -76,7 +76,7 @@ const array<int,800> DataProcessor::integrate(const Event& data)
 
 	//do the integration (stepsize is one)
 	//TODO check for correctness
-	result[0] = data[0];
+	result[0] = 0;
 	for(int i = 1; i < dataArray.size(); i++)
 	{
 		result[i] = dataArray[i] + result[i-1];
@@ -351,7 +351,7 @@ unsigned short DataProcessor::findLastFilledBin(const Event& data, unsigned shor
 	{
 		return data.getData().size()-1;
 	}
-	for (unsigned short i = 0; i < data.getData().size() - 1; i++)
+	for (unsigned short i = 0; i < data.getData().size() - 2; i++)
 	{
 		if (data[i] <= threshold && data[i + 1] >= threshold)
 		{

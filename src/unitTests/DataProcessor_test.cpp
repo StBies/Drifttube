@@ -76,9 +76,9 @@ TEST_F(DataProcessorTest,TestIntegrate)
 
 	for(int i = 0; i < 800; i++)
 	{
-		const1_int_exp[i] = i + 1;
+		const1_int_exp[i] = i;
 		const0_int_exp[i] = 0;
-		max_uint_int_exp[i] = (i + 1) * 0xFFFF;
+		max_uint_int_exp[i] = i * 0xFFFF;
 	}
 
 	ASSERT_EQ(const1_int_exp,DataProcessor::integrate(*const1));
