@@ -13,8 +13,8 @@ public:
 		std::unique_ptr<std::array<uint32_t,800>> b(new std::array<uint32_t,800>);
 		a->fill(0xFFFFFFFF);
 		b->fill(0);
-		spect1 = new DriftTimeSpectrum(move(a),25000);
-		spect2 = new DriftTimeSpectrum(move(b),0);
+		spect1 = new DriftTimeSpectrum(move(a),25000,0);
+		spect2 = new DriftTimeSpectrum(move(b),0,0);
 
 	}
 

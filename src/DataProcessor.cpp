@@ -185,6 +185,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	unsigned short triggerpos = ADC_TRIGGERPOS_BIN;
 
 	unique_ptr<array<uint32_t,800>> result(new array<uint32_t,800>);
+	int rejected = 0;
 
 //	#pragma omp parallel for
 	for (size_t i = 0; i < data.getSize(); i++)
@@ -194,9 +195,13 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 		{
 			(*result)[driftTimeBin]++;
 		}
+		else
+		{
+			rejected++;
+		}
 	}
 
-	return DriftTimeSpectrum(move(result),data.getSize());
+	return DriftTimeSpectrum(move(result),data.getSize(),rejected);
 }
 
 /**
@@ -220,9 +225,9 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
 
 	double integral = 0.0;
 	//TODO own method
-//	int numberOfRealEvents = dtSpect.GetEntries() - dtSpect.GetBinContent(0);
-//	double eff = numberOfRealEvents/(double)dtSpect.GetEntries();
-//	cout << "efficiency = " << eff << " +- " << sqrt(eff*(1-eff)/(double)dtSpect.GetEntries()) << endl;
+	int numberOfRealEvents = dtSpect.getEntries() - dtSpect.getRejected();
+	double eff = numberOfRealEvents/(double)dtSpect.getEntries();
+	cout << "efficiency = " << eff << " +- " << sqrt(eff*(1-eff)/(double)dtSpect.getEntries()) << endl;
 	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)dtSpect.getEntries());
 
 	//TODO check, why this doesn't work
