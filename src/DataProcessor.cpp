@@ -199,44 +199,44 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	return DriftTimeSpectrum(move(result),data.getSize());
 }
 
-///**
-// * Calculates the reation between drift time and drift radius. The relation is returned as TH1D* pointer to a histogram.
-// * It calculates the relation from a passed drift time spectrum as argument.
-// *
-// * @author Stefan Bieschke
-// * @version 1.0
-// * @date November 21, 2016
-// *
-// * @param dtSpect TH1D object reference containing the drift time spectrum
-// *
-// * @return Pointer to a TH1D object histogram containing the rt-relation plot
-// *
-// * @warning Needs drift tube data in globals.h to be set
-// */
-//static TH1D* DataProcessor::calculateRtRelation(TH1D& dtSpect) const
-//{
-//	int nBins = dtSpect.GetNbinsX();
-//	Double_t* binLowEdges = new Double_t[nBins + 1];
-//
-//	double integral = 0.0;
-//	//TODO own method
+/**
+ * Calculates the relation between drift time and drift radius. The relation is returned as RtRelation object.
+ * It calculates the relation from a passed drift time spectrum as argument.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date June 22, 2017
+ *
+ * @param dtSpect DriftTimeSpectrum object reference containing the drift time spectrum
+ *
+ * @return RtRelation object containing the rt-relation
+ *
+ * @warning Needs drift tube data in globals.h to be set
+ */
+static const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtSpect)
+{
+	unsigned int nBins = dtSpect.getData().size();
+	unique_ptr<array<double,800>> result(new array<double,800>);
+
+	double integral = 0.0;
+	//TODO own method
 //	int numberOfRealEvents = dtSpect.GetEntries() - dtSpect.GetBinContent(0);
 //	double eff = numberOfRealEvents/(double)dtSpect.GetEntries();
 //	cout << "efficiency = " << eff << " +- " << sqrt(eff*(1-eff)/(double)dtSpect.GetEntries()) << endl;
-//	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)numberOfRealEvents);
-//
-//	//TODO check, why this doesn't work
-//	//	#pragma omp parallel for reduction(+:integral) shared(result,binWidth)
-//	//start at bin 1 -> do not integrate the underflow bin
-//	for (int i = 1; i <= nBins; i++)
-//	{
-//		integral += dtSpect.GetBinContent(i) * scalingFactor;
-//		result->Fill(dtSpect.GetBinLowEdge(i), integral);
-//	}
-//
-//	return result;
-//}
-//
+	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)dtSpect.getEntries());
+
+	//TODO check, why this doesn't work
+	//	#pragma omp parallel for reduction(+:integral) shared(result)
+	//start at bin 1 -> do not integrate the underflow bin
+	for (unsigned int i = 0; i < nBins; i++)
+	{
+		integral += dtSpect[i] * scalingFactor;
+		(*result)[i] = integral;
+	}
+
+	return RtRelation(move(result));
+}
+
 //TODO threshold as parameter?
 //TODO possibility to use any other t_max as parameter
 /**

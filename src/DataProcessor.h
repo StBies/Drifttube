@@ -37,7 +37,7 @@ public:
 	static short findDriftTime(const Event& data, unsigned short threshold);
 	static unsigned short findLastFilledBin(const Event& data, unsigned short threshold);
 	static const DriftTimeSpectrum calculateDriftTimeSpectrum(const DataSet& data);
-//	static const std::array<uint16_t,800> calculateRtRelation(const std::array<int,800>& dtSpect) const;
+	static const RtRelation calculateRtRelation(const DriftTimeSpectrum& dtSpect);
 	static const unsigned int countAfterpulses(const DataSet& rawData, const RtRelation& rtRelation);
 
 private:
