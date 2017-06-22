@@ -1,5 +1,5 @@
 CC			=	g++
-CFLAGS		=	-std=c++11 -O3 -fopenmp
+CFLAGS		=	-std=c++17 -O3 -fopenmp
 ROOTCFLAGS	=	$(shell root-config --cflags)
 ROOTLDFLAGS	=	$(shell root-config --libs)
 TESTINC		=	-I./gtest/include
@@ -23,7 +23,7 @@ prog: $(OBJ)
 	$(CC) -o prog.out $^ $(LDFLAGS) $(ROOTLDFLAGS)
 	
 obj/%.o: src/%.cpp
-	$(CC) $(CFLAGS) $(ROOTCFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 	
 %_test.out:  $(TESTOBJS)
 	

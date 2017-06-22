@@ -19,7 +19,7 @@ DriftTimeSpectrum::~DriftTimeSpectrum()
 	// TODO Auto-generated destructor stub
 }
 
-unsigned int DriftTimeSpectrum::getEntries()
+unsigned int DriftTimeSpectrum::getEntries() const
 {
 	return m_entries;
 }

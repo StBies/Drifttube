@@ -18,7 +18,7 @@ public:
 	DriftTimeSpectrum(std::unique_ptr<std::array<uint32_t,800>>,unsigned int nEntries);
 	virtual ~DriftTimeSpectrum();
 
-	unsigned int getEntries();
+	unsigned int getEntries() const;
 
 protected:
 	unsigned int m_entries;

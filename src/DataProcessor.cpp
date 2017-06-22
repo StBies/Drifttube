@@ -213,7 +213,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
  *
  * @warning Needs drift tube data in globals.h to be set
  */
-static const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtSpect)
+const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtSpect)
 {
 	unsigned int nBins = dtSpect.getData().size();
 	unique_ptr<array<double,800>> result(new array<double,800>);
@@ -228,9 +228,10 @@ static const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectr
 	//TODO check, why this doesn't work
 	//	#pragma omp parallel for reduction(+:integral) shared(result)
 	//start at bin 1 -> do not integrate the underflow bin
-	for (unsigned int i = 0; i < nBins; i++)
+	(*result)[0] = integral;
+	for (unsigned int i = 1; i < nBins; i++)
 	{
-		integral += dtSpect[i] * scalingFactor;
+		integral += dtSpect[i - 1] * scalingFactor;
 		(*result)[i] = integral;
 	}
 
