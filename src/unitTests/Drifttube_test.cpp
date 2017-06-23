@@ -10,18 +10,29 @@ public:
 	{
 		d1 = new Drifttube(1,2,move(unique_ptr<DataSet>(new DataSet())));
 		d2 = new Drifttube(3,4,move(unique_ptr<DataSet>(new DataSet())));
+
+		//create data for a DataSet containing one event with a voltage under 2200-50 channels in bin 50 (real dt = 40ns)
+		vector<unique_ptr<Event>> data;
+		unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
+		arr->fill(2200);
+		(*arr)[50] = 2100;
+		unique_ptr<Event> e1(new Event(1,move(arr)));
+		data.push_back(move(e1));
+		data.shrink_to_fit();
+		d3_filled = new Drifttube(5,6,move(unique_ptr<DataSet>(new DataSet(data))));
 	}
 
 	~DrifttubeTest()
 	{
 		delete d1;
 		delete d2;
+		delete d3_filled;
 	}
 
 protected:
 	Drifttube* d1;
 	Drifttube* d2;
-
+	Drifttube* d3_filled;
 };
 
 TEST_F(DrifttubeTest,TestRadius)
@@ -61,6 +72,38 @@ TEST_F(DrifttubeTest,TestDataSet)
 {
 	ASSERT_EQ(0,d1->getDataSet().getSize());
 	ASSERT_EQ(0,d2->getDataSet().getSize());
+}
+
+TEST_F(DrifttubeTest,TestDriftTimeSpectrum)
+{
+	unique_ptr<array<uint32_t,800>> dt(new array<uint32_t,800>);
+	dt->fill(0);
+	(*dt)[50] = 1;
+	DriftTimeSpectrum wanted(move(dt),1,0);
+	ASSERT_EQ(wanted.getEntries(),d3_filled->getDriftTimeSpectrum().getEntries());
+	ASSERT_EQ(wanted.getRejected(),d3_filled->getDriftTimeSpectrum().getRejected());
+	ASSERT_EQ(wanted.getData(),(*d3_filled).getDriftTimeSpectrum().getData());
+}
+
+TEST_F(DrifttubeTest,TestRtRelation)
+{
+	unique_ptr<array<double,800>> rt(new array<double,800>);
+	rt->fill(18.15);
+	for(size_t i = 0; i < 51; i++)
+	{
+		(*rt)[i] = 0;
+	}
+	RtRelation wanted(move(rt));
+
+	for(size_t i = 0; i < wanted.getData().size(); i++)
+	{
+		ASSERT_DOUBLE_EQ(wanted[i],d3_filled->getRtRelation()[i]);
+	}
+}
+
+TEST_F(DrifttubeTest,TestEfficiency)
+{
+	ASSERT_EQ(1,d3_filled->getEfficiency());
 }
 
 int main(int argc, char **argv)

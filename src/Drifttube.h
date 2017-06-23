@@ -11,6 +11,9 @@
 #include <array>
 #include <memory>
 #include "DataSet.h"
+#include "DataProcessor.h"
+#include "DriftTimeSpectrum.h"
+#include "RtRelation.h"
 
 
 /**
@@ -34,12 +37,19 @@ public:
 	const int getPositionY() const;
 	const std::array<int,2>& getPosition() const;
 
+	const DriftTimeSpectrum& getDriftTimeSpectrum() const;
+	const RtRelation& getRtRelation() const;
+	const double getEfficiency() const;
+
 	const DataSet& getDataSet() const;
 
 private:
 	const unsigned int m_radius = 18150; //micron
 	std::array<int,2> m_position;
 	std::unique_ptr<DataSet> m_data;
+	DriftTimeSpectrum m_dtSpect;
+	RtRelation m_rtRel;
+	double m_efficiency;
 };
 
 #endif /* DRIFTTUBE_H_ */
