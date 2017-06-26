@@ -1,5 +1,6 @@
 #include "../RtRelation.h"
 #include <gtest/gtest.h>
+#include <cmath>
 
 using namespace std;
 
@@ -15,7 +16,6 @@ public:
 		b->fill(0);
 		rt1 = new RtRelation(move(a));
 		rt2 = new RtRelation(move(b));
-
 	}
 
 	~RtRelationTest()
@@ -30,9 +30,18 @@ protected:
 
 };
 
-TEST_F(RtRelationTest,TestDummy)
+TEST_F(RtRelationTest,TestCopyConstruction)
 {
-	ASSERT_TRUE(true);
+	RtRelation copy(*rt1);
+	ASSERT_FALSE(rt1 == &copy);
+	ASSERT_EQ(rt1->getData(), copy.getData());
+	ASSERT_FALSE(&rt1->getData() == &copy.getData());
+}
+
+TEST_F(RtRelationTest,TestDoubleContainment)
+{
+	(*rt1)[0] = M_PI;
+	ASSERT_DOUBLE_EQ(3.14159265358979323846, (*rt1)[0]);
 }
 
 int main(int argc, char **argv)

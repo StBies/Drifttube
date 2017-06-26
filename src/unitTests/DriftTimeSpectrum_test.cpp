@@ -30,6 +30,18 @@ protected:
 
 };
 
+TEST_F(DriftTimeSpectrumTest,TestCopyConstruction)
+{
+	DriftTimeSpectrum copyOfSpect1(*spect1);
+
+
+	ASSERT_FALSE(&copyOfSpect1 == spect1);
+	ASSERT_EQ(spect1->getData(), copyOfSpect1.getData());
+	ASSERT_FALSE(&spect1->getData() == &copyOfSpect1.getData());
+	ASSERT_EQ(spect1->getEntries(), copyOfSpect1.getEntries());
+	ASSERT_EQ(spect1->getRejected(), copyOfSpect1.getRejected());
+}
+
 TEST_F(DriftTimeSpectrumTest,TestMaxValue)
 {
 	unsigned long maxInt = 0xFFFFFFFF;

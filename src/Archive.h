@@ -17,6 +17,7 @@
 #include "DataSet.h"
 #include "DataPresenceException.h"
 #include "globals.h"
+#include "Drifttube.h"
 
 using namespace std;
 
@@ -37,19 +38,10 @@ public:
 	~Archive();
 
 	const size_t getSize() const;
-	const DataSet& getRawData() const;
-	const DataSet& getProcessedData() const;
-	const std::array<int,800>& getEvent(int event) const;
-	const std::array<int,800>& getDrifttimeSpectrum() const;
-	const std::array<int,800>& getDtDerivative() const;
-	const std::array<int,800>& getRtRelation() const;
 	TString getFilename() const;
 	TString getDirname() const;
 
-	void setProcessedData(DataSet* data);
-	void setDifttimeSpect(const std::array<int,800> spect);
-	void setDiffDrifttimeSpect(const std::array<int,800> spect);
-	void setRtRelation(const std::array<int,800> data);
+	void setProcessedData(const DataSet& data);
 
 private:
 //	TH1D* convertEntryToHistogram(const unsigned int entry,TTree* tree);
@@ -61,19 +53,12 @@ private:
 	string parseDir(string filename);
 	string parseFile(string filename);
 
-	DataSet _rawData;
-	DataSet _processedData;
-	std::array<int,800> _drifttimeSpect;
-	std::array<int,800> _rtRelation;
-	std::array<int,800> _diffDtSpect;
-	TString _directory;
-	TString _file;
-	unsigned int _numberOfEntries;
 
-	bool _dtFilled;
-	bool _rtFilled;
-	bool _integralsFilled;
-	bool _diffDtFilled;
+	std::vector<Drifttube> m_tubes;
+	TString m_directory;
+	TString m_file;
+	unsigned int m_numberOfEntries;
+
 	//bitpattern to store information, if things are set
 	char m_filled_bitpattern;
 };

@@ -29,17 +29,17 @@ Archive::Archive(TString filename)
 	TTree* tree = (TTree*) file.Get("Tfadc");
 	cout << "Reading tree" << endl;
 
-	_rawData = new DataSet();
-	_numberOfEntries = tree->GetEntries();
+	m_rawData = new DataSet();
+	m_numberOfEntries = tree->GetEntries();
 
-	cout << "Beginning conversion. Entries: " << _numberOfEntries << endl;
+	cout << "Beginning conversion. Entries: " << m_numberOfEntries << endl;
 
 	convertAllEntriesToHistograms(tree);
 
-	cout << "DataSet size is: " << _rawData->getSize() << endl;
+	cout << "DataSet size is: " << m_rawData->getSize() << endl;
 
-	_directory = parseDir(filename);
-	_file = parseFile(filename);
+	m_directory = parseDir(filename);
+	m_file = parseFile(filename);
 	file.Close();
 }
 
@@ -56,7 +56,7 @@ Archive::Archive(TString filename)
 Archive::~Archive()
 {
 	stringstream name;
-	name << _directory << "processed_" << _file;
+	name << m_directory << "processed_" << m_file;
 	TString filename(name.str());
 	cout << "Saving data to: " << filename << endl;
 	writeToFile(filename);
@@ -75,7 +75,7 @@ Archive::~Archive()
  */
 const unsigned int Archive::getSize() const
 {
-	return _numberOfEntries;
+	return m_numberOfEntries;
 }
 
 /**
@@ -91,7 +91,7 @@ const unsigned int Archive::getSize() const
  */
 const DataSet& Archive::getRawData() const
 {
-	return _rawData;
+	return m_rawData;
 }
 
 /**
@@ -112,7 +112,7 @@ DataSet& Archive::getProcessedData() const
 {
 	if (m_filled_bitpattern & 0b00100000)
 	{
-		return _processedData;
+		return m_processedData;
 	}
 	else
 	{
@@ -135,7 +135,7 @@ void Archive::setProcessedData(DataSet* data)
 {
 	_integralsFilled = true;
 	m_filled_bitpattern |= 0b00100000;
-	_processedData = data;
+	m_processedData = data;
 }
 
 /**
@@ -157,7 +157,7 @@ const std::array<int,800>& Archive::getEvent(const unsigned int event) const
 {
 	try
 	{
-		return _rawData.getEvent(event);
+		return m_rawData.getEvent(event);
 	} catch (Exception& e)
 	{
 		cerr << e.error() << endl;
@@ -181,7 +181,7 @@ const std::array<int,800>& Archive::getDrifttimeSpectrum() const
 {
 	if (m_filled_bitpattern & 0b10000000)
 	{
-		return _drifttimeSpect;
+		return m_drifttimeSpect;
 	}
 	else
 	{
@@ -229,7 +229,7 @@ const std::array<int,800>& Archive::getRtRelation() const
 {
 	if (m_filled_bitpattern & 0b01000000)
 	{
-		return _rtRelation;
+		return m_rtRelation;
 	}
 	else
 	{
@@ -250,7 +250,7 @@ const std::array<int,800>& Archive::getRtRelation() const
  */
 TString Archive::getFilename() const
 {
-	return _file;
+	return m_file;
 }
 
 /**
@@ -266,7 +266,7 @@ TString Archive::getFilename() const
  */
 TString Archive::getDirname() const
 {
-	return _directory;
+	return m_directory;
 }
 
 /**
@@ -284,7 +284,7 @@ void Archive::setDifttimeSpect(TH1D* spect)
 {
 	m_filled_bitpattern |= 0b10000000;
 	_dtFilled = true;
-	_drifttimeSpect = spect;
+	m_drifttimeSpect = spect;
 }
 
 /**
@@ -321,7 +321,7 @@ void Archive::setRtRelation(TH1D* data)
 {
 	m_filled_bitpattern |= 0b01000000;
 	_rtFilled = true;
-	_rtRelation = data;
+	m_rtRelation = data;
 }
 
 /**
@@ -349,21 +349,21 @@ void Archive::writeToFile(TString filename)
 	TH1D* hist = nullptr;
 	TH1D* integral = nullptr;
 
-	for (int i = 0; i < _numberOfEntries; i++)
+	for (int i = 0; i < m_numberOfEntries; i++)
 	{
-		hist = _rawData->getEvent(i);
-		integral = _processedData->getEvent(i);
+		hist = m_rawData->getEvent(i);
+		integral = m_processedData->getEvent(i);
 		file.cd("rawData");
 		hist->Write();
 		file.cd("integrated");
 		integral->Write();
 	}
 	file.cd("dtSpect");
-	_drifttimeSpect->Write();
+	m_drifttimeSpect->Write();
 	file.cd("diffDriftTime");
 	_diffDtSpect->Write();
 	file.cd("rtRelation");
-	_rtRelation->Write();
+	m_rtRelation->Write();
 	file.Close();
 	cout << "Saving complete" << endl;
 }
@@ -478,9 +478,9 @@ std::unique_ptr < std::array<int, 800> > Archive::convertEntry(int entry, TTree*
  */
 void Archive::convertAllEntries(TTree* tree)
 {
-	for (int i = 0; i < _numberOfEntries; i++)
+	for (int i = 0; i < m_numberOfEntries; i++)
 	{
-		_rawData->addData(std::move(convertEntry(i, tree)));
+		m_rawData->addData(std::move(convertEntry(i, tree)));
 	}
 }
 

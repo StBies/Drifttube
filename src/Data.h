@@ -29,7 +29,7 @@ template<typename T = uint16_t>
 class Data
 {
 public:
-	virtual ~Data();
+	virtual ~Data() = 0;
 
 	const std::array<T,800>& getData() const;
 	//TODO fix const correctness - methods const qualifier needed, else an event can not be passed as const reference

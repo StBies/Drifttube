@@ -34,6 +34,24 @@ Drifttube::Drifttube(int posX, int posY, unique_ptr<DataSet> data)
 //	cout << "efficiency = " << m_efficiency << " +- " << sqrt(m_efficiency*(1-m_efficiency)/(double)m_dtSpect.getEntries()) << endl;
 }
 
+
+/**
+ * Copy constructor. Initializes a copy of a passed Drifttube object including copies of the DataSet for that Drifttube.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date June 26, 2017
+ *
+ * @param original Reference to the original Drifttube object of that a copy should be created
+ */
+Drifttube::Drifttube(const Drifttube& original)
+: m_dtSpect(original.m_dtSpect), m_rtRel(original.m_rtRel)
+{
+	m_data = unique_ptr<DataSet>(new DataSet(*original.m_data));
+	m_efficiency = original.m_efficiency;
+	m_position = original.m_position;
+}
+
 Drifttube::~Drifttube()
 {
 

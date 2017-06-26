@@ -30,6 +30,7 @@ class Drifttube
 {
 public:
 	Drifttube(const int posX, const int posY, unique_ptr<DataSet> data);
+	Drifttube(const Drifttube& original);
 	~Drifttube();
 
 	const unsigned int getRadius() const;

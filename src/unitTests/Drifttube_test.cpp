@@ -35,6 +35,27 @@ protected:
 	Drifttube* d3_filled;
 };
 
+TEST_F(DrifttubeTest,TestCopyConstruction)
+{
+	Drifttube copyOfD3(*d3_filled);
+	ASSERT_FALSE(d3_filled == &copyOfD3);
+
+
+	//Test, if the position holds the same values at another memory location
+	ASSERT_EQ(d3_filled->getPosition(), copyOfD3.getPosition());
+	ASSERT_FALSE(&d3_filled->getPosition() == &copyOfD3.getPosition());
+
+	//Test, if the DriftTimeSpectrum holds the same values at another memory location
+	ASSERT_EQ(d3_filled->getDriftTimeSpectrum().getData(), copyOfD3.getDriftTimeSpectrum().getData());
+	ASSERT_FALSE(&d3_filled->getDriftTimeSpectrum() == &copyOfD3.getDriftTimeSpectrum());
+	ASSERT_EQ(d3_filled->getDriftTimeSpectrum().getEntries(), copyOfD3.getDriftTimeSpectrum().getEntries());
+	ASSERT_EQ(d3_filled->getDriftTimeSpectrum().getRejected(), copyOfD3.getDriftTimeSpectrum().getRejected());
+
+	//Test, if the RtRelation holds the same values at another memory location
+	ASSERT_EQ(d3_filled->getRtRelation().getData(), copyOfD3.getRtRelation().getData());
+	ASSERT_FALSE(&d3_filled->getRtRelation() == &copyOfD3.getRtRelation());
+}
+
 TEST_F(DrifttubeTest,TestRadius)
 {
 	ASSERT_EQ(18150,d1->getRadius());

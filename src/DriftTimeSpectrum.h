@@ -16,6 +16,7 @@ class DriftTimeSpectrum: public Data<uint32_t>
 {
 public:
 	DriftTimeSpectrum(std::unique_ptr<std::array<uint32_t,800>>,unsigned int nEntries,unsigned int rejected);
+	DriftTimeSpectrum(const DriftTimeSpectrum& original);
 	virtual ~DriftTimeSpectrum();
 	//TODO check if a constructor should be given, where a DataSet is passed and the dt-spect is autocalculating itself - kind of
 
@@ -24,7 +25,7 @@ public:
 
 protected:
 	unsigned int m_entries;
-	unsigned int m_rejectec_evts;
+	unsigned int m_rejected_evts;
 };
 
 #endif /* DRIFTTIMESPECTRUM_H_ */
