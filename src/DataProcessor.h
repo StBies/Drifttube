@@ -1,6 +1,10 @@
 #ifndef DATAPROCESSOR_H_
 #define DATAPROCESSOR_H_
 
+//forward declaration needed due to ring inclusion
+class Event;
+class DataSet;
+
 #include <omp.h>
 #include <iostream>
 #include <sstream>

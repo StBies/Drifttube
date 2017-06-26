@@ -8,10 +8,14 @@
 #ifndef EVENT_H_
 #define EVENT_H_
 
+//forward declaration needed due to ring inclusion
+class DataProcessor;
+
 #include <array>
 #include <memory>
 #include <cstdlib>
 #include "Data.h"
+#include "DataProcessor.h"
 
 /**
  * Class that represents the data for one event.

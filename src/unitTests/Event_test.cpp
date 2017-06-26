@@ -131,6 +131,22 @@ TEST_F(EventTest, TestConstCorrectness)
 	ASSERT_EQ(1338,copy2[0]);
 }
 
+TEST_F(EventTest, TestDriftTime)
+{
+	unique_ptr<array<uint16_t,800>> arr = unique_ptr<array<uint16_t,800>>(new array<uint16_t,800>);
+	unique_ptr<array<uint16_t,800>> arr2 = unique_ptr<array<uint16_t,800>>(new array<uint16_t,800>);
+	arr->fill(2200);
+	arr2->fill(2200);
+	(*arr)[50] = 2100;
+	Event e(1,move(arr));
+	Event e2(2,move(arr2));
+
+
+
+	ASSERT_EQ(200,e.getDriftTime());
+	ASSERT_EQ(-168,e2.getDriftTime());
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
