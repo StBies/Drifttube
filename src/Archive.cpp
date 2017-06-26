@@ -63,181 +63,6 @@ Archive::~Archive()
 }
 
 /**
- * Method to return the total number of events that are stored in this archive.
- *
- * @brief Getter method for #events
- *
- * @author Stefan
- * @date April 20, 2017
- * @version Alpha 2.0
- *
- * @return integer number of events that are stored in this archive
- */
-const unsigned int Archive::getSize() const
-{
-	return m_numberOfEntries;
-}
-
-/**
- * Getter method for the raw data histograms. Returns a DataSet object reference
- *
- * @brief raw data getter method
- *
- * @author Stefan Bieschke
- * @date April 20, 2017
- * @version Alpha 2.0
- *
- * @return DataSet* containing histograms for all events
- */
-const DataSet& Archive::getRawData() const
-{
-	return m_rawData;
-}
-
-/**
- * Getter method for the processed data DataSet. Returns a DataSet object reference
- * containing the processed data
- *
- * @brief raw data getter method
- *
- * @author Stefan Bieschke
- * @date April 20, 2017
- * @version Alpha 2.0
- *
- * @return DataSet containing histograms for all events
- *
- * @warning Throws an exception, if processed (integrated) data is not yet present
- */
-DataSet& Archive::getProcessedData() const
-{
-	if (m_filled_bitpattern & 0b00100000)
-	{
-		return m_processedData;
-	}
-	else
-	{
-		throw DataPresenceException();
-	}
-}
-
-/**
- * Sets a DataSet as this objects member _processedData.
- *
- * @brief Setter method for processed data
- *
- * @author Stefan
- * @date July 19, 2016
- * @version 0.1
- *
- * @param data Pointer to the dataset containing the processed data
- */
-void Archive::setProcessedData(DataSet* data)
-{
-	_integralsFilled = true;
-	m_filled_bitpattern |= 0b00100000;
-	m_processedData = data;
-}
-
-/**
- * Method, that returns a data for a single event.
- *
- * @brief Getter method for single event
- *
- * @author Stefan
- * @date June 28, 2016
- * @version 0.1
- *
- * @param event Number of the event to be returned
- *
- * @return array type object containing the data of the event.
- *
- * @require event < #events_total
- */
-const std::array<int,800>& Archive::getEvent(const unsigned int event) const
-{
-	try
-	{
-		return m_rawData.getEvent(event);
-	} catch (Exception& e)
-	{
-		cerr << e.error() << endl;
-	}
-}
-
-/**
- * Returns the spectrum of drifttimes as TH1D* histogram if present, throws an DataPresenceException else.
- *
- * @brief Getter method for DT spectrum
- *
- * @author Stefan
- * @date August 1, 2016
- * @version 0.1
- *
- * @return TH1D* pointer to the drifttime spectrum
- *
- * @warning If the spectrum was not yet set, a DataPresenceException is thrown.
- */
-const std::array<int,800>& Archive::getDrifttimeSpectrum() const
-{
-	if (m_filled_bitpattern & 0b10000000)
-	{
-		return m_drifttimeSpect;
-	}
-	else
-	{
-		throw DataPresenceException();
-	}
-}
-
-/**
- * Returns the derivative of the drift time spectrum as TH1D* histogram if it is present, if not an exception is thrown.
- *
- * @author Stefan
- * @date November 18, 2017
- * @version 0.9
- *
- * @return Pointer to the TH1D* type histogram containing the derivative.
- *
- * @warning If it is not yet set, a DataPrsenceException is thrown.
- */
-const std::array<int,800>& Archive::getDtDerivative() const
-{
-	if (m_filled_bitpattern & 0b00010000)
-	{
-		return _diffDtSpect;
-	}
-	else
-	{
-		throw DataPresenceException();
-	}
-}
-
-/**
- * Returns the radius-drifttime relation as TH1D* histogram if present, throws an DataPresenceException else.
- *
- * @brief Getter method for rt relation
- *
- * @author Stefan
- * @date August 1, 2016
- * @version 0.1
- *
- * @return TH1D* pointer to the rt relation
- *
- * @warning If the relation was not yet set, a DataPresenceException is thrown.
- */
-const std::array<int,800>& Archive::getRtRelation() const
-{
-	if (m_filled_bitpattern & 0b01000000)
-	{
-		return m_rtRelation;
-	}
-	else
-	{
-		throw DataPresenceException();
-	}
-}
-
-/**
  * Returns the filename in a TString
  *
  * @brief Getter method for the filename
@@ -270,61 +95,6 @@ TString Archive::getDirname() const
 }
 
 /**
- * Stores a calculated drifttime spectrum in the Archive.
- *
- * @brief Setter method for the drifttime spectrum
- *
- * @author Stefan
- * @date August 1, 2016
- * @version 0.1
- *
- * @param spect Pointer to the TH1D histogram containing the drifttime spectrum
- */
-void Archive::setDifttimeSpect(TH1D* spect)
-{
-	m_filled_bitpattern |= 0b10000000;
-	_dtFilled = true;
-	m_drifttimeSpect = spect;
-}
-
-/**
- * Stores a calculated derivative of a drifttime spectrum in the Archive.
- *
- * @brief Setter method for the derivative of the drifttime spectrum
- *
- * @author Stefan
- * @date November 17, 2016
- * @version 0.1
- *
- * @param spect Pointer to the TH1D histogram containing the derivative of the drifttime spectrum
- */
-void Archive::setDiffDrifttimeSpect(TH1D* spect)
-{
-	m_filled_bitpattern |= 0b00010000;
-	_diffDtFilled = true;
-	_diffDtSpect = spect;
-}
-
-/**
- * Stores a calculated radius-drifttime relation in the Archive object.
- *
- * @brief Setter method for the rt relation
- *
- * @author Stefan
- * @date August 1, 2016
- * @version 0.1
- *
- * @param data Pointer to the histogram that is to be stored
- *
- */
-void Archive::setRtRelation(TH1D* data)
-{
-	m_filled_bitpattern |= 0b01000000;
-	_rtFilled = true;
-	m_rtRelation = data;
-}
-
-/**
  * Writes the histograms to a file, that is specified with parameter filename.
  *
  * @brief Write data to file
@@ -344,7 +114,6 @@ void Archive::writeToFile(TString filename)
 	file.mkdir("integrated");
 	file.mkdir("dtSpect");
 	file.mkdir("rtRelation");
-	file.mkdir("diffDriftTime");
 
 	TH1D* hist = nullptr;
 	TH1D* integral = nullptr;
@@ -420,12 +189,12 @@ TH1D* Archive::convertEntryToHistogram(int entry, TTree* tree)
  * @brief Convert from root-file to internally used data
  *
  * @author Stefan Bieschke
- * @date April 18, 2017
+ * @date June 26, 2017
  * @version Alpha 2.0
  *
- * @return unique pointer to an std::array<int,800> containing the data. The ownership is transferred to caller after this method.
+ * @return unique pointer to an Event containing the data. The ownership is transferred to caller after this method.
  */
-std::unique_ptr < std::array<int, 800> > Archive::convertEntry(int entry, TTree* tree)
+std::unique_ptr<Event> Archive::convertEntry(unsigned int entry, TTree* tree)
 {
 	const int numberOfChannels = 800;
 
@@ -433,15 +202,17 @@ std::unique_ptr < std::array<int, 800> > Archive::convertEntry(int entry, TTree*
 	tree->SetBranchAddress("Voltage", &voltage);
 	tree->GetEntry(entry);
 
-	std::unique_ptr < std::array<int, 800> > rawData(new std::array<int, 800>);
+	unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
+
+	unique_ptr<Event> rawData(new Event(entry,move(arr)));
 
 	#pragma omp parallel for
 	for (int i = 0; i < numberOfChannels; i++)
 	{
-		(*rawData)[i] = voltage[i];
+		(*rawData)[i] = (uint16_t)voltage[i];
 	}
 
-	return std::move(rawData);
+	return move(rawData);
 }
 
 ///**

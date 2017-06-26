@@ -14,20 +14,17 @@
 //own headers
 #include "DataSet.h"
 
-//ROOT headers
-#include "TH1D.h"
-
 class EventFinder
 {
 public:
 	EventFinder();
 	virtual ~EventFinder();
 
-	vector<int> listEventNumbers(string expression);
+	vector<unsigned int> listEventNumbers(string expression) const;
 	DataSet* getEvents(string expression);
 
 private:
-	bool parseExpression(string expression,TH1D* data);
+	bool parseExpression(string expression, const Event& data) const;
 };
 
 #endif /* EVENTFINDER_H_ */

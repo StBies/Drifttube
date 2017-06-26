@@ -11,7 +11,7 @@
 #include <array>
 #include <memory>
 #include <cstdlib>
-#include "Data.h" //.cpp file inclusion needed as Data is a template class
+#include "Data.h"
 
 /**
  * Class that represents the data for one event.

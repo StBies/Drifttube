@@ -11,6 +11,13 @@ using namespace std;
 
 /**
  * Constructor
+ *
+ * @brief ctor
+ *
+ * @author Stefan Bieschke
+ * @date May 16, 2017
+ * @version Alpha 2.0
+ *
  * @param eventNumber number of the event
  * @param data Data that should be stored
  */
