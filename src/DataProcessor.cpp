@@ -166,7 +166,6 @@ unsigned short DataProcessor::findMinimumBin(const Event& data)
 	return minBin;
 }
 
-//TODO overhaul - use drifttime stored in events
 /**
  * Calculates the spectrum of drifttimes for the data given in a DataSet object containing raw data.
  * The result is a histogram containing the spectrum. Note, that in order to find the correct drift time spectrum, the
@@ -188,10 +187,10 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	result->fill(0);
 	unsigned int rejected = 0;
 
-//	#pragma omp parallel for
+	#pragma omp parallel for
 	for (size_t i = 0; i < data.getSize(); i++)
 	{
-		short driftTimeBin = findDriftTime(data[i], OFFSET_ZERO_VOLTAGE - 50);
+		short driftTimeBin = (short)(data[i].getDriftTime() / 4);
 		if(driftTimeBin >= 0)
 		{
 			(*result)[driftTimeBin]++;
@@ -337,11 +336,11 @@ short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
 }
 
 /**
- * Finds the last bin, where a threshold voltage is reached.
+ * Finds the last bin, where a threshold voltage is reached (a.k.a where the bincontent is EQUAL to the threshold).
  *
  * @author Stefan Bieschke
- * @date June 9, 2017
- * @version Alpha 2.0
+ * @date June 28, 2017
+ * @version Alpha 2.0.1
  *
  * @param data Event object reference, containing the data on which the last filled bin is to be found
  * @param threshold Threshold in FADC units. The last time will be found, for that the data entry is SMALLER THAN the threshold.
@@ -351,15 +350,11 @@ short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
 unsigned short DataProcessor::findLastFilledBin(const Event& data, unsigned short threshold)
 {
 	unsigned short bin = 0;
-	if(data[data.getData().size()-1] <= threshold)
+	for (unsigned short i = data.getData().size() - 1; i > 0; i--)
 	{
-		return data.getData().size()-1;
-	}
-	for (unsigned short i = 0; i < data.getData().size() - 2; i++)
-	{
-		if (data[i] <= threshold && data[i + 1] >= threshold)
+		if (data[i] <= threshold)
 		{
-			bin = i;
+			return i;
 		}
 	}
 	return bin;

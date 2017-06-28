@@ -84,6 +84,7 @@ Data<T>::Data(const Data& data)
 	unique_ptr<array<T,800>> temp(new array<T,800>);
 
 	//deep copy
+	#pragma omp parallel for
 	for(int i = 0; i < data.m_data->size(); i++)
 	{
 		(*temp)[i] = (*data.m_data)[i];
@@ -133,6 +134,7 @@ const std::array<T,800>& Data<T>::getData() const
 template<typename T>
 const T& Data<T>::operator[](const unsigned short bin) const
 {
+	//TODO std::array can throw an exception on its own - remove this
 	if(bin < m_data->size())
 	{
 		return (*m_data)[bin];
@@ -160,6 +162,7 @@ const T& Data<T>::operator[](const unsigned short bin) const
 template<typename T>
 T& Data<T>::operator[](const unsigned short bin)
 {
+	//TODO std::array can throw an exception on its own - remove this
 	if(bin < m_data->size())
 	{
 		return (*m_data)[bin];

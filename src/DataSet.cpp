@@ -71,6 +71,7 @@ DataSet::DataSet(const DataSet& original)
 
 	//deep copy
 	//note: range based for (aka for each) does not work, since that would be a copy of the unique pointer
+	#pragma omp parallel for
 	for(size_t i = 0; i < original.getSize(); i++)
 	{
 		unique_ptr<Event> temp(new Event(original[i]));

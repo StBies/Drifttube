@@ -115,10 +115,7 @@ TEST_F(EventTest, TestPointerToEvent)
 	arr[1] = e;
 	ASSERT_EQ(e,e1);
 	ASSERT_EQ(e->getData(),e1->getData());
-	for(size_t i = 0; i < e->getData().size(); i++)
-	{
-		ASSERT_EQ((*e)[i],(*e1)[i]);
-	}
+	ASSERT_EQ(&e->getData(),&e1->getData());
 }
 
 TEST_F(EventTest, TestConstCorrectness)
@@ -140,8 +137,6 @@ TEST_F(EventTest, TestDriftTime)
 	(*arr)[50] = 2100;
 	Event e(1,move(arr));
 	Event e2(2,move(arr2));
-
-
 
 	ASSERT_EQ(200,e.getDriftTime());
 	ASSERT_EQ(-168,e2.getDriftTime());
