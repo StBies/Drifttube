@@ -40,9 +40,11 @@ TEST_F(DataSetTest,TestConstruction)
 {
 	ASSERT_EQ(0,d1->getSize());
 	ASSERT_EQ(DataSetTestSize,d2->getSize());
-	ASSERT_EQ(0,(*d2)[0][0]);
-	ASSERT_EQ(1,(*d2)[1][0]);
-	ASSERT_EQ(2,(*d2)[2][0]);
+
+	for(size_t i = 0; i < DataSetTestSize; i++)
+	{
+		ASSERT_EQ((uint16_t)i,(*d2)[i][0]);
+	}
 }
 
 TEST_F(DataSetTest,TestCopyConstruction)
