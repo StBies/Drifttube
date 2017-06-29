@@ -11,13 +11,14 @@ public:
 	DataSetTest()
 	{
 		d1 = new DataSet();
-		vector<unique_ptr<Event>> initVector;
+		vector<unique_ptr<Event>> initVector(DataSetTestSize);
+		#pragma omp parallel for
 		for(int i = 0; i < DataSetTestSize; i++)
 		{
 			unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
 			arr->fill(i);
 			unique_ptr<Event> a(new Event(i,move(arr)));
-			initVector.push_back(move(a));
+			initVector[i] = move(a);
 		}
 		initVector.shrink_to_fit();
 		d2 = new DataSet(initVector);
