@@ -3,6 +3,8 @@
 
 using namespace std;
 
+size_t DataSetTestSize = 1000000;
+
 class DataSetTest : public ::testing::Test
 {
 public:
@@ -10,7 +12,7 @@ public:
 	{
 		d1 = new DataSet();
 		vector<unique_ptr<Event>> initVector;
-		for(int i = 0; i < 15; i++)
+		for(int i = 0; i < DataSetTestSize; i++)
 		{
 			unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
 			arr->fill(i);
@@ -36,11 +38,10 @@ protected:
 TEST_F(DataSetTest,TestConstruction)
 {
 	ASSERT_EQ(0,d1->getSize());
-	ASSERT_EQ(15,d2->getSize());
+	ASSERT_EQ(DataSetTestSize,d2->getSize());
 	ASSERT_EQ(0,(*d2)[0][0]);
 	ASSERT_EQ(1,(*d2)[1][0]);
 	ASSERT_EQ(2,(*d2)[2][0]);
-
 }
 
 TEST_F(DataSetTest,TestCopyConstruction)
@@ -48,7 +49,7 @@ TEST_F(DataSetTest,TestCopyConstruction)
 	//test copy construction: copy d2
 	DataSet copyOfD2(*d2);
 
-	ASSERT_EQ(15,copyOfD2.getSize());
+	ASSERT_EQ(DataSetTestSize,copyOfD2.getSize());
 	ASSERT_FALSE(d2 == &copyOfD2);
 	ASSERT_TRUE(d2->getSize() == copyOfD2.getSize());
 
@@ -59,7 +60,6 @@ TEST_F(DataSetTest,TestCopyConstruction)
 		ASSERT_FALSE(&copyOfD2[i].getData() == &(*d2)[i].getData());
 		ASSERT_TRUE(copyOfD2[i].getData() == (*d2)[i].getData());
 	}
-
 }
 
 TEST_F(DataSetTest,TestAddData)
