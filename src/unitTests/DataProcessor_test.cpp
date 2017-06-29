@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include <array>
 #include "../Event.h"
+#include "../RtRelation.h"
+#include "../DriftTimeSpectrum.h"
 
 using namespace std;
 
@@ -105,6 +107,27 @@ TEST_F(DataProcessorTest,TestFindLastFilledBin)
 	ASSERT_EQ(400,DataProcessor::findLastFilledBin(*min_at_400,6));
 	ASSERT_EQ(799,DataProcessor::findLastFilledBin(*const1,1));
 	ASSERT_EQ(0,DataProcessor::findLastFilledBin(*const1,0));
+}
+
+TEST_F(DataProcessorTest,TestcalculateRtRelation)
+{
+	unique_ptr<array<uint32_t,800>> dtArr(new array<uint32_t,800>);
+	dtArr->fill(0);
+	(*dtArr)[30] = 1;
+	DriftTimeSpectrum spect(move(dtArr),1,0);
+	RtRelation rt = DataProcessor::calculateRtRelation(spect);
+
+	array<double,800> expectedRt;
+	expectedRt.fill(0);
+	for(size_t i = 31; i < expectedRt.size(); i++)
+	{
+		expectedRt[i] = DRIFT_TUBE_RADIUS;
+	}
+	//actual test
+	for(size_t i = 0; i < expectedRt.size(); i++)
+	{
+		ASSERT_DOUBLE_EQ(expectedRt[i],rt.getData()[i]);
+	}
 }
 
 int main(int argc, char **argv)

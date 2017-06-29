@@ -17,7 +17,7 @@ DataProcessor::DataProcessor()
 
 /**
  * Destructor, frees the allocated memory for this object, when it is
- * destroyed
+ * destroyed. In this special case: does nothing
  * 
  * @brief Destructor
  * 
@@ -27,7 +27,6 @@ DataProcessor::DataProcessor()
  */
 DataProcessor::~DataProcessor()
 {
-	//TODO implement
 }
 
 /**
@@ -190,7 +189,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	#pragma omp parallel for
 	for (size_t i = 0; i < data.getSize(); i++)
 	{
-		short driftTimeBin = (short)(data[i].getDriftTime() / 4);
+		short driftTimeBin = (short)(data[i].getDriftTime() / ADC_BINS_TO_TIME);
 		if(driftTimeBin >= 0)
 		{
 			(*result)[driftTimeBin]++;
@@ -228,9 +227,9 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
 	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)dtSpect.getEntries());
 
 	//TODO check, why this doesn't work
-	//	#pragma omp parallel for reduction(+:integral) shared(result)
 	//start at bin 1 -> do not integrate the underflow bin
 	(*result)[0] = integral;
+//	#pragma omp parallel for shared(result) reduction(+:integral)
 	for (unsigned int i = 1; i < nBins; i++)
 	{
 		integral += dtSpect[i - 1] * scalingFactor;
@@ -336,7 +335,7 @@ short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
 }
 
 /**
- * Finds the last bin, where a threshold voltage is reached (a.k.a where the bincontent is EQUAL to the threshold).
+ * Finds the last bin, where a threshold voltage is reached (a.k.a where the bin content is EQUAL to the threshold).
  *
  * @author Stefan Bieschke
  * @date June 28, 2017
@@ -349,7 +348,7 @@ short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
  */
 unsigned short DataProcessor::findLastFilledBin(const Event& data, unsigned short threshold)
 {
-	unsigned short bin = 0;
+	unsigned short defaultBin = 0;
 	for (unsigned short i = data.getData().size() - 1; i > 0; i--)
 	{
 		if (data[i] <= threshold)
@@ -357,5 +356,5 @@ unsigned short DataProcessor::findLastFilledBin(const Event& data, unsigned shor
 			return i;
 		}
 	}
-	return bin;
+	return defaultBin;
 }
