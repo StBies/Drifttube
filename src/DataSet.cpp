@@ -111,7 +111,7 @@ DataSet::~DataSet()
  * @require data != nullptr
  * @ensure new size = old size + 1
  */
-void DataSet::addData(std::unique_ptr<Event> data)
+void DataSet::addData(unique_ptr<Event> data)
 {
 	//move the ownership of the data array to the vector m_data, that should finally store it
 	m_data.push_back(move(data));

@@ -59,4 +59,3 @@ RtRelation& RtRelation::operator=(const RtRelation& rhs)
 
 	return *this;
 }
-

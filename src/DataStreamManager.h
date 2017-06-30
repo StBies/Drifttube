@@ -31,9 +31,8 @@ public:
 //	bool startup(std::string dataPath);
 //	bool writeToRootFile(Archive& archive);
 //
-//private:
-//	Archive _archive;
-//	DataProcessor _processor;
+private:
+//	Archive m_archive;
 };
 
 #endif /* DATASTREAMMANAGER_H_ */

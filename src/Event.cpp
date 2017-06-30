@@ -82,4 +82,3 @@ Event& Event::operator=(const Event& rhs)
 
 	return *this;
 }
-
