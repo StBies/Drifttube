@@ -38,7 +38,7 @@ public:
 	const unsigned int getEventNumber() const;
 	const double getDriftTime() const;
 
-	//TODO check if offering this is bad design and if getData() should be all that is available
+	Event& operator=(const Event& rhs);
 
 private:
 	unsigned int m_event_number;

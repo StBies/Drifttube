@@ -84,3 +84,22 @@ unsigned int DriftTimeSpectrum::getRejected() const
 	return m_rejected_evts;
 }
 
+/**
+ * Assignment operator, assigns the ride hand side (rhs) to a lhs variable of fitting type.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date June 30, 2017
+ *
+ * @param rhs const Reference to the ride hand side value
+ * @return Reference to the bound object
+ */
+DriftTimeSpectrum& DriftTimeSpectrum::operator=(const DriftTimeSpectrum& rhs)
+{
+	Data::operator=(rhs);
+	m_rejected_evts = rhs.m_rejected_evts;
+	m_entries = rhs.m_entries;
+
+	return *this;
+}
+

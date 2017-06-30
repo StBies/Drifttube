@@ -78,6 +78,23 @@ TEST_F(DriftTimeSpectrumTest,TestOverflowAtZero)
 	ASSERT_EQ(0,(*spect1)[0]);
 }
 
+TEST_F(DriftTimeSpectrumTest,TestAssignmentOperator)
+{
+	DriftTimeSpectrum a = *spect1;
+
+	ASSERT_EQ(spect1->getEntries(),a.getEntries());
+	ASSERT_EQ(spect1->getRejected(),a.getRejected());
+	ASSERT_EQ(spect1->getData(),a.getData());
+	ASSERT_FALSE(&spect1->getData() == &a.getData());
+
+	DriftTimeSpectrum b = DriftTimeSpectrum(*spect1);
+
+	ASSERT_EQ(spect1->getEntries(),b.getEntries());
+	ASSERT_EQ(spect1->getRejected(),b.getRejected());
+	ASSERT_EQ(spect1->getData(),b.getData());
+	ASSERT_FALSE(&spect1->getData() == &b.getData());
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

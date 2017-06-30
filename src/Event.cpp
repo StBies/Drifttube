@@ -24,7 +24,6 @@ using namespace std;
 Event::Event(unsigned int eventNumber, unique_ptr<array<uint16_t,800>> data) : Data(move(data))
 {
 	m_event_number = eventNumber;
-	//TODO drift time initialization done - maybe this is not a good idea - but works for now
 	m_drift_time = ADC_BINS_TO_TIME * DataProcessor::findDriftTime(*this,2150);
 }
 
@@ -70,5 +69,17 @@ const unsigned int Event::getEventNumber() const
 const double Event::getDriftTime() const
 {
 	return m_drift_time;
+}
+
+
+//TODO comment
+//TODO test
+Event& Event::operator=(const Event& rhs)
+{
+	Data::operator=(rhs);
+	m_event_number = rhs.m_event_number;
+	m_drift_time = rhs.m_drift_time;
+
+	return *this;
 }
 

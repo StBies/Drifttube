@@ -4,7 +4,6 @@
 
 using namespace std;
 
-//TODO implement Tests for RtRelation
 class RtRelationTest : public ::testing::Test
 {
 public:

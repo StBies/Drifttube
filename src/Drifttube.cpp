@@ -191,3 +191,28 @@ const DataSet& Drifttube::getDataSet() const
 {
 	return *m_data;
 }
+
+
+//TODO test
+/**
+ * Assignment operator allowing to write Drifttube a = Drifttube(...); Basically, this calls the copy constructor and returns itself.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date June 23, 2017
+ *
+ * @param rhs Const reference to the object that should be assigned to the left hand side value.
+ *
+ * @return Reference to the bound object
+ */
+Drifttube& Drifttube::operator=(const Drifttube& rhs)
+{
+	m_dtSpect = rhs.m_dtSpect;
+	m_rtRel = rhs.m_rtRel;
+	//TODO implement assignment operator for DataSet
+	m_data = unique_ptr<DataSet>(new DataSet(*rhs.m_data));
+	m_efficiency = rhs.m_efficiency;
+	m_position = rhs.m_position;
+
+	return *this;
+}

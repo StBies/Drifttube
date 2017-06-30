@@ -9,12 +9,10 @@
 
 DataStreamManager::DataStreamManager()
 {
-	// TODO Auto-generated constructor stub
 
 }
 
 DataStreamManager::~DataStreamManager()
 {
-	// TODO Auto-generated destructor stub
 }
 

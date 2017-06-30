@@ -13,7 +13,6 @@
 #include <cstdlib>
 
 
-//TODO update comment
 /**
  * A class for basic data types. This is basically a wrapper for arrays of any primitive data type values. The Data class is a base class for Events and drift time spectra.
  *
@@ -32,14 +31,14 @@ public:
 	virtual ~Data() = 0;
 
 	const std::array<T,800>& getData() const;
-	//TODO fix const correctness - methods const qualifier needed, else an event can not be passed as const reference
 	T& operator[](const unsigned short bin);
 	const T& operator[](const unsigned short bin) const;
 
 protected:
-	//TODO check, if constructor should be private instead of protected
+	Data<T>& operator=(const Data<T>& rhs);
 	Data(std::unique_ptr<std::array<T,800>> data); //not meant for instantiation
 	Data(const Data& data);
+
 	std::unique_ptr<std::array<T,800>> m_data;
 };
 
@@ -47,7 +46,7 @@ protected:
 using namespace std;
 
 /**
- * Constructor of the Data class. This is protected, Data objects are not meant to be instantiated. This transferres ownership of the passed
+ * Constructor of the Data class. This is protected, Data objects are not meant to be instantiated. This transfers ownership of the passed
  * array to the member m_data.
  *
  * @brief Constructor (protected)
@@ -134,16 +133,19 @@ const std::array<T,800>& Data<T>::getData() const
 template<typename T>
 const T& Data<T>::operator[](const unsigned short bin) const
 {
-	//TODO std::array can throw an exception on its own - remove this
-	if(bin < m_data->size())
+	return (*m_data)[bin];
+}
+
+//TODO comment
+//TODO test
+template<typename T>
+Data<T>& Data<T>::operator=(const Data<T>& rhs)
+{
+	for(size_t i = 0; i < m_data->size(); i++)
 	{
-		return (*m_data)[bin];
+		(*m_data)[i] = (*rhs.m_data)[i];
 	}
-	else
-	{
-		//TODO throw an Exception for index out of bounds
-		throw 'i';
-	}
+	return *this;
 }
 
 /**
@@ -162,16 +164,7 @@ const T& Data<T>::operator[](const unsigned short bin) const
 template<typename T>
 T& Data<T>::operator[](const unsigned short bin)
 {
-	//TODO std::array can throw an exception on its own - remove this
-	if(bin < m_data->size())
-	{
-		return (*m_data)[bin];
-	}
-	else
-	{
-		//TODO throw an Exception for index out of bounds
-		throw 'i';
-	}
+	return (*m_data)[bin];
 }
 
 #endif /* DATA_H_ */

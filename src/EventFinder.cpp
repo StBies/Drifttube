@@ -9,12 +9,10 @@
 
 EventFinder::EventFinder()
 {
-	// TODO Auto-generated constructor stub
 
 }
 
 EventFinder::~EventFinder()
 {
-	// TODO Auto-generated destructor stub
 }
 

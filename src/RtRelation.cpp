@@ -51,3 +51,12 @@ RtRelation::~RtRelation()
 {
 }
 
+//TODO comment
+//TODO test
+RtRelation& RtRelation::operator=(const RtRelation& rhs)
+{
+	Data::operator=(rhs);
+
+	return *this;
+}
+

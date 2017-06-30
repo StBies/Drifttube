@@ -41,7 +41,6 @@ DataSet::DataSet()
 DataSet::DataSet(vector<unique_ptr<Event>>& data)
 {
 //TODO Think about design of this method, might be unclear to caller, what happens here.
-//TODO Excessive testing needed.
 	size_t size = data.size();
 	m_data.resize(size);
 

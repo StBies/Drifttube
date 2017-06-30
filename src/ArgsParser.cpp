@@ -9,13 +9,11 @@
 
 ArgsParser::ArgsParser()
 {
-	// TODO Auto-generated constructor stub
 
 }
 
 ArgsParser::~ArgsParser()
 {
-	// TODO Auto-generated destructor stub
 }
 
 Parsed ArgsParser::parseArguments(int argc, char* args)

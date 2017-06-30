@@ -74,7 +74,6 @@ const array<int,800> DataProcessor::integrate(const Event& data)
 	array<uint16_t,800> dataArray = data.getData();
 
 	//do the integration (stepsize is one)
-	//TODO check for correctness
 	result[0] = 0;
 	for(int i = 1; i < dataArray.size(); i++)
 	{
@@ -223,13 +222,9 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
 	unique_ptr<array<double,800>> result(new array<double,800>);
 
 	double integral = 0.0;
-	//TODO own method
 	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)dtSpect.getEntries());
 
-	//TODO check, why this doesn't work
-	//start at bin 1 -> do not integrate the underflow bin
 	(*result)[0] = integral;
-//	#pragma omp parallel for shared(result) reduction(+:integral)
 	for (unsigned int i = 1; i < nBins; i++)
 	{
 		integral += dtSpect[i - 1] * scalingFactor;

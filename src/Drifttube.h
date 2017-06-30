@@ -44,6 +44,8 @@ public:
 
 	const DataSet& getDataSet() const;
 
+	Drifttube& operator=(const Drifttube& rhs);
+
 private:
 	const unsigned int m_radius = 18150; //micron
 	std::array<int,2> m_position;

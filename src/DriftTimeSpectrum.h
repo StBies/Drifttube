@@ -23,6 +23,8 @@ public:
 	unsigned int getEntries() const;
 	unsigned int getRejected() const;
 
+	DriftTimeSpectrum& operator=(const DriftTimeSpectrum& rhs);
+
 protected:
 	unsigned int m_entries;
 	unsigned int m_rejected_evts;
