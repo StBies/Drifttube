@@ -44,7 +44,7 @@ TEST_F(DriftTimeSpectrumTest,TestCopyConstruction)
 
 TEST_F(DriftTimeSpectrumTest,TestMaxValue)
 {
-	unsigned long maxInt = 0xFFFFFFFF;
+	uint64_t maxInt = 0xFFFFFFFF;
 	ASSERT_TRUE(maxInt + 1 > maxInt);
 	for(unsigned short i = 0; i < spect1->getData().size(); i++)
 	{
