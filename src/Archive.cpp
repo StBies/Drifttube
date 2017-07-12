@@ -236,23 +236,43 @@ std::unique_ptr<Event> Archive::convertEntry(unsigned int entry, TTree* tree)
 //}
 
 /**
- * Converts all event data stored in a tree to unique pointers to std::arrays containing the data.
- * The converted histograms are stored in the member variable _rawData.
+ * Converts all event data stored in a binary file to the data types needed internally
+ * The converted data is stored in DataSets for each drifttube.
  *
  * @brief Convert all data in tree to datatypes used internally
  *
  * @author Stefan Bieschke
- * @date April 18, 2017
+ * @date July 12, 2017
  * @version Alpha 2.0
  *
- * @param tree TTree object, that contains the data to be converted
+ * @param filename relative path of the file containing raw data
  */
-void Archive::convertAllEntries(TTree* tree)
+void Archive::convertAllEntries(const std::string filename)
 {
-	for (int i = 0; i < m_numberOfEntries; i++)
+	//TODO implement
+	//TODO test
+
+	ifstream file(filename, ios::binary);
+	FileParams par = readHeader(file);
+	for(size_t i = 0; i < par.nTubes; i++)
 	{
-		m_rawData->addData(std::move(convertEntry(i, tree)));
+		vector<unique_ptr<Event>> events(par.nEvents);
+		for(size_t j = 0; j < events.size(); j++)
+		{
+			unique_ptr<array<uint16_t,par.eventSize>> arr(new array<uint16_t,par.eventSize>);
+			for(size_t k = 0; k < arr->size(); k++)
+			{
+				uint16_t buffer;
+				file.read((char*)&buffer,sizeof(uint16_t));
+				(*arr)[k] = buffer;
+			}
+			events[j] = unique_ptr<Event>(new Event(j,move(arr)));
+		}
+		//TODO implement positions init
+		//TODO test if operator= deletes the old object in m_tubes
+		m_tubes[i] = Drifttube(1,2,move(unique_ptr<DataSet>(new DataSet(events))));
 	}
+	file.close();
 }
 
 /**
@@ -300,4 +320,25 @@ TString Archive::parseFile(TString filename)
 	int positionOfLastSlash = filename.Last('/');
 	TSubString file = filename(positionOfLastSlash + 1, filename.Length());
 	return TString(file);
+}
+
+FileParams readHeader(ifstream& file)
+{
+	size_t nTubes, eventSize, nEvents;
+	if(file.is_open())
+	{
+		file.seekg(0,ios::beg);
+		file.read((char*)&nTubes,sizeof(size_t));
+		file.read((char*)&nEvents,sizeof(size_t));
+		file.read((char*)&eventSize,sizeof(size_t));
+	}
+
+	streampos pos = file.tellg();
+	FileParams result;
+	result.nTubes = nTubes;
+	result.nEvents = nEvents;
+	result.eventSize = eventSize;
+	result.endOfHeader = pos;
+
+	return result;
 }

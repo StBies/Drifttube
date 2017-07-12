@@ -11,6 +11,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <fstream>
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
@@ -21,42 +22,45 @@
 
 using namespace std;
 
-
+struct FileParams;
 /**
  * A class that archives processed data and manages writing it to files.
  *
  * @brief Archiving tool
  *
- * @author Stefan
- * @data June 20,2016
- * @version 0.15
+ * @author Stefan Bieschke
+ * @date July 12, 2017
+ * @version Alpha 2.0
  */
 class Archive
 {
 public:
-	Archive(std::string filename);
+	Archive(const std::string filename);
 	~Archive();
 
-	const size_t getSize() const;
-	TString getFilename() const;
-	TString getDirname() const;
-
-	void setProcessedData(const DataSet& data);
+	std::string getFilename() const;
+	std::string getDirname() const;
+	const std::vector<Drifttube>& getTubes() const;
 
 private:
-//	TH1D* convertEntryToHistogram(const unsigned int entry,TTree* tree);
-	std::unique_ptr<Event> convertEntry(const unsigned int entry,TTree* tree);
-//
-//	void convertAllEntriesToHistograms(TTree* tree);
-	vector<std::unique_ptr<Event>> convertAllEntries(TTree* tree);
-	void writeToFile(string filename);
-	string parseDir(string filename);
-	string parseFile(string filename);
+	void convertAllEntries(const std::string filename);
+	void writeToFile(const std::string filename);
+	std::string parseDir(const std::string filename);
+	std::string parseFile(const std::string filename);
+	FileParams readHeader(ifstream& file);
 
 
 	std::vector<Drifttube> m_tubes;
-	TString m_directory;
-	TString m_file;
+	std::string m_directory;
+	std::string m_file;
+};
+
+struct FileParams
+{
+	size_t nTubes;
+	size_t eventSize;
+	size_t nEvents;
+	streampos endOfHeader;
 };
 
 #endif /* SRC_ARCHIVE_H_ */

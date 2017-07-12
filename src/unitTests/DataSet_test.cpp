@@ -3,7 +3,7 @@
 
 using namespace std;
 
-size_t DataSetTestSize = 1000000;
+size_t DataSetTestSize = 100000;
 
 class DataSetTest : public ::testing::Test
 {
