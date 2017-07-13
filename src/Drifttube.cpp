@@ -195,7 +195,8 @@ const DataSet& Drifttube::getDataSet() const
 
 //TODO test
 /**
- * Assignment operator allowing to write Drifttube a = Drifttube(...); Basically, this calls the copy constructor and returns itself.
+ * Assignment operator allowing to write Drifttube a = Drifttube(...); In this case, the DataSet from the rhs is MOVED to the lhs without copying.
+ * Thus, after this operation, rhs is empty. Good for temporary rvalues.
  *
  * @author Stefan Bieschke
  * @version Alpha 2.0
@@ -209,7 +210,31 @@ Drifttube& Drifttube::operator=(const Drifttube& rhs)
 {
 	m_dtSpect = rhs.m_dtSpect;
 	m_rtRel = rhs.m_rtRel;
-	//TODO implement assignment operator for DataSet
+	//move dataset
+	m_data = move(rhs.m_data);
+	m_efficiency = rhs.m_efficiency;
+	m_position = rhs.m_position;
+
+	return *this;
+}
+
+/**
+ * Assignment operator with non-constant rvalue. This operator needs a non-temporary rvalue. After completion, lvalue holds a copy of rvalue.
+ *
+ * @brief Assignment operator
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date July 13, 2017
+ *
+ * @param rhs Non-const (non-temporary) reference to the right hand side value, that should be assigned to the left hand side
+ * @return Reference to the bound object
+ */
+Drifttube& Drifttube::operator=(Drifttube& rhs)
+{
+	m_dtSpect = rhs.m_dtSpect;
+	m_rtRel = rhs.m_rtRel;
+	//copy dataset
 	m_data = unique_ptr<DataSet>(new DataSet(*rhs.m_data));
 	m_efficiency = rhs.m_efficiency;
 	m_position = rhs.m_position;

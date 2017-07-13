@@ -45,6 +45,7 @@ public:
 	const DataSet& getDataSet() const;
 
 	Drifttube& operator=(const Drifttube& rhs);
+	Drifttube& operator=(Drifttube& rhs);
 
 private:
 	const unsigned int m_radius = 18150; //micron

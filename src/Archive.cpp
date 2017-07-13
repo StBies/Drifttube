@@ -251,7 +251,6 @@ void Archive::convertAllEntries(const std::string filename)
 {
 	//TODO implement
 	//TODO test
-
 	ifstream file(filename, ios::binary);
 	FileParams par = readHeader(file);
 	for(size_t i = 0; i < par.nTubes; i++)
@@ -266,10 +265,15 @@ void Archive::convertAllEntries(const std::string filename)
 				file.read((char*)&buffer,sizeof(uint16_t));
 				(*arr)[k] = buffer;
 			}
-			events[j] = unique_ptr<Event>(new Event(j,move(arr)));
+			unique_ptr<Event> e(new Event(j,move(arr)));
+			//zero supression - if no valid drift time was found: reject (a.k.a store nullptr)
+			if(e->getDriftTime() == -42)
+			{
+				e.reset();
+			}
+			events[j] = move(e);
 		}
 		//TODO implement positions init
-		//TODO test if operator= deletes the old object in m_tubes
 		m_tubes[i] = Drifttube(1,2,move(unique_ptr<DataSet>(new DataSet(events))));
 	}
 	file.close();
