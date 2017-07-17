@@ -10,7 +10,7 @@ SRC			=	$(wildcard src/*.cpp)
 TESTSRC		=	$(wildcard src/unitTests/*.cpp)
 TESTFILES	=	$(notdir $(TESTSRC:.cpp=))
 TESTEDOBJS	=	$(addprefix obj/,$(notdir $(TESTSRC:_test.cpp=.o)))
-TESTEDOBJS 	+= 	obj/Exception.o obj/EventSizeException.o
+TESTEDOBJS 	+= 	obj/Exception.o obj/EventSizeException.o obj/DataPresenceException.o
 OBJ			=	$(addprefix obj/,$(notdir $(SRC:.cpp=.o)))
 OBJDIR		=	obj
 MKDIR		=	mkdir -p

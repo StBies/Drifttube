@@ -224,12 +224,11 @@ void Archive::convertAllEntries(const std::string filename)
 //			cout << "Event built at " << e.get() << endl;
 			//zero supression - if no valid drift time was found: reject (a.k.a store nullptr)
 			//TODO zero supression interfering with DriftTimeSpectrum
-//			if(e->getDriftTime() < 0)
-//			{
-//				cout << "Rejected event #" << e->getEventNumber() << endl;
-//				e.reset();
-//
-//			}
+			if(e->getDriftTime() < 0)
+			{
+				cout << "Rejected event #" << e->getEventNumber() << endl;
+				e.reset();
+			}
 			events[j] = move(e);
 		}
 		cout << "Events built. Beginning building of tube object" << endl;

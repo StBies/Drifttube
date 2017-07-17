@@ -9,6 +9,7 @@
 #define DATASET_H_
 
 #include "EventSizeException.h"
+#include "DataPresenceException.h"
 #include <vector>
 #include <memory>
 #include "Event.h"
@@ -40,6 +41,7 @@ public:
 	void addData(std::unique_ptr<Event> data);
 	size_t getSize() const;
 	const Event& getEvent(const unsigned int event) const;
+	const std::vector<std::unique_ptr<Event>>& getData() const;
 
 	const Event& operator[](const unsigned int event) const;
 

@@ -30,7 +30,6 @@ Drifttube::Drifttube(int posX, int posY, unique_ptr<DataSet> data)
 	m_position[0] = posX;
 	m_position[1] = posY;
 	m_data = move(data);
-	cout << "Drifttube ctor: moved DataSet" << endl;
 
 	unsigned int numberOfRealEvents = m_dtSpect.getEntries() - m_dtSpect.getRejected();
 	m_efficiency = numberOfRealEvents/(double)m_dtSpect.getEntries();

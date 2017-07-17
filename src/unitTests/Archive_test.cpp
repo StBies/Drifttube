@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <array>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ protected:
 
 TEST_F(ArchiveTest,Testtest)
 {
+	cout << "efficiency: " << a->getTubes()[0]->getEfficiency() << endl;
 	ASSERT_EQ(1,1);
 }
 

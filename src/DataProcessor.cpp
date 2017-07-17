@@ -44,7 +44,7 @@ int DataProcessor::computeIntegral(const Event& data)
 {
 	int integral = 0;
 
-	for (uint16_t binContent : data.getData() )
+	for (uint16_t binContent : data.getData())
 	{
 		integral += binContent;
 	}
@@ -68,16 +68,16 @@ int DataProcessor::computeIntegral(const Event& data)
  * 
  * @warning Does integrate the whole interval for that the data object provides data.
  */
-const array<int,800> DataProcessor::integrate(const Event& data)
+const array<int, 800> DataProcessor::integrate(const Event& data)
 {
-	array<int,800> result;
-	array<uint16_t,800> dataArray = data.getData();
+	array<int, 800> result;
+	array<uint16_t, 800> dataArray = data.getData();
 
 	//do the integration (stepsize is one)
 	result[0] = 0;
-	for(int i = 1; i < dataArray.size(); i++)
+	for (int i = 1; i < dataArray.size(); i++)
 	{
-		result[i] = dataArray[i] + result[i-1];
+		result[i] = dataArray[i] + result[i - 1];
 	}
 	//TODO check if returning a copy isn't too slow
 	return result;
@@ -157,7 +157,7 @@ const array<int,800> DataProcessor::integrate(const Event& data)
 unsigned short DataProcessor::findMinimumBin(const Event& data)
 {
 	int minBin = 0;
-	for(unsigned short i = 0; i < data.getData().size(); i++)
+	for (unsigned short i = 0; i < data.getData().size(); i++)
 	{
 		minBin = data[i] < data[minBin] ? i : minBin;
 	}
@@ -181,25 +181,25 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 {
 	unsigned short triggerpos = ADC_TRIGGERPOS_BIN;
 
-	unique_ptr<array<uint32_t,800>> result(new array<uint32_t,800>);
+	unique_ptr<array<uint32_t, 800>> result(new array<uint32_t, 800>);
 	result->fill(0);
 	unsigned int rejected = 0;
 
 	#pragma omp parallel for
 	for (size_t i = 0; i < data.getSize(); i++)
 	{
-		short driftTimeBin = (short)(data[i].getDriftTime() / ADC_BINS_TO_TIME);
-		if(driftTimeBin >= 0)
+		try
 		{
+			short driftTimeBin = (short) (data[i].getDriftTime() / ADC_BINS_TO_TIME);
 			(*result)[driftTimeBin]++;
 		}
-		else
+		catch(Exception& e)
 		{
 			rejected++;
 		}
 	}
 
-	return DriftTimeSpectrum(move(result),data.getSize(),rejected);
+	return DriftTimeSpectrum(move(result), data.getSize(), rejected);
 }
 
 /**
@@ -216,13 +216,15 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
  *
  * @warning Needs drift tube data in globals.h to be set
  */
-const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtSpect)
+const RtRelation DataProcessor::calculateRtRelation(
+		const DriftTimeSpectrum& dtSpect)
 {
 	unsigned int nBins = dtSpect.getData().size();
-	unique_ptr<array<double,800>> result(new array<double,800>);
+	unique_ptr<array<double, 800>> result(new array<double, 800>);
 
 	double integral = 0.0;
-	double scalingFactor = ((double)DRIFT_TUBE_RADIUS) / ((double)dtSpect.getEntries());
+	double scalingFactor = ((double) DRIFT_TUBE_RADIUS)
+			/ ((double) dtSpect.getEntries());
 
 	(*result)[0] = integral;
 	for (unsigned int i = 1; i < nBins; i++)
@@ -252,15 +254,17 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
  *
  * @return number of afterpulses
  */
-const unsigned int DataProcessor::countAfterpulses(const DataSet& rawData, const RtRelation& rtRelation)
+const unsigned int DataProcessor::countAfterpulses(const DataSet& rawData,
+		const RtRelation& rtRelation)
 {
 	unsigned short maxDriftTimeBin = 0;
 	unsigned int nAfterPulses = 0;
 
 	//calculate maxDriftTime
-	for(unsigned short i = 1; i <= rtRelation.getData().size(); i++)
+	for (unsigned short i = 1; i <= rtRelation.getData().size(); i++)
 	{
-		if(rtRelation.getData()[i] >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
+		if (rtRelation.getData()[i]
+				>= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
 		{
 			maxDriftTimeBin = i;
 			cout << "maxDriftTime: " << maxDriftTimeBin * 4 << endl;
@@ -269,28 +273,34 @@ const unsigned int DataProcessor::countAfterpulses(const DataSet& rawData, const
 	}
 
 	//counting loop
-	for(unsigned int i = 0; i < rawData.getSize(); i++)
+	for (unsigned int i = 0; i < rawData.getSize(); i++)
 	{
 		bool pulseEnded = true;
 		Event voltage = rawData.getEvent(i);
 		int nBins = voltage.getData().size();
 
 		//check, if the signal already ended at max drift time
-		if(voltage[maxDriftTimeBin] <= -50*ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE)
+		if (voltage[maxDriftTimeBin]
+				<= -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE)
 		{
 			pulseEnded = false;
 		}
 
-		for(unsigned int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins; j++)
+		for (unsigned int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins;
+				j++)
 		{
 			//if-else switches a variable in order not to count a single pulse bin per bin
-			if(voltage[j] <= -50*ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE && pulseEnded)
+			if (voltage[j]
+					<= -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE
+					&& pulseEnded)
 			{
 //				cout << "event " <<i << " time: " << j*4 << endl;
 				++nAfterPulses;
 				pulseEnded = false;
 			}
-			else if(voltage[j] > -50*ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE && !pulseEnded)
+			else if (voltage[j]
+					> -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE
+					&& !pulseEnded)
 			{
 				pulseEnded = true;
 			}

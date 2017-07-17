@@ -137,6 +137,23 @@ size_t DataSet::getSize() const
 
 
 /**
+ * Getter method for the raw vector containing unique pointers to Event type objects.
+ *
+ * @brief raw data getter
+ *
+ * @author Stefan Bieschke
+ * @date July 17, 2017
+ * @version Alpha 2.0
+ *
+ * @return Const reference to the vector containing the events in unique pointers.
+ */
+const vector<unique_ptr<Event>>& DataSet::getData() const
+{
+	return m_data;
+}
+
+
+/**
  * Getter method for an event in this DataSet. Returns the raw data as a reference to an std::array, containing the bin entries as
  * integers. Can throw an exception if the requested eventnumber is greater than the
  * total number of events in the DataSet. See warning and requirements for details.
@@ -144,8 +161,8 @@ size_t DataSet::getSize() const
  * @brief Getter method for an event
  *
  * @author Stefan
- * @date April 10, 2017
- * @version Alpha 2.0
+ * @date July 17, 2017
+ * @version Alpha 2.0.1
  *
  * @param event Number of the requested Event
  *
@@ -161,6 +178,10 @@ const Event& DataSet::getEvent(const unsigned int event) const
 	if(event > getSize())
 	{
 		throw EventSizeException(event);
+	}
+	if(!m_data[event])
+	{
+		throw DataPresenceException();
 	}
 	return *(m_data[event]);
 }
@@ -185,6 +206,14 @@ const Event& DataSet::getEvent(const unsigned int event) const
  */
 const Event& DataSet::operator[](const unsigned int event) const
 {
-	return getEvent(event);
+	try
+	{
+		return getEvent(event);
+	}
+	catch(Exception& e)
+	{
+		//TODO better check what to throw
+		throw DataPresenceException();
+	}
 }
 
