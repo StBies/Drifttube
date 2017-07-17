@@ -127,6 +127,25 @@ TEST_F(DrifttubeTest,TestEfficiency)
 	ASSERT_EQ(1,d3_filled->getEfficiency());
 }
 
+TEST_F(DrifttubeTest,TestAssignmentOperators)
+{
+	unique_ptr<DataSet> data(new DataSet(d3_filled->getDataSet()));
+	//TODO seems like neither of the two defined assignment operators is called
+	Drifttube d(*d1);
+	d = Drifttube(0,0,move(data));
+
+//	ASSERT_FALSE(&a[0].getDataSet() == &d.getDataSet());
+
+	ASSERT_FALSE(&d.getDataSet() == data.get());
+	for(size_t i = 0; i < d.getDataSet().getSize(); i++)
+	{
+		ASSERT_EQ(d3_filled->getDataSet()[i].getData(),d.getDataSet()[i].getData());
+	}
+
+	//TODO leave this here until it is clear, which operator= is called
+	ASSERT_TRUE(false);
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

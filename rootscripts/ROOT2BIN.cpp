@@ -3,6 +3,7 @@
 #include "TString.h"
 #include <iostream>
 #include <fstream>
+#include <stdint.h>
 
 using namespace std;
 
@@ -16,15 +17,19 @@ void ROOT2BIN(TString filename)
 	TTree* tree = (TTree*) file.Get("Tfadc");
 	cout << "Reading tree" << endl;
 
-	unsigned int nEntries = tree->GetEntries();
-	const int numberOfChannels = 800;
+	size_t nEntries = tree->GetEntries();
+	const size_t numberOfChannels = 800;
+	size_t nTubes = 1;
 
 	cout << "Beginning conversion. Entries: " << nEntries << endl;
 
-	ofstream of("test2.drift", ios::out | ios::binary);
-	of.write((char*)&nEntries,sizeof(unsigned int));
-	of.write((char*)&numberOfChannels,sizeof(int));
+	ofstream of("unitTestingData.drift", ios::out | ios::binary);
+	//write header
+	of.write((char*)&nTubes,sizeof(size_t));
+	of.write((char*)&nEntries,sizeof(size_t));
+	of.write((char*)&numberOfChannels,sizeof(size_t));
 
+	//write data
 	double voltage[800];
 	tree->SetBranchAddress("Voltage", &voltage);
 	for (unsigned int entry = 0; entry < nEntries; entry++)

@@ -7,6 +7,8 @@
 
 #include "Drifttube.h"
 
+using namespace std;
+
 /**
  * Constructor of the drift tube. Initializes the Drifttube object. During the process of initialization, the drift time spectrum and
  * rt relation are calculated and stored in the Drifttube as well. The calculation is performed and results are provided by the static
@@ -28,6 +30,7 @@ Drifttube::Drifttube(int posX, int posY, unique_ptr<DataSet> data)
 	m_position[0] = posX;
 	m_position[1] = posY;
 	m_data = move(data);
+	cout << "Drifttube ctor: moved DataSet" << endl;
 
 	unsigned int numberOfRealEvents = m_dtSpect.getEntries() - m_dtSpect.getRejected();
 	m_efficiency = numberOfRealEvents/(double)m_dtSpect.getEntries();
@@ -47,6 +50,7 @@ Drifttube::Drifttube(int posX, int posY, unique_ptr<DataSet> data)
 Drifttube::Drifttube(const Drifttube& original)
 : m_dtSpect(original.m_dtSpect), m_rtRel(original.m_rtRel)
 {
+	cout << "Drifttube copy ctor" << endl;
 	m_data = unique_ptr<DataSet>(new DataSet(*original.m_data));
 	m_efficiency = original.m_efficiency;
 	m_position = original.m_position;
@@ -210,10 +214,13 @@ Drifttube& Drifttube::operator=(const Drifttube& rhs)
 {
 	m_dtSpect = rhs.m_dtSpect;
 	m_rtRel = rhs.m_rtRel;
-	//move dataset
-	m_data = move(rhs.m_data);
+	//move dataset: Update - cannot work with const param... d'oh
+//	m_data.reset(rhs.m_data.get());
+	m_data = unique_ptr<DataSet>(new DataSet(*rhs.m_data));
 	m_efficiency = rhs.m_efficiency;
 	m_position = rhs.m_position;
+
+	cout << "Drifttube& Drifttube::operator=(const Drifttube& rhs)" << endl;
 
 	return *this;
 }
@@ -238,6 +245,8 @@ Drifttube& Drifttube::operator=(Drifttube& rhs)
 	m_data = unique_ptr<DataSet>(new DataSet(*rhs.m_data));
 	m_efficiency = rhs.m_efficiency;
 	m_position = rhs.m_position;
+
+	cout << "Drifttube& Drifttube::operator=(Drifttube& rhs)" << endl;
 
 	return *this;
 }

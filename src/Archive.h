@@ -12,9 +12,6 @@
 #include <memory>
 #include <sstream>
 #include <fstream>
-#include "TFile.h"
-#include "TTree.h"
-#include "TString.h"
 #include "DataSet.h"
 #include "DataPresenceException.h"
 #include "globals.h"
@@ -22,7 +19,14 @@
 
 using namespace std;
 
-struct FileParams;
+typedef struct
+{
+	size_t nTubes;
+	size_t eventSize;
+	size_t nEvents;
+	streampos endOfHeader;
+}FileParams;
+
 /**
  * A class that archives processed data and manages writing it to files.
  *
@@ -38,29 +42,21 @@ public:
 	Archive(const std::string filename);
 	~Archive();
 
-	std::string getFilename() const;
-	std::string getDirname() const;
-	const std::vector<Drifttube>& getTubes() const;
+	const std::string& getFilename() const;
+	const std::string& getDirname() const;
+	const std::vector<std::unique_ptr<Drifttube>>& getTubes() const;
 
 private:
 	void convertAllEntries(const std::string filename);
-	void writeToFile(const std::string filename);
+//	void writeToFile(const std::string filename);
 	std::string parseDir(const std::string filename);
 	std::string parseFile(const std::string filename);
 	FileParams readHeader(ifstream& file);
 
 
-	std::vector<Drifttube> m_tubes;
+	std::vector<unique_ptr<Drifttube>> m_tubes;
 	std::string m_directory;
 	std::string m_file;
-};
-
-struct FileParams
-{
-	size_t nTubes;
-	size_t eventSize;
-	size_t nEvents;
-	streampos endOfHeader;
 };
 
 #endif /* SRC_ARCHIVE_H_ */
