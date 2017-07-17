@@ -11,7 +11,7 @@ class ArchiveTest : public ::testing::Test
 public:
 	ArchiveTest()
 	{
-		a = new Archive("unitTestingData.drift");
+		a = new Archive("data/unitTestingData.drift");
 	}
 
 	~ArchiveTest()

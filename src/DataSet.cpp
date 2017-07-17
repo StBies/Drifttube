@@ -179,17 +179,19 @@ const Event& DataSet::getEvent(const unsigned int event) const
 	{
 		throw EventSizeException(event);
 	}
+	#ifdef ZEROSUP
 	if(!m_data[event])
 	{
 		throw DataPresenceException();
 	}
+	#endif
 	return *(m_data[event]);
 }
 
 //operators
 
 /**
- * Implementation of the [] operator enabling on to use the common DataSet[event] statement to access individual events
+ * Implementation of the [] operator enabling one to use the common DataSet[event] statement to access individual events
  * of the DataSet object. Note, that the usage of this operator does not allow the caller to do certain things with the returned object:
  * 1. One can not move the returned histogram in memory
  * 2. One can not change the content of the histogram

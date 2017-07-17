@@ -185,6 +185,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	result->fill(0);
 	unsigned int rejected = 0;
 
+	#ifdef ZEROSUP
 	#pragma omp parallel for
 	for (size_t i = 0; i < data.getSize(); i++)
 	{
@@ -198,6 +199,22 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 			rejected++;
 		}
 	}
+	#else
+	#pragma omp parallel for
+	for (size_t i = 0; i < data.getSize(); i++)
+	{
+		short driftTimeBin = (short) (data[i].getDriftTime() / ADC_BINS_TO_TIME);
+		if(driftTimeBin != -42)
+		{
+			(*result)[driftTimeBin]++;
+		}
+		else
+		{
+			rejected++;
+		}
+	}
+	#endif
+
 
 	return DriftTimeSpectrum(move(result), data.getSize(), rejected);
 }
