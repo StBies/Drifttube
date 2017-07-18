@@ -204,7 +204,7 @@ const Event& DataSet::getEvent(const unsigned int event) const
  * @param event Eventnumber to be accessed.
  * @return array containing the raw data as reference
  *
- * @warning can throw an EventSizeException
+ * @warning can throw an DataPresenceException
  */
 const Event& DataSet::operator[](const unsigned int event) const
 {

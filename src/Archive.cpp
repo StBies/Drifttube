@@ -21,7 +21,6 @@ using namespace std;
  */
 Archive::Archive(string filename)
 {
-	cout << "Archive ctor entered. Filename: " << filename << endl;
 	convertAllEntries(filename);
 
 	m_directory = parseDir(filename);
@@ -153,17 +152,16 @@ const vector<unique_ptr<Drifttube>>& Archive::getTubes() const
 // *
 // * @return unique pointer to an Event containing the data. The ownership is transferred to caller after this method.
 // */
-//std::unique_ptr<Event> Archive::convertEntry(unsigned int entry, TTree* tree)
+//unique_ptr<Event> Archive::convertEntry(size_t tube, size_t entry, ifstream& file)
 //{
-//	const int numberOfChannels = 800;
-//
-//	double voltage[800];
-//	tree->SetBranchAddress("Voltage", &voltage);
-//	tree->GetEntry(entry);
+//	FileParams par(readHeader(file));
 //
 //	unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
 //
 //	unique_ptr<Event> rawData(new Event(entry,move(arr)));
+//
+//	file.seekg(par.endOfHeader);
+//	streampos eof = file.tellg(0,file.end);
 //
 //	#pragma omp parallel for
 //	for (int i = 0; i < numberOfChannels; i++)
@@ -178,15 +176,15 @@ const vector<unique_ptr<Drifttube>>& Archive::getTubes() const
  * Converts all event data stored in a binary file to the data types needed internally
  * The converted data is stored in DataSets for each drifttube.
  *
- * @brief Convert all data in tree to datatypes used internally
+ * @brief Convert all data in the file to datatypes used internally
  *
  * @author Stefan Bieschke
- * @date July 12, 2017
+ * @date July 17, 2017
  * @version Alpha 2.0
  *
  * @param filename relative path of the file containing raw data
  */
-void Archive::convertAllEntries(const std::string filename)
+void Archive::convertAllEntries(const string filename)
 {
 	//TODO implement
 	//TODO test
@@ -226,20 +224,17 @@ void Archive::convertAllEntries(const std::string filename)
 	#ifdef ZEROSUP
 			if(e->getDriftTime() < 0)
 			{
-				cout << "Rejected event #" << e->getEventNumber() << endl;
+//				cout << "Rejected event #" << e->getEventNumber() << endl;
 				e.reset();
 			}
 	#endif
 			events[j] = move(e);
 		}
-		cout << "Events built. Beginning building of tube object" << endl;
 		//TODO implement positions init
 		unique_ptr<DataSet> set(new DataSet(events));
-		cout << "DataSet built. Size: " << set->getSize() << endl;
 
 		m_tubes.push_back(unique_ptr<Drifttube>(new Drifttube(1,2,move(set))));
 	}
-	cout << "finished converting, closing file." << endl;
 	file.close();
 	cout << "file closed" << endl;
 }
@@ -262,7 +257,6 @@ void Archive::convertAllEntries(const std::string filename)
  */
 string Archive::parseDir(const string filename)
 {
-	//TODO test
 	size_t positionOfLastSlash = filename.find_last_of('/');
 	string dir = filename.substr(0,positionOfLastSlash+1);
 	return dir;
@@ -287,7 +281,6 @@ string Archive::parseDir(const string filename)
  */
 string Archive::parseFile(string filename)
 {
-	//TODO test
 	size_t positionOfLastSlash = filename.find_last_of('/');
 	string file = filename.substr(positionOfLastSlash + 1);
 	return file;

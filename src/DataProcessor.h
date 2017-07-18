@@ -33,6 +33,7 @@ class DataSet;
 class DataProcessor
 {
 public:
+	//TODO implement functions for Event as parameter as Template Data<typename T>
 	static int computeIntegral(const Event& data);
 	static const std::array<int,800> integrate(const Event& data);
 //	static const std::array<uint16_t,800> derivate(const Event& data) const;

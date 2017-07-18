@@ -1,5 +1,5 @@
 CC			=	g++
-CFLAGS		=	-std=c++11 -O3 -fopenmp
+CFLAGS		=	-std=c++11 -O3 -fopenmp -D ZEROSUP
 ROOTCFLAGS	=	$(shell root-config --cflags)
 ROOTLDFLAGS	=	$(shell root-config --libs)
 TESTINC		=	-I./gtest/include

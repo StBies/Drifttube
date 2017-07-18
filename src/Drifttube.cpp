@@ -49,7 +49,6 @@ Drifttube::Drifttube(int posX, int posY, unique_ptr<DataSet> data)
 Drifttube::Drifttube(const Drifttube& original)
 : m_dtSpect(original.m_dtSpect), m_rtRel(original.m_rtRel)
 {
-	cout << "Drifttube copy ctor" << endl;
 	m_data = unique_ptr<DataSet>(new DataSet(*original.m_data));
 	m_efficiency = original.m_efficiency;
 	m_position = original.m_position;
@@ -213,13 +212,12 @@ Drifttube& Drifttube::operator=(const Drifttube& rhs)
 {
 	m_dtSpect = rhs.m_dtSpect;
 	m_rtRel = rhs.m_rtRel;
+	//TODO check below
 	//move dataset: Update - cannot work with const param... d'oh
 //	m_data.reset(rhs.m_data.get());
 	m_data = unique_ptr<DataSet>(new DataSet(*rhs.m_data));
 	m_efficiency = rhs.m_efficiency;
 	m_position = rhs.m_position;
-
-	cout << "Drifttube& Drifttube::operator=(const Drifttube& rhs)" << endl;
 
 	return *this;
 }
@@ -244,8 +242,6 @@ Drifttube& Drifttube::operator=(Drifttube& rhs)
 	m_data = unique_ptr<DataSet>(new DataSet(*rhs.m_data));
 	m_efficiency = rhs.m_efficiency;
 	m_position = rhs.m_position;
-
-	cout << "Drifttube& Drifttube::operator=(Drifttube& rhs)" << endl;
 
 	return *this;
 }

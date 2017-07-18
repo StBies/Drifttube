@@ -20,14 +20,22 @@ public:
 
 protected:
 	Archive* a;
-
 };
 
-TEST_F(ArchiveTest,Testtest)
+TEST_F(ArchiveTest,TestBinaryRead)
 {
-	cout << "efficiency: " << a->getTubes()[0]->getEfficiency() << endl;
-	ASSERT_EQ(1,1);
+	size_t nTubes = a->getTubes().size();
+	ASSERT_EQ(1,nTubes);
+	size_t sizeOfTubeDataSet = a->getTubes()[0]->getDataSet().getSize();
+	ASSERT_EQ(17069,sizeOfTubeDataSet);
 }
+
+TEST_F(ArchiveTest,TestParser)
+{
+	ASSERT_EQ(0,a->getDirname().compare("data/"));
+	ASSERT_EQ(0,a->getFilename().compare("unitTestingData.drift"));
+}
+
 
 int main(int argc, char **argv)
 {

@@ -18,7 +18,7 @@ public:
 	DataPresenceException();
 	virtual ~DataPresenceException();
 
-	string error();
+	virtual string error();
 };
 
 #endif /* DATAPRESENCEEXCEPTION_H_ */
