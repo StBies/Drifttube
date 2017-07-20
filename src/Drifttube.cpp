@@ -17,8 +17,8 @@ using namespace std;
  * @brief ctor
  *
  * @author Stefan Bieschke
- * @date May 19, 2017
- * @version Alpha 2.0
+ * @date July 20, 2017
+ * @version Alpha 2.0.1
  *
  * @param posX x-coordinate [mm] of the tube
  * @param posY y-coordinate [mm] of the tube
@@ -34,6 +34,17 @@ Drifttube::Drifttube(int posX, int posY, unique_ptr<DataSet> data)
 	unsigned int numberOfRealEvents = m_dtSpect.getEntries() - m_dtSpect.getRejected();
 	m_efficiency = numberOfRealEvents/(double)m_dtSpect.getEntries();
 //	cout << "efficiency = " << m_efficiency << " +- " << sqrt(m_efficiency*(1-m_efficiency)/(double)m_dtSpect.getEntries()) << endl;
+
+	//TODO check, if this is faster than putting m_rtRel.getData().size() in the for loop conditional
+	size_t arraySize = m_rtRel.getData().size();
+	for(size_t i = 0; i < arraySize; i++)
+	{
+		if(m_rtRel[i] >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
+		{
+			m_max_drifttime = i * ADC_BINS_TO_TIME;
+			break;
+		}
+	}
 }
 
 
@@ -52,6 +63,7 @@ Drifttube::Drifttube(const Drifttube& original)
 	m_data = unique_ptr<DataSet>(new DataSet(*original.m_data));
 	m_efficiency = original.m_efficiency;
 	m_position = original.m_position;
+	m_max_drifttime = original.m_max_drifttime;
 }
 
 Drifttube::~Drifttube()
@@ -175,6 +187,25 @@ const RtRelation& Drifttube::getRtRelation() const
 const double Drifttube::getEfficiency() const
 {
 	return m_efficiency;
+}
+
+/**
+ * Returns the maximum drift time in nanoseconds. This is computed using the rtRelation stored in the tube. The maximum drift time, in the context
+ * of this method, is defined as the time, where the r(t) in rtRelation suprasses 99.95% of the tube's radius. This is equivalent to integrating
+ * the drift time spectrum up to the point, where 99.95% of all events are included in the integral.
+ *
+ * @brief Getter for maximum drift time
+ *
+ * @author Stefan Bieschke
+ * @date July 20,2017
+ * @version Alpha 2.0
+ *
+ *
+ * @return Maximum drift time (ns)
+ */
+const double Drifttube::getMaxDrifttime() const
+{
+	return m_max_drifttime;
 }
 
 

@@ -43,6 +43,20 @@ TEST_F(RtRelationTest,TestDoubleContainment)
 	ASSERT_DOUBLE_EQ(3.14159265358979323846, (*rt1)[0]);
 }
 
+TEST_F(RtRelationTest,TestAssignmentOperator)
+{
+	//first make a copy of rt1
+	RtRelation r(*rt1);
+	//assign rt2 to r - thus rt1 should not be stored in r anymore
+	r = *rt2;
+	ASSERT_FALSE(&r.getData() == &rt2->getData());
+	ASSERT_FALSE(&r == rt2);
+	for(size_t i = 0; i < r.getData().size(); i++)
+	{
+		ASSERT_EQ(rt2->getData()[i],r.getData()[i]);
+	}
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

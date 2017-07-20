@@ -22,7 +22,6 @@ using namespace std;
  */
 RtRelation::RtRelation(unique_ptr<array<double,800>> data) : Data(move(data))
 {
-
 }
 
 
@@ -39,7 +38,6 @@ RtRelation::RtRelation(unique_ptr<array<double,800>> data) : Data(move(data))
  */
 RtRelation::RtRelation(const RtRelation& original) : Data(original)
 {
-
 }
 
 /**
@@ -51,8 +49,18 @@ RtRelation::~RtRelation()
 {
 }
 
-//TODO comment
-//TODO test
+/**
+ * Assignment operator for RtRelations.
+ *
+ * @brief Assignment operator
+ *
+ * @author Stefan Bieschke
+ * @date July 19, 2017
+ * @version Alpha 2.0
+ *
+ * @param rhs RtRelation on the right hand side of the assignment
+ * @return Reference to the RtRelation object to be stored to the left hand side of the assignment
+ */
 RtRelation& RtRelation::operator=(const RtRelation& rhs)
 {
 	Data::operator=(rhs);

@@ -48,8 +48,7 @@ public:
 
 private:
 	void convertAllEntries(const std::string filename);
-//	std::unique_ptr<Event> convertEntry(size_t entry, ifstream& file);
-//	void writeToFile(const std::string filename);
+	void writeToFile(const std::string& filename);
 	std::string parseDir(const std::string filename);
 	std::string parseFile(const std::string filename);
 	FileParams readHeader(ifstream& file);

@@ -44,7 +44,7 @@ int DataProcessor::computeIntegral(const Event& data)
 {
 	int integral = 0;
 
-	for (uint16_t binContent : data.getData())
+	for(uint16_t binContent : data.getData())
 	{
 		integral += binContent;
 	}
@@ -157,7 +157,7 @@ const array<int, 800> DataProcessor::integrate(const Event& data)
 unsigned short DataProcessor::findMinimumBin(const Event& data)
 {
 	int minBin = 0;
-	for (unsigned short i = 0; i < data.getData().size(); i++)
+	for(unsigned short i = 0; i < data.getData().size(); i++)
 	{
 		minBin = data[i] < data[minBin] ? i : minBin;
 	}
@@ -187,7 +187,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 
 	#ifdef ZEROSUP
 	#pragma omp parallel for
-	for (size_t i = 0; i < data.getSize(); i++)
+	for(size_t i = 0; i < data.getSize(); i++)
 	{
 		try
 		{
@@ -201,7 +201,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	}
 	#else
 	#pragma omp parallel for
-	for (size_t i = 0; i < data.getSize(); i++)
+	for(size_t i = 0; i < data.getSize(); i++)
 	{
 		short driftTimeBin = (short) (data[i].getDriftTime() / ADC_BINS_TO_TIME);
 		if(driftTimeBin != -42)
@@ -214,7 +214,6 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 		}
 	}
 	#endif
-
 
 	return DriftTimeSpectrum(move(result), data.getSize(), rejected);
 }
@@ -233,8 +232,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
  *
  * @warning Needs drift tube data in globals.h to be set
  */
-const RtRelation DataProcessor::calculateRtRelation(
-		const DriftTimeSpectrum& dtSpect)
+const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtSpect)
 {
 	unsigned int nBins = dtSpect.getData().size();
 	unique_ptr<array<double, 800>> result(new array<double, 800>);
@@ -256,7 +254,7 @@ const RtRelation DataProcessor::calculateRtRelation(
 //TODO threshold as parameter?
 //TODO possibility to use any other t_max as parameter
 /**
- * Count the number of afterpulses in a DataSet containing voltage pulses. An afterpulse is counted,
+ * Count the number of afterpulses in a Drifttube. An afterpulse is counted,
  * if the after the maximum drift time, a threshold voltage is undershot. This maximum drift time is
  * calculated from the rtRelation as the time, at which it reaches 99.95% of the tube's inner radius.
  *
@@ -271,56 +269,45 @@ const RtRelation DataProcessor::calculateRtRelation(
  *
  * @return number of afterpulses
  */
-const unsigned int DataProcessor::countAfterpulses(const DataSet& rawData,
-		const RtRelation& rtRelation)
+const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 {
-	unsigned short maxDriftTimeBin = 0;
+	unsigned short maxDriftTimeBin = tube.getMaxDrifttime() / ADC_BINS_TO_TIME;
 	unsigned int nAfterPulses = 0;
 
-	//calculate maxDriftTime
-	for (unsigned short i = 1; i <= rtRelation.getData().size(); i++)
-	{
-		if (rtRelation.getData()[i]
-				>= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
-		{
-			maxDriftTimeBin = i;
-			cout << "maxDriftTime: " << maxDriftTimeBin * 4 << endl;
-			break;
-		}
-	}
-
 	//counting loop
-	for (unsigned int i = 0; i < rawData.getSize(); i++)
+	for(unsigned int i = 0; i < tube.getDataSet().getSize(); i++)
 	{
-		bool pulseEnded = true;
-		Event voltage = rawData.getEvent(i);
-		int nBins = voltage.getData().size();
+		//skip events missing due to zero suppression
+		if(tube.getDataSet().getData()[i].get() == nullptr)
+		{
+			continue;
+		}
 
+		//assume the pulse has already ended
+		bool pulseEnded = true;
+		Event voltage = tube.getDataSet().getEvent(i);
+		int nBins = voltage.getData().size();
 		//check, if the signal already ended at max drift time
-		if (voltage[maxDriftTimeBin]
-				<= -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE)
+		if(voltage[maxDriftTimeBin] <= -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE)
 		{
 			pulseEnded = false;
 		}
 
-		for (unsigned int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins;
-				j++)
+		//from maximum drift time on: loop over the event to even higher drift times
+		for(unsigned int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins;j++)
 		{
 			//if-else switches a variable in order not to count a single pulse bin per bin
-			if (voltage[j]
-					<= -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE
-					&& pulseEnded)
+			if(voltage[j] <= -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE && pulseEnded)
 			{
 //				cout << "event " <<i << " time: " << j*4 << endl;
 				++nAfterPulses;
 				pulseEnded = false;
 			}
-			else if (voltage[j]
-					> -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE
-					&& !pulseEnded)
+			else if(voltage[j] > -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE && !pulseEnded)
 			{
 				pulseEnded = true;
 			}
+
 		}
 	}
 
@@ -343,14 +330,14 @@ const unsigned int DataProcessor::countAfterpulses(const DataSet& rawData,
  */
 short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
 {
-	//if threshold given positive, change sign
+//if threshold given positive, change sign
 //	threshold *= (threshold < 0 ? 1 : -1);
 
-	for (unsigned short i = 0; i < data.getData().size(); i++)
+	for(unsigned short i = 0; i < data.getData().size(); i++)
 	{
-		if (data[i] < threshold)
+		if(data[i] < threshold)
 		{
-			return i;
+		return i;
 		}
 	}
 	return -42;
@@ -371,9 +358,9 @@ short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
 unsigned short DataProcessor::findLastFilledBin(const Event& data, unsigned short threshold)
 {
 	unsigned short defaultBin = 0;
-	for (unsigned short i = data.getData().size() - 1; i > 0; i--)
+	for(unsigned short i = data.getData().size() - 1; i > 0; i--)
 	{
-		if (data[i] <= threshold)
+		if(data[i] <= threshold)
 		{
 			return i;
 		}

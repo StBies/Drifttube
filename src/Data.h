@@ -34,6 +34,7 @@ public:
 	T& operator[](const unsigned short bin);
 	const T& operator[](const unsigned short bin) const;
 
+
 protected:
 	Data<T>& operator=(const Data<T>& rhs);
 	Data(std::unique_ptr<std::array<T,800>> data); //not meant for instantiation
@@ -112,7 +113,7 @@ Data<T>::~Data()
  * @return Reference to the array that is contained
  */
 template<typename T>
-const std::array<T,800>& Data<T>::getData() const
+const array<T,800>& Data<T>::getData() const
 {
 	return *m_data;
 }

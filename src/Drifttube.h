@@ -43,6 +43,7 @@ public:
 	const DriftTimeSpectrum& getDriftTimeSpectrum() const;
 	const RtRelation& getRtRelation() const;
 	const double getEfficiency() const;
+	const double getMaxDrifttime() const;
 
 	const DataSet& getDataSet() const;
 
@@ -56,6 +57,7 @@ private:
 	DriftTimeSpectrum m_dtSpect;
 	RtRelation m_rtRel;
 	double m_efficiency;
+	double m_max_drifttime; //ns - defined as the drift time where 99.95% of the tube's radius is reached in rtRelation
 };
 
 #endif /* DRIFTTUBE_H_ */

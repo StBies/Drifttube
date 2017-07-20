@@ -9,6 +9,8 @@
 #define RTRELATION_H_
 
 #include "Data.h"
+#include "globals.h"
+#include <iostream>
 
 class RtRelation: public Data<double>
 {

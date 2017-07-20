@@ -150,6 +150,11 @@ TEST_F(DrifttubeTest,TestAssignmentOperators)
 	}
 }
 
+TEST_F(DrifttubeTest,TestMaxDrifttime)
+{
+	ASSERT_EQ(204,d3_filled->getMaxDrifttime());
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

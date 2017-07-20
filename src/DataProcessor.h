@@ -10,6 +10,7 @@ class DataSet;
 #include <sstream>
 #include <fstream>
 #include <cmath>
+#include "Drifttube.h"
 #include "DataSet.h"
 #include "EventSizeException.h"
 #include "globals.h"
@@ -18,6 +19,8 @@ class DataSet;
 #include "Event.h"
 #include "RtRelation.h"
 #include "DriftTimeSpectrum.h"
+
+class Drifttube;
 
 /**
  * A class, that processes raw data measured by an FADC, that comes as
@@ -43,7 +46,7 @@ public:
 	static unsigned short findLastFilledBin(const Event& data, unsigned short threshold);
 	static const DriftTimeSpectrum calculateDriftTimeSpectrum(const DataSet& data);
 	static const RtRelation calculateRtRelation(const DriftTimeSpectrum& dtSpect);
-	static const unsigned int countAfterpulses(const DataSet& rawData, const RtRelation& rtRelation);
+	static const unsigned int countAfterpulses(const Drifttube& tube);
 
 private:
 	DataProcessor();
