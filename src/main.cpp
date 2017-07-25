@@ -77,12 +77,12 @@ int main(int argc, char** argv)
 	//for teaching purposes
 	for(int i = 0; i < dataSet->getSize(); i++)
 	{
-		short driftTimeBin = processor.findDriftTime(*dataSet->getEvent(i),-50* ADC_CHANNELS_TO_VOLTAGE);
+		short driftTimeBin = processor.findDriftTime(*dataSet->getEvent(i),ADC_THRESHOLD* ADC_CHANNELS_TO_VOLTAGE);
 		if(driftTimeBin < 0)
 		{
 			continue;
 		}
-		unsigned short integrationEndBin = processor.findLastFilledBin(*dataSet->getEvent(i),-50* ADC_CHANNELS_TO_VOLTAGE);
+		unsigned short integrationEndBin = processor.findLastFilledBin(*dataSet->getEvent(i), ADC_THRESHOLD* ADC_CHANNELS_TO_VOLTAGE);
 		unsigned short integrationTime = (integrationEndBin - driftTimeBin) * ADC_BINS_TO_TIME;
 
 		Double_t integral = processor.computeIntegral(*dataSet->getEvent(i),driftTimeBin,integrationEndBin);
