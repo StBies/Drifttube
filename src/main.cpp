@@ -74,6 +74,23 @@ int main(int argc, char** argv)
 
 	double endRuntime = omp_get_wtime();
 
+	//for teaching purposes
+	for(int i = 0; i < dataSet->getSize(); i++)
+	{
+		short driftTimeBin = processor.findDriftTime(*dataSet->getEvent(i),-50* ADC_CHANNELS_TO_VOLTAGE);
+		if(driftTimeBin < 0)
+		{
+			continue;
+		}
+		unsigned short integrationEndBin = processor.findLastFilledBin(*dataSet->getEvent(i),-50* ADC_CHANNELS_TO_VOLTAGE);
+		unsigned short integrationTime = (integrationEndBin - driftTimeBin) * ADC_BINS_TO_TIME;
+
+		Double_t integral = processor.computeIntegral(*dataSet->getEvent(i),driftTimeBin,integrationEndBin);
+		cout << i << "\t" << integral << "\t" << integrationTime << endl;
+	}
+	//end for teaching purposes
+
+
 	cout << "Computation without saving took " << endRuntime - beginRuntime << " seconds" << endl;
 	processor.writeResults(*dataSet,*integralSet,archive->getFilename(),archive->getDirname());
 

@@ -31,6 +31,7 @@ public:
 	virtual ~DataProcessor();
 	
 	Double_t computeIntegral(const TH1D& data) const;
+	Double_t computeIntegral(const TH1D& data, const unsigned short from, const unsigned short to) const;
 	TH1D* integrate(TH1D* data) const;
 	TH1D* derivate(TH1D* data) const;
 	DataSet* integrateAll(DataSet* data) const;

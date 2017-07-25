@@ -56,6 +56,34 @@ Double_t DataProcessor::computeIntegral(const TH1D& data) const
 }
 
 /**
+ * Computes the integral of the data given as parameter. It will count positive as well as
+ * negative entries and sum up the bin content.
+ *
+ * @author Stefan Bieschke
+ * @date July 24, 2017
+ * @version 1.0
+ *
+ * @param data TH1 family object containing the data to be integrated.
+ * @param from bin, starting from which the integration is to be performed
+ * @param to bin up to that the integration is performed
+ *
+ * @return Value of the integral over the bins between from and to
+ */
+Double_t DataProcessor::computeIntegral(const TH1D& data, const unsigned short from, const unsigned short to) const
+{
+	Double_t counter = 0;
+
+	//TODO check if parallelization is of use here
+
+	for (int i = from; i < to; i++)
+	{
+		counter += data.GetBinContent(i);
+	}
+
+	return counter * data.GetBinWidth(1);
+}
+
+/**
  * Integrates the given data, which is in a histogram. This method will return
  * a new histogram of type TH1* containing the integrated original data.
  * 
