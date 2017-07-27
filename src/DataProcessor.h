@@ -4,6 +4,7 @@
 //forward declaration needed due to ring inclusion
 class Event;
 class DataSet;
+class Drifttube;
 
 #include <omp.h>
 #include <iostream>
@@ -21,7 +22,6 @@ class DataSet;
 #include "DriftTimeSpectrum.h"
 
 //forward declarations
-class Drifttube;
 
 /**
  * A class, that processes raw data measured by an FADC, that comes as

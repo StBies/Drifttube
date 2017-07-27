@@ -45,10 +45,10 @@ public:
 	const std::string& getFilename() const;
 	const std::string& getDirname() const;
 	const std::vector<std::unique_ptr<Drifttube>>& getTubes() const;
+	void writeToFile(const std::string& filename);
 
 private:
 	void convertAllEntries(const std::string filename);
-	void writeToFile(const std::string& filename);
 	std::string parseDir(const std::string filename);
 	std::string parseFile(const std::string filename);
 	FileParams readHeader(ifstream& file);

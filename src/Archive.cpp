@@ -96,6 +96,7 @@ const vector<unique_ptr<Drifttube>>& Archive::getTubes() const
 	return m_tubes;
 }
 
+//TODO test
 /**
  * Writes the results and data to a file, that is specified with parameter filename.
  *
@@ -114,9 +115,18 @@ void Archive::writeToFile(const string& filename)
 	ofstream file(filename, ios::out | ios::binary);
 
 	//write header... must contain: nTubes, nEvents per tube,...
+	//TODO complete impl
+	size_t nTubes = m_tubes.size();
+	size_t nEvents = m_tubes[0]->getDataSet().getSize() - m_tubes[0]->getDriftTimeSpectrum().getRejected();
+	size_t nEventSize = 800;
+	file.write((char*)&nTubes,sizeof(size_t));
+	file.write((char*)&nEvents,sizeof(size_t));
+	file.write((char*)&nEventSize,sizeof(size_t));
 
+	//loop over tubes
 	for(size_t i = 0; i < m_tubes.size(); i++)
 	{
+		//loop over DataSet for each tube
 		for(size_t j = 0; j < m_tubes[i]->getDataSet().getSize(); j++)
 		{
 			try

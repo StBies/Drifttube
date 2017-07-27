@@ -1,10 +1,6 @@
 #include <iostream>
-#include "TH1D.h"
-#include "TCanvas.h"
-#include "TApplication.h"
 #include "DataProcessor.h"
 #include "Archive.h"
-#include "TFile.h"
 #include "omp.h"
 #include <cmath>
 
@@ -24,7 +20,7 @@ using namespace std;
  */
 typedef struct
 {
-	TString infilename;
+	string infilename;
 	char mode;
 } ParsedArgs;
 
@@ -42,41 +38,45 @@ ParsedArgs parseCmdArgs(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	ParsedArgs args = parseCmdArgs(argc,argv);
-	DataProcessor processor;
+//	DataProcessor processor;
 
-	TString filename = args.infilename;
+	string filename = args.infilename;
 	cout << "using file: " << filename << endl;
 
 	double beginRuntime = omp_get_wtime();
 
-	Archive* archive = new Archive(filename);
-
-	DataSet* dataSet = archive->getRawData();
-	DataSet* integralSet = processor.integrateAll(dataSet);
-	archive->setProcessedData(integralSet);
-	TH1D* spect = processor.calculateDriftTimeSpectrum(dataSet);
-
-
-	TH1D* rt = processor.calculateRtRelation(*spect);
-	TH1D* derivSpec = processor.derivate(spect);
-
-	archive->setDifttimeSpect(spect);
-	archive->setRtRelation(rt);
-	archive->setDiffDrifttimeSpect(derivSpec);
-	int nAfterPulses = processor.countAfterpulses(*dataSet,*rt);
-	int nEvents = spect->GetEntries() - spect->GetBinContent(0);
-
-	cout <<"# afterpulses: " << nAfterPulses
-			<< " probability: " << (double)nAfterPulses/nEvents
-			<< " +- " << sqrt(nAfterPulses/pow(nEvents,2) + pow(nAfterPulses * sqrt(nEvents),2)/pow(nEvents,4))
-			<< endl;
+	Archive archive(filename);
+	string outFileName = archive.getDirname();
+	outFileName.append("processed_");
+	outFileName.append(archive.getFilename());
+	archive.writeToFile(outFileName);
+//
+//	DataSet* dataSet = archive->getRawData();
+//	DataSet* integralSet = processor.integrateAll(dataSet);
+//	archive->setProcessedData(integralSet);
+//	TH1D* spect = processor.calculateDriftTimeSpectrum(dataSet);
+//
+//
+//	TH1D* rt = processor.calculateRtRelation(*spect);
+//	TH1D* derivSpec = processor.derivate(spect);
+//
+//	archive->setDifttimeSpect(spect);
+//	archive->setRtRelation(rt);
+//	archive->setDiffDrifttimeSpect(derivSpec);
+//	int nAfterPulses = processor.countAfterpulses(*dataSet,*rt);
+//	int nEvents = spect->GetEntries() - spect->GetBinContent(0);
+//
+//	cout <<"# afterpulses: " << nAfterPulses
+//			<< " probability: " << (double)nAfterPulses/nEvents
+//			<< " +- " << sqrt(nAfterPulses/pow(nEvents,2) + pow(nAfterPulses * sqrt(nEvents),2)/pow(nEvents,4))
+//			<< endl;
 
 	double endRuntime = omp_get_wtime();
 
 	cout << "Computation without saving took " << endRuntime - beginRuntime << " seconds" << endl;
-	processor.writeResults(*dataSet,*integralSet,archive->getFilename(),archive->getDirname());
+//	processor.writeResults(*dataSet,*integralSet,archive->getFilename(),archive->getDirname());
 
-	delete archive;
+//	delete archive;
 
 	return 0;
 }
@@ -91,10 +91,10 @@ ParsedArgs parseCmdArgs(int argc, char** argv)
 		{
 			if(argv[i][0] == 'i' && argv[i][1] == 'f' && argv[i][2] == '=')
 			{
-				TString file(argv[i]);
-				int equalSignPos = file.First('=') + 1;
-				TSubString filename = file(equalSignPos,file.Length());
-				result.infilename = TString(filename);
+				string file(argv[i]);
+				int equalSignPos = file.find_first_of('=') + 1;
+				string filename = file.substr(equalSignPos,file.length());
+				result.infilename = filename;
 			}
 		}
 	}

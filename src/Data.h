@@ -150,8 +150,19 @@ Data<T>& Data<T>::operator=(const Data<T>& rhs)
 	return *this;
 }
 
-//TODO comment
 //TODO test
+/**
+ * Computes a normalized version of this Data object. This method does not change the calling data object but computes the normalized version and
+ * returns it in the form of an array<double,800> in a unique_ptr.
+ *
+ * @brief Compute normalized data
+ *
+ * @author Stefan Bieschke
+ * @date July 27, 2017
+ * @version Alpha 2.0
+ *
+ * @return std::unique_ptr<std::array<double,800>> containing the normalized data
+ */
 template<typename T>
 unique_ptr<array<double,800>> Data<T>::normalized() const
 {
@@ -163,6 +174,7 @@ unique_ptr<array<double,800>> Data<T>::normalized() const
 	{
 		integral += (*m_data)[i];
 	}
+
 	return move(result);
 }
 
