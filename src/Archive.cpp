@@ -260,6 +260,9 @@ string Archive::parseFile(string filename)
 	return file;
 }
 
+
+//TODO comment
+//TODO test
 FileParams Archive::readHeader(ifstream& file)
 {
 	size_t nTubes, eventSize, nEvents;

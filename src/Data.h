@@ -33,6 +33,7 @@ public:
 	const std::array<T,800>& getData() const;
 	T& operator[](const unsigned short bin);
 	const T& operator[](const unsigned short bin) const;
+	std::unique_ptr<std::array<double,800>> normalized() const;
 
 
 protected:
@@ -147,6 +148,22 @@ Data<T>& Data<T>::operator=(const Data<T>& rhs)
 		(*m_data)[i] = (*rhs.m_data)[i];
 	}
 	return *this;
+}
+
+//TODO comment
+//TODO test
+template<typename T>
+unique_ptr<array<double,800>> Data<T>::normalized() const
+{
+	unique_ptr<array<double,800>> result(new array<double,800>);
+
+	int integral = 0;
+//	#pragma omp parallel for reduction(+,integral)
+	for(size_t i = 0; i < m_data->size(); i++)
+	{
+		integral += (*m_data)[i];
+	}
+	return move(result);
 }
 
 /**
