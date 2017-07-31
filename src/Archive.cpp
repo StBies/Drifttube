@@ -137,7 +137,8 @@ void Archive::writeToFile(const string& filename)
 				//write event
 				for(size_t k = 0; k < e.getData().size(); k++)
 				{
-					file.write((char*)&e[k],sizeof(uint16_t));
+					double datum = (e[k] - OFFSET_ZERO_VOLTAGE) * ADC_CHANNELS_TO_VOLTAGE;
+					file.write((char*)&datum,sizeof(double));
 				}
 			}
 			catch(Exception& e)

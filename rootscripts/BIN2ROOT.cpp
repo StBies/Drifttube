@@ -29,22 +29,23 @@ void BIN2ROOT(string file)
 		cout << "Tube " << tube << endl;
 		TString tubeDirName = "Tube";
 		tubeDirName.Append(tube);
-		f->mkdir(tubeDirName);
-		f->cd(tubeDirName);
-		f->mkdir("RawData");
-		f->cd("RawData");
+		TDirectory* tDir = f->mkdir(tubeDirName);
+		tDir->mkdir("RawData");
+		tDir->cd("RawData");
 		for(size_t data = 0; data < nEvents; data++)
 		{
-			UShort_t datum = 0;
+			double datum = 0;
 			size_t evtNr = 0;
 			infile.read((char*)&evtNr,sizeof(size_t));
 			stringstream titleBuild;
 			titleBuild << "Event #" << evtNr;
 			TString title(titleBuild.str());
-			TH1I* hist = new TH1I(title, "FADC Data",800,0,3200);
+			TH1D* hist = new TH1D(title, "FADC Data",800,0,3200);
+			hist->GetXaxis()->SetTitle("time [ns]");
+			hist->GetYaxis()->SetTitle("voltage [V]");
 			for(size_t i = 0; i < eventSize; i++)
 			{
-				infile.read((char*)&datum,sizeof(UShort_t));
+				infile.read((char*)&datum,sizeof(double));
 				hist->SetBinContent(i+1,datum);
 			}
 			hist->Write();
