@@ -39,7 +39,7 @@ public:
 protected:
 	Data<T>& operator=(const Data<T>& rhs);
 	Data(std::unique_ptr<std::array<T,800>> data); //not meant for instantiation
-	Data(const Data& data);
+	Data(const Data<T>& data);
 
 	std::unique_ptr<std::array<T,800>> m_data;
 };
@@ -80,7 +80,7 @@ Data<T>::Data(unique_ptr<array<T,800>> data)
  * @warning Protected: should only be called by inheriting class' constructors
  */
 template<typename T>
-Data<T>::Data(const Data& data)
+Data<T>::Data(const Data<T>& data)
 {
 	unique_ptr<array<T,800>> temp(new array<T,800>);
 
@@ -138,8 +138,20 @@ const T& Data<T>::operator[](const unsigned short bin) const
 	return (*m_data)[bin];
 }
 
-//TODO comment
 //TODO test
+/**
+ * Assignment operator. The Data<T> object on the right hand side (rhs) gets assigned to the left hand side (lhs) Data<T> object. Due to the
+ * constness of the parameter rhs, temporary objects can be assigned to non temporary lvalues.
+ *
+ * @brief assignment operator
+ *
+ * @author Stefan Bieschke
+ * @date August 1, 2017
+ * @version Alpha 2.0
+ *
+ * @param rhs const reference to the Data<T> object on the right hand side of the assignment
+ * @return Reference to the lhs object - basically the adress that the rhs is assigned to
+ */
 template<typename T>
 Data<T>& Data<T>::operator=(const Data<T>& rhs)
 {
