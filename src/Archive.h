@@ -19,6 +19,16 @@
 
 using namespace std;
 
+/**
+ * Struct containing parameters that are read from the header of the binary file containing raw data.
+ * This contains the number of drift tubes, the number of events per tube and the size of one event (number of data points.
+ *
+ * @brief Parameters from header of binary file
+ *
+ * @author Stefan Bieschke
+ * @date August 1, 2017
+ * @version Alpha 2.0
+ */
 typedef struct
 {
 	size_t nTubes;

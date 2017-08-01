@@ -8,6 +8,9 @@
 #include <sstream>
 
 using namespace std;
+
+//TODO comment
+//TODO TEST!!!!
 void BIN2ROOT(string file)
 {
 	ifstream infile(file.c_str(),ios::binary);

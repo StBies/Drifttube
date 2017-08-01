@@ -97,14 +97,15 @@ const vector<unique_ptr<Drifttube>>& Archive::getTubes() const
 }
 
 //TODO test
+//TODO probably don't want to calculate integrals in here but have them persistent for later use.
 /**
  * Writes the results and data to a file, that is specified with parameter filename.
  *
  * @brief Write data to file
  *
  * @author Stefan Bieschke
- * @date July 20, 2017
- * @version Alpha 2.0
+ * @date August 1, 2017
+ * @version Alpha 2.0.1
  *
  * @param filename relative path to the file.
  *
@@ -141,7 +142,8 @@ void Archive::writeToFile(const string& filename)
 					double datum = (e[k] - OFFSET_ZERO_VOLTAGE) * ADC_CHANNELS_TO_VOLTAGE;
 					file.write((char*)&datum,sizeof(double));
 				}
-				//wirte integral
+				//write integral
+				//TODO use precomputed integrals - see above doc comment for this method
 				for(size_t k = 0; k < e.getData().size(); k++)
 				{
 					file.write((char*)&integral[i],sizeof(int));
@@ -158,13 +160,6 @@ void Archive::writeToFile(const string& filename)
 			file.write((char*)&m_tubes[i]->getDriftTimeSpectrum()[bin],sizeof(uint32_t));
 		}
 	}
-
-//	file.cd("dtSpect");
-//	m_drifttimeSpect->Write();
-//	file.cd("diffDriftTime");
-//	_diffDtSpect->Write();
-//	file.cd("rtRelation");
-//	m_rtRelation->Write();
 
 	file.close();
 	cout << "Saving complete" << endl;
@@ -277,9 +272,23 @@ string Archive::parseFile(string filename)
 	return file;
 }
 
-
-//TODO comment
 //TODO test
+/**
+ * Read the header of the binary file containing the raw data from the FADC (probably .drift).
+ * The header is (state: August 1, 2017) 12 byte long. The bytes contain the following:
+ * 		Bytes 0-3: nTubes - the number of drift tubes that data is present for (size_t)
+ * 		Bytes 4-7: nEvents - the number of events per tube
+ * 		Bytes 8-11: eventSize - the number of data points (bins) per event
+ *
+ * @author Stefan Bieschke
+ * @date August 1, 2017
+ * @version Alpha 2.0
+ *
+ * @brief Read the binary file header
+ * @param file reference to an opened infilestream object containing the binary data
+ *
+ * @return FileParams object containing the read bytes in a usable form
+ */
 FileParams Archive::readHeader(ifstream& file)
 {
 	size_t nTubes, eventSize, nEvents;

@@ -26,6 +26,7 @@ typedef struct
 
 ParsedArgs parseCmdArgs(int argc, char** argv);
 
+//TODO rework comment
 /**
  * Startup of the application is managed here
  * 
