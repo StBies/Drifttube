@@ -49,6 +49,20 @@ int main(int argc, char** argv)
 	string outFileName = archive.getDirname();
 	outFileName.append("processed_");
 	outFileName.append(archive.getFilename());
+	vector<array<int,800>> integrals;
+	for(size_t i = 0; i < archive.getTubes()[0]->getDataSet().getSize(); i++)
+	{
+		try
+		{
+			integrals.push_back(DataProcessor::integrate(archive.getTubes()[0]->getDataSet()[i]));
+		}
+		catch(Exception& e)
+		{
+			continue;
+		}
+	}
+
+	double endRuntime = omp_get_wtime();
 	archive.writeToFile(outFileName);
 //
 //	DataSet* dataSet = archive->getRawData();
@@ -71,7 +85,6 @@ int main(int argc, char** argv)
 //			<< " +- " << sqrt(nAfterPulses/pow(nEvents,2) + pow(nAfterPulses * sqrt(nEvents),2)/pow(nEvents,4))
 //			<< endl;
 
-	double endRuntime = omp_get_wtime();
 
 	cout << "Computation without saving took " << endRuntime - beginRuntime << " seconds" << endl;
 //	processor.writeResults(*dataSet,*integralSet,archive->getFilename(),archive->getDirname());
