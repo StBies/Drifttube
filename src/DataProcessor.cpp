@@ -239,7 +239,7 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
 
 	double integral = 0.0;
 	double scalingFactor = ((double) DRIFT_TUBE_RADIUS)
-			/ ((double) dtSpect.getEntries());
+			/ ((double) dtSpect.getEntries() - dtSpect.getRejected());
 
 	(*result)[0] = integral;
 	for (unsigned int i = 1; i < nBins; i++)

@@ -3,6 +3,7 @@
 #include "Archive.h"
 #include "omp.h"
 #include <cmath>
+#include <fstream>
 
 
 using namespace std;
@@ -64,6 +65,18 @@ int main(int argc, char** argv)
 	}
 
 	double endRuntime = omp_get_wtime();
+	DriftTimeSpectrum dt1 = archive.getTubes()[0]->getDriftTimeSpectrum();
+	RtRelation rt1 = archive.getTubes()[0]->getRtRelation();
+
+	ofstream f("scripts/plots/data/out.dat");
+
+	for(size_t i = 0; i < dt1.getData().size(); i++)
+	{
+		f << 4*i << "\t" << dt1[i] << "\t" << rt1[i] << endl;
+	}
+	f.close();
+	system("gnuplot -p scripts/plots/dtAndRt.plt");
+
 	archive.writeToFile(outFileName);
 //
 //	DataSet* dataSet = archive->getRawData();
