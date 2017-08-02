@@ -68,6 +68,7 @@ int main(int argc, char** argv)
 	DriftTimeSpectrum dt1 = archive.getTubes()[0]->getDriftTimeSpectrum();
 	RtRelation rt1 = archive.getTubes()[0]->getRtRelation();
 
+	//save data as ASCII table for plotting in gnuplot - don't like it
 	ofstream f("scripts/plots/data/out.dat");
 
 	for(size_t i = 0; i < dt1.getData().size(); i++)
