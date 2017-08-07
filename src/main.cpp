@@ -63,10 +63,16 @@ int main(int argc, char** argv)
 			continue;
 		}
 	}
+	unsigned int afterpulses = DataProcessor::countAfterpulses(*archive.getTubes()[0]);
+	DriftTimeSpectrum dt1 = archive.getTubes()[0]->getDriftTimeSpectrum();
+	unsigned int entries = dt1.getEntries();
+	unsigned int rejected = dt1.getRejected();
+	unsigned int valid = entries - rejected;
+	cout << entries << "\t" << rejected << "\t" << valid << endl;
+	RtRelation rt1 = archive.getTubes()[0]->getRtRelation();
+	cout << "Afterpulses: " << afterpulses << " Probability: " << afterpulses/(double)(dt1.getEntries() - dt1.getRejected()) <<  endl;
 
 	double endRuntime = omp_get_wtime();
-	DriftTimeSpectrum dt1 = archive.getTubes()[0]->getDriftTimeSpectrum();
-	RtRelation rt1 = archive.getTubes()[0]->getRtRelation();
 
 	//save data as ASCII table for plotting in gnuplot - don't like it
 	ofstream f("scripts/plots/data/out.dat");

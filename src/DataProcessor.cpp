@@ -288,7 +288,7 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 		Event voltage = tube.getDataSet().getEvent(i);
 		int nBins = voltage.getData().size();
 		//check, if the signal already ended at max drift time
-		if(voltage[maxDriftTimeBin] <= -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE)
+		if(voltage[maxDriftTimeBin] <= -50 + OFFSET_ZERO_VOLTAGE)
 		{
 			pulseEnded = false;
 		}
@@ -297,13 +297,13 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 		for(unsigned int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins;j++)
 		{
 			//if-else switches a variable in order not to count a single pulse bin per bin
-			if(voltage[j] <= -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE && pulseEnded)
+			if(voltage[j] <= -50 + OFFSET_ZERO_VOLTAGE && pulseEnded)
 			{
 //				cout << "event " <<i << " time: " << j*4 << endl;
 				++nAfterPulses;
 				pulseEnded = false;
 			}
-			else if(voltage[j] > -50 * ADC_CHANNELS_TO_VOLTAGE + OFFSET_ZERO_VOLTAGE && !pulseEnded)
+			else if(voltage[j] > -50 + OFFSET_ZERO_VOLTAGE && !pulseEnded)
 			{
 				pulseEnded = true;
 			}

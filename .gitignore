@@ -17,6 +17,8 @@ testdata/*
 spectra/*
 rootscripts/*.dat
 *.dat
+*.drift
+*.root
 
 #Google test
 gtest/
