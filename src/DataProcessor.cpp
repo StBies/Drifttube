@@ -179,6 +179,7 @@ unsigned short DataProcessor::findMinimumBin(const Event& data)
  */
 const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet& data)
 {
+	//can not run in parallel - at least not this way
 	unsigned short triggerpos = ADC_TRIGGERPOS_BIN;
 
 	unique_ptr<array<uint32_t, 800>> result(new array<uint32_t, 800>);
@@ -186,12 +187,13 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	unsigned int rejected = 0;
 
 	#ifdef ZEROSUP
-	#pragma omp parallel for
+//	#pragma omp parallel for
 	for(size_t i = 0; i < data.getSize(); i++)
 	{
 		try
 		{
-			short driftTimeBin = (short) (data[i].getDriftTime() / ADC_BINS_TO_TIME);
+			short driftTimeBin = (short)(data[i].getDriftTime() / ADC_BINS_TO_TIME) - ADC_TRIGGERPOS_BIN;
+			driftTimeBin = driftTimeBin < 0 ? 0 : driftTimeBin;
 			(*result)[driftTimeBin]++;
 		}
 		catch(Exception& e)
@@ -200,12 +202,14 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 		}
 	}
 	#else
-	#pragma omp parallel for
+//	#pragma omp parallel for
 	for(size_t i = 0; i < data.getSize(); i++)
 	{
 		short driftTimeBin = (short) (data[i].getDriftTime() / ADC_BINS_TO_TIME);
 		if(driftTimeBin != -42)
 		{
+			driftTimeBin = (data[i].getDriftTime() / ADC_BINS_TO_TIME) - ADC_TRIGGERPOS_BIN;
+			driftTimeBin = driftTimeBin < 0 ? 0 : driftTimeBin;
 			(*result)[driftTimeBin]++;
 		}
 		else
@@ -238,13 +242,11 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
 	unique_ptr<array<double, 800>> result(new array<double, 800>);
 
 	double integral = 0.0;
-	double scalingFactor = ((double) DRIFT_TUBE_RADIUS)
-			/ ((double) dtSpect.getEntries() - dtSpect.getRejected());
+	double scalingFactor = DRIFT_TUBE_RADIUS / (dtSpect.getEntries() - dtSpect.getRejected());
 
-	(*result)[0] = integral;
-	for (unsigned int i = 1; i < nBins; i++)
+	for (unsigned int i = 0; i < nBins; i++)
 	{
-		integral += dtSpect[i - 1] * scalingFactor;
+		integral += dtSpect[i] * scalingFactor;
 		(*result)[i] = integral;
 	}
 
