@@ -337,7 +337,7 @@ short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
 	{
 		if(data[i] < threshold)
 		{
-		return i;
+			return i;
 		}
 	}
 	return -42;

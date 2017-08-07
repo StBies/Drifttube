@@ -21,8 +21,6 @@ class Drifttube;
 #include "RtRelation.h"
 #include "DriftTimeSpectrum.h"
 
-//forward declarations
-
 /**
  * A class, that processes raw data measured by an FADC, that comes as
  * *.root files. It offers functions to integrate histograms, calculate

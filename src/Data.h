@@ -180,11 +180,16 @@ unique_ptr<array<double,800>> Data<T>::normalized() const
 {
 	unique_ptr<array<double,800>> result(new array<double,800>);
 
-	int integral = 0;
+	double integral = 0;
 //	#pragma omp parallel for reduction(+,integral)
 	for(size_t i = 0; i < m_data->size(); i++)
 	{
 		integral += (*m_data)[i];
+	}
+
+	for(size_t i = 0; i < m_data->size(); i++)
+	{
+		(*result)[i] = (*this)[i] / integral;
 	}
 
 	return move(result);

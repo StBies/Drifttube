@@ -142,6 +142,21 @@ TEST_F(EventTest, TestDriftTime)
 	ASSERT_EQ(-168,e2.getDriftTime());
 }
 
+TEST_F(EventTest, TestNormalized)
+{
+	unique_ptr<array<uint16_t,800>> arr = unique_ptr<array<uint16_t,800>>(new array<uint16_t,800>);
+	unique_ptr<array<double,800>> res;
+
+	arr->fill(1);
+	Event e(1,move(arr));
+	res = e.normalized();
+
+	for(unsigned int i = 0; i < arr->size(); i++)
+	{
+		ASSERT_DOUBLE_EQ(1/(double)800,(*res)[i]);
+	}
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
