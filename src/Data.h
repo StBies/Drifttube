@@ -162,7 +162,6 @@ Data<T>& Data<T>::operator=(const Data<T>& rhs)
 	return *this;
 }
 
-//TODO test
 /**
  * Computes a normalized version of this Data object. This method does not change the calling data object but computes the normalized version and
  * returns it in the form of an array<double,800> in a unique_ptr.
@@ -179,6 +178,7 @@ template<typename T>
 unique_ptr<array<double,800>> Data<T>::normalized() const
 {
 	unique_ptr<array<double,800>> result(new array<double,800>);
+	//TODO include DataProcessor and let it perform the integration
 
 	double integral = 0;
 //	#pragma omp parallel for reduction(+,integral)
