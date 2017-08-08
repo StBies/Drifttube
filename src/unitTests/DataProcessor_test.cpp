@@ -98,8 +98,8 @@ TEST_F(DataProcessorTest,TestFindMinumumBin)
 
 TEST_F(DataProcessorTest,TestFindDriftTime)
 {
-	ASSERT_EQ(400,DataProcessor::findDriftTime(*min_at_400,6));
-	ASSERT_EQ(-42,DataProcessor::findDriftTime(*max_uint,100));
+	ASSERT_EQ(400,DataProcessor::findDriftTimeBin(*min_at_400,6));
+	ASSERT_EQ(-42,DataProcessor::findDriftTimeBin(*max_uint,100));
 }
 
 TEST_F(DataProcessorTest,TestFindLastFilledBin)

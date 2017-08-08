@@ -107,42 +107,6 @@ const array<int, 800> DataProcessor::integrate(const Event& data)
 //	return result;
 //}
 
-///**
-// * Integrates all histograms, that are passed to this method in a DataSet object. The resulting histograms containing the histograms
-// * are returned in a new DataSet object.
-// *
-// * @brief Integrate all data in a DataSet object
-// *
-// * @author Stefan Bieschke
-// * @date April 10, 2017
-// * @version Alpha 2.0
-// *
-// * @param data reference to the DataSet object that is to be integrated
-// *
-// * @return std::unique pointer to the new DataSet on heap. Be aware that ownership is transferred to caller
-// *
-// * @warning Heap object returned, caller needs to handle memory
-// */
-//unique_ptr<DataSet> DataProcessor::integrateAll(const DataSet& data)
-//{
-//	vector<unique_ptr<Event>> set(data.getSize());
-//
-//	#pragma omp parallel for shared(set)
-//	for (int i = 0; i < data.getSize(); i++)
-//	{
-//		try
-//		{
-//			unique_ptr<array<int,800>> integral(new array<int,800>());
-//			*integral = integrate(data.getEvent(i));
-//			set[i] = integral;
-//		} catch (Exception& e)
-//		{
-//			cerr << e.error() << endl;
-//		}
-//	}
-//	return move(unique_ptr<DataSet>(new DataSet(set)));
-//}
-
 /**
  * Find the position of the minimum of the given data. Will only find the absolute
  * minimum. Can not yet find more than one negative peak.
@@ -187,7 +151,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	unsigned int rejected = 0;
 
 	#ifdef ZEROSUP
-//	#pragma omp parallel for
+//	#pragma omp parallel for schedule(static) reduction(+:rejected)
 	for(size_t i = 0; i < data.getSize(); i++)
 	{
 		try
@@ -198,11 +162,14 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 		}
 		catch(Exception& e)
 		{
-			rejected++;
+//			#pragma omp critical
+//			{
+				rejected++;
+//			}
 		}
 	}
 	#else
-//	#pragma omp parallel for
+//	#pragma omp parallel for schedule(static) shared(rejected)
 	for(size_t i = 0; i < data.getSize(); i++)
 	{
 		short driftTimeBin = (short) (data[i].getDriftTime() / ADC_BINS_TO_TIME);
@@ -330,7 +297,7 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
  *
  * @return Bin number of the first occurance of a signal larger than threshold
  */
-short DataProcessor::findDriftTime(const Event& data, unsigned short threshold)
+short DataProcessor::findDriftTimeBin(const Event& data, unsigned short threshold)
 {
 //if threshold given positive, change sign
 //	threshold *= (threshold < 0 ? 1 : -1);

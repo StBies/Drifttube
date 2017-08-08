@@ -22,7 +22,7 @@ MKDIR		=	mkdir -p
 all: directories prog test
 
 prog: $(OBJ)
-	$(CC) -o prog.out $^ $(LDFLAGS) $(ROOTLDFLAGS)
+	$(CC) -o prog.out $^ $(LDFLAGS)
 	
 obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<

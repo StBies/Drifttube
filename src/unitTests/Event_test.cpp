@@ -157,6 +157,16 @@ TEST_F(EventTest, TestNormalized)
 	}
 }
 
+TEST_F(EventTest, TestAssignment)
+{
+	Event e(*e1);
+	e = *e2;
+	ASSERT_EQ(e2->getEventNumber(),e.getEventNumber());
+	ASSERT_EQ(e2->getData(),e.getData());
+	ASSERT_FALSE(&e2->getData() == &e.getData());
+	ASSERT_FALSE(e2 == &e);
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

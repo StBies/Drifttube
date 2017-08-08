@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 	unsigned int afterpulses = DataProcessor::countAfterpulses(*archive.getTubes()[0]);
 	DriftTimeSpectrum dt1 = archive.getTubes()[0]->getDriftTimeSpectrum();
 	RtRelation rt1 = archive.getTubes()[0]->getRtRelation();
-//	cout << "Afterpulses: " << afterpulses << " Probability: " << afterpulses/(double)(dt1.getEntries() - dt1.getRejected()) <<  endl;
+	cout << "Afterpulses: " << afterpulses << " Probability: " << afterpulses/(double)(dt1.getEntries() - dt1.getRejected()) <<  endl;
 
 	double endRuntime = omp_get_wtime();
 
@@ -82,32 +82,10 @@ int main(int argc, char** argv)
 	system("gnuplot -p scripts/plots/dtAndRt.plt");
 
 	archive.writeToFile(outFileName);
-//
-//	DataSet* dataSet = archive->getRawData();
-//	DataSet* integralSet = processor.integrateAll(dataSet);
-//	archive->setProcessedData(integralSet);
-//	TH1D* spect = processor.calculateDriftTimeSpectrum(dataSet);
-//
-//
-//	TH1D* rt = processor.calculateRtRelation(*spect);
-//	TH1D* derivSpec = processor.derivate(spect);
-//
-//	archive->setDifttimeSpect(spect);
-//	archive->setRtRelation(rt);
-//	archive->setDiffDrifttimeSpect(derivSpec);
-//	int nAfterPulses = processor.countAfterpulses(*dataSet,*rt);
-//	int nEvents = spect->GetEntries() - spect->GetBinContent(0);
-//
-//	cout <<"# afterpulses: " << nAfterPulses
-//			<< " probability: " << (double)nAfterPulses/nEvents
-//			<< " +- " << sqrt(nAfterPulses/pow(nEvents,2) + pow(nAfterPulses * sqrt(nEvents),2)/pow(nEvents,4))
-//			<< endl;
+
 
 
 	cout << "Computation without saving took " << endRuntime - beginRuntime << " seconds" << endl;
-//	processor.writeResults(*dataSet,*integralSet,archive->getFilename(),archive->getDirname());
-
-//	delete archive;
 
 	return 0;
 }

@@ -24,7 +24,7 @@ using namespace std;
 Event::Event(unsigned int eventNumber, unique_ptr<array<uint16_t,800>> data) : Data(move(data))
 {
 	m_event_number = eventNumber;
-	m_drift_time = ADC_BINS_TO_TIME * DataProcessor::findDriftTime(*this,2150);
+	m_drift_time = ADC_BINS_TO_TIME * DataProcessor::findDriftTimeBin(*this,2150);
 }
 
 Event::~Event()
@@ -72,8 +72,19 @@ const double Event::getDriftTime() const
 }
 
 
-//TODO comment
-//TODO test
+/**
+ * Assignment operator. The Event object on the right hand side (rhs) gets assigned to the left hand side (lhs) Event object. Due to the
+ * constness of the parameter rhs, temporary objects can be assigned to non temporary lvalues.
+ *
+ * @brief assignment operator
+ *
+ * @author Stefan Bieschke
+ * @date August 1, 2017
+ * @version Alpha 2.0
+ *
+ * @param rhs const reference to the Event object on the right hand side of the assignment
+ * @return Reference to the lhs object - basically the adress that the rhs is assigned to
+ */
 Event& Event::operator=(const Event& rhs)
 {
 	Data::operator=(rhs);

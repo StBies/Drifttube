@@ -41,7 +41,7 @@ public:
 //	static const std::array<uint16_t,800> derivate(const Event& data) const;
 //	static std::unique_ptr<DataSet> integrateAll(const DataSet& data) const;
 	static unsigned short findMinimumBin(const Event& data);
-	static short findDriftTime(const Event& data, unsigned short threshold);
+	static short findDriftTimeBin(const Event& data, unsigned short threshold);
 	static unsigned short findLastFilledBin(const Event& data, unsigned short threshold);
 	static const DriftTimeSpectrum calculateDriftTimeSpectrum(const DataSet& data);
 	static const RtRelation calculateRtRelation(const DriftTimeSpectrum& dtSpect);
