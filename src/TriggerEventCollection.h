@@ -13,7 +13,11 @@
 #define TRIGGEREVENTCOLLECTION_H_
 
 /**
- * A triggersignal results in the readout of a raw voltage signal for each drift tube channel on the FADC. The
+ * A triggersignal results in the readout of a raw voltage signal for each drift tube channel on the FADC.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date September 1, 2017
  */
 class TriggerEventCollection
 {

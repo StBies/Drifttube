@@ -22,7 +22,7 @@
  * @date June 12, 2017
  * @version Alpha 2.0
  *
- * @warning This is not meant for instantiation.
+ * @warning Abstract class, cannot be instantiated.
  */
 template<typename T = uint16_t>
 class Data
