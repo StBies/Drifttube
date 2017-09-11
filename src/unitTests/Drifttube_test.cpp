@@ -1,5 +1,6 @@
 #include "../Drifttube.h"
 #include <gtest/gtest.h>
+#include "../globals.h"
 
 using namespace std;
 
@@ -99,7 +100,7 @@ TEST_F(DrifttubeTest,TestDriftTimeSpectrum)
 {
 	unique_ptr<array<uint32_t,800>> dt(new array<uint32_t,800>);
 	dt->fill(0);
-	(*dt)[50] = 1;
+	(*dt)[10] = 1;
 	DriftTimeSpectrum wanted(move(dt),1,0);
 	ASSERT_EQ(wanted.getEntries(),d3_filled->getDriftTimeSpectrum().getEntries());
 	ASSERT_EQ(wanted.getRejected(),d3_filled->getDriftTimeSpectrum().getRejected());
@@ -110,7 +111,7 @@ TEST_F(DrifttubeTest,TestRtRelation)
 {
 	unique_ptr<array<double,800>> rt(new array<double,800>);
 	rt->fill(18.15);
-	for(size_t i = 0; i < 51; i++)
+	for(size_t i = 0; i < 11; i++)
 	{
 		(*rt)[i] = 0;
 	}
@@ -152,7 +153,10 @@ TEST_F(DrifttubeTest,TestAssignmentOperators)
 
 TEST_F(DrifttubeTest,TestMaxDrifttime)
 {
-	ASSERT_EQ(204,d3_filled->getMaxDrifttime());
+	//44 expected: Event is in bin 50:
+	// 50 - ADC_TRIGGERPOS = 10
+	// So 99.9% of all events happened in bin 11 -> 44ns
+	ASSERT_EQ(44,d3_filled->getMaxDrifttime());
 }
 
 int main(int argc, char **argv)
