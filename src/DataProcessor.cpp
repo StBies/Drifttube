@@ -257,7 +257,7 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 		Event voltage = tube.getDataSet().getEvent(i);
 		int nBins = voltage.getData().size();
 		//check, if the signal already ended at max drift time
-		if(voltage[maxDriftTimeBin] <= -50 + OFFSET_ZERO_VOLTAGE)
+		if(voltage[maxDriftTimeBin] <= EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE)
 		{
 			pulseEnded = false;
 		}
@@ -266,13 +266,13 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 		for(unsigned int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins;j++)
 		{
 			//if-else switches a variable in order not to count a single pulse bin per bin
-			if(voltage[j] <= -50 + OFFSET_ZERO_VOLTAGE && pulseEnded)
+			if(voltage[j] <= EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE && pulseEnded)
 			{
 //				cout << "event " <<i << " time: " << j*4 << endl;
 				++nAfterPulses;
 				pulseEnded = false;
 			}
-			else if(voltage[j] > -50 + OFFSET_ZERO_VOLTAGE && !pulseEnded)
+			else if(voltage[j] > EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE && !pulseEnded)
 			{
 				pulseEnded = true;
 			}
@@ -283,7 +283,7 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 	return nAfterPulses;
 }
 
-//TODO decide, if this should return the "real time" in nanoseconds instead of the bin number
+//TODO Change it to return it corrected for triggertime offset
 /**
  * Finds the bin number in a passed Event, in which a passed threshold is first surpassed.
  * Note that this method finds the bin number, in which the drift time is.

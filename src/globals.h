@@ -21,9 +21,12 @@
 static const double ADC_CHANNELS_TO_VOLTAGE = 12.0 / 4096; //V per channel
 static const short ADC_BINS_TO_TIME = 4; //ns
 static const unsigned short ADC_TRIGGERPOS_BIN = 40;
-static const unsigned short OFFSET_ZERO_VOLTAGE = 2200; //bins
+static const unsigned short OFFSET_ZERO_VOLTAGE = 2200; //channels
 
-//variables describing the drift tube
+//variables describing the drift tube:
 static const double DRIFT_TUBE_RADIUS = 18.15;//mm
+
+//values for actual physics:
+static const short EVENT_THRESHOLD_VOLTAGE = -50; //channels relative to OFFSET_ZERO_VOLTAGE
 
 #endif /* GLOBALS_H_ */
