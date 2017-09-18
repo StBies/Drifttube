@@ -124,6 +124,10 @@ void Archive::writeToFile(const string& filename)
 	file.write((char*)&nEvents,sizeof(size_t));
 	file.write((char*)&nEventSize,sizeof(size_t));
 
+	unique_ptr<array<uint16_t,800>> offset(new array<uint16_t,800>);
+	offset->fill(2200);
+	array<int,800> error = DataProcessor::integrate(Event(0,move(offset)));
+
 	//loop over tubes
 	for(size_t i = 0; i < m_tubes.size(); i++)
 	{
@@ -134,6 +138,7 @@ void Archive::writeToFile(const string& filename)
 			{
 				Event e = m_tubes[i]->getDataSet()[j];
 				array<int,800> integral = DataProcessor::integrate(e);
+
 				//write eventnumber
 
 				file.write((char*)&j,sizeof(size_t));
@@ -148,7 +153,8 @@ void Archive::writeToFile(const string& filename)
 
 				for(size_t k = 0; k < e.getData().size(); k++)
 				{
-					file.write((char*)&integral[k],sizeof(int));
+					int correctedIntegral = integral[k] - error[k];
+					file.write((char*)&correctedIntegral,sizeof(int));
 				}
 			}
 			catch(Exception& e)

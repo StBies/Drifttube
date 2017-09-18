@@ -157,6 +157,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 		try
 		{
 			short driftTimeBin = (short)(data[i].getDriftTime() / ADC_BINS_TO_TIME) - ADC_TRIGGERPOS_BIN;
+			//TODO THIS IS BAD!!!! Maybe it should be rejected, maybe not - more thinking needed
 			driftTimeBin = driftTimeBin < 0 ? 0 : driftTimeBin;
 			(*result)[driftTimeBin]++;
 		}
@@ -176,6 +177,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 		if(driftTimeBin != -42)
 		{
 			driftTimeBin = (data[i].getDriftTime() / ADC_BINS_TO_TIME) - ADC_TRIGGERPOS_BIN;
+			//TODO THIS IS BAD!!!! Maybe it should be rejected, maybe not - more thinking needed
 			driftTimeBin = driftTimeBin < 0 ? 0 : driftTimeBin;
 			(*result)[driftTimeBin]++;
 		}
