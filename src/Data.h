@@ -138,7 +138,6 @@ const T& Data<T>::operator[](const unsigned short bin) const
 	return (*m_data)[bin];
 }
 
-//TODO test
 /**
  * Assignment operator. The Data<T> object on the right hand side (rhs) gets assigned to the left hand side (lhs) Data<T> object. Due to the
  * constness of the parameter rhs, temporary objects can be assigned to non temporary lvalues.
@@ -150,7 +149,7 @@ const T& Data<T>::operator[](const unsigned short bin) const
  * @version Alpha 2.0
  *
  * @param rhs const reference to the Data<T> object on the right hand side of the assignment
- * @return Reference to the lhs object - basically the adress that the rhs is assigned to
+ * @return Reference to the lhs object - basically the adress that the lhs is assigned to
  */
 template<typename T>
 Data<T>& Data<T>::operator=(const Data<T>& rhs)
