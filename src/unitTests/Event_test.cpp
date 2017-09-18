@@ -165,6 +165,10 @@ TEST_F(EventTest, TestAssignment)
 	ASSERT_EQ(e2->getData(),e.getData());
 	ASSERT_FALSE(&e2->getData() == &e.getData());
 	ASSERT_FALSE(e2 == &e);
+	(*e2)[0] = 13378;
+	ASSERT_EQ(13378,e2->getData().at(0));
+	ASSERT_FALSE(e[0] == 13378);
+	ASSERT_FALSE(e[0] == (*e2)[0]);
 }
 
 int main(int argc, char **argv)
