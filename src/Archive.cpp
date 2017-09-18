@@ -135,6 +135,7 @@ void Archive::writeToFile(const string& filename)
 				Event e = m_tubes[i]->getDataSet()[j];
 				array<int,800> integral = DataProcessor::integrate(e);
 				//write eventnumber
+
 				file.write((char*)&j,sizeof(size_t));
 				//write event
 				for(size_t k = 0; k < e.getData().size(); k++)
@@ -144,9 +145,10 @@ void Archive::writeToFile(const string& filename)
 				}
 				//write integral
 				//TODO use precomputed integrals - see above doc comment for this method
+
 				for(size_t k = 0; k < e.getData().size(); k++)
 				{
-					file.write((char*)&integral[i],sizeof(int));
+					file.write((char*)&integral[k],sizeof(int));
 				}
 			}
 			catch(Exception& e)

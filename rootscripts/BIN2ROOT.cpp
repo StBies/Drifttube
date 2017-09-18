@@ -44,21 +44,16 @@ void BIN2ROOT(string file)
 			infile.read((char*)&evtNr,sizeof(size_t));
 			stringstream titleBuild;
 			titleBuild << "Event #" << evtNr;
-			cout << "Entry: " << data << " Event # " << evtNr;
 			TString title(titleBuild.str());
 			TH1D* hist = new TH1D(title, "FADC Data",800,0,3200);
 			hist->GetXaxis()->SetTitle("time [ns]");
 			hist->GetYaxis()->SetTitle("voltage [V]");
-			cout << " histogram built, title: " << hist->GetName() << endl;
-			cout << "Data: " << endl;
 			for(size_t i = 0; i < eventSize; i++)
 			{
 				infile.read((char*)&datum,sizeof(double));
-//				cout << i << "\t" << datum << endl;
 				hist->SetBinContent(i+1,datum);
 			}
 			hist->Write();
-			cout << "histogram written" << endl;
 			delete hist;
 
 			tDir->cd("integrals");
@@ -68,8 +63,8 @@ void BIN2ROOT(string file)
 			inthist->GetYaxis()->SetTitle("a.u");
 			for(size_t i = 0; i < eventSize; i++)
 			{
-				infile.read((char*)&value,sizeof(int));
-//				cout << i << "\t" << datum << endl;
+				infile.read((char*)&value,sizeof(Int_t));
+//				cout << i << "\t" << value << endl;
 				inthist->SetBinContent(i+1,value);
 			}
 			inthist->Write();
