@@ -53,14 +53,14 @@ int DataProcessor::computeIntegral(const Event& data)
 }
 
 /**
- * Computes the integral of a passed array containing raw FADC data. The result is an array again, which contains the
+ * Computes the integral of a passed Event containing raw FADC data. The result is an array, which contains the
  * integral per bin
  * 
- * @brief integrator
+ * @brief Event integrator
  * 
  * @author Stefan Bieschke
- * @date May 16, 2017
- * @version Alpha 2.0
+ * @date September 19, 2017
+ * @version Alpha 2.0.1
  * 
  * @param data Reference to an Event that is to be integrated
  * 
@@ -70,42 +70,84 @@ int DataProcessor::computeIntegral(const Event& data)
  */
 const array<int, 800> DataProcessor::integrate(const Event& data)
 {
-	array<int, 800> result;
 	array<uint16_t, 800> dataArray = data.getData();
-
-	//do the integration (stepsize is one)
-	result[0] = 0;
-	for (int i = 1; i < dataArray.size(); i++)
-	{
-		result[i] = dataArray[i] + result[i - 1];
-	}
 	//TODO check if returning a copy isn't too slow
+	return integrate(dataArray);
+}
+
+/**
+ * Computes the integral of a given Event and subtracts the integral of a constant function with value error over that same interval.
+ * With the result I, Event e and error \f$\Delta e\f$ this can be described as:
+ *  \f[I = \int_{x_0}^{x} (e(x) - \Delta e)\, dx \f]
+ *
+ * @brief Event integrator with error correction
+ *
+ * @author Stefan Bieschke
+ * @date September 19, 2017
+ * @version Alpha 2.0
+ *
+ * @param data Event containing the data to be integrated
+ * @param error constat error subtracted from each databin
+ * @return the error-corrected integral of the Event
+ */
+const std::array<int,800> DataProcessor::integrate(const Event& data, const uint16_t error)
+{
+	array<uint16_t, 800> dataArray = data.getData();
+	return integrate(dataArray,error);
+}
+
+/**
+ * Computes the integral of a passed array containing raw FADC data. The result is an array, which contains the
+ * integral per bin
+ *
+ * @brief Array integrator
+ *
+ * @author Stefan Bieschke
+ * @date September 19, 2017
+ * @version Alpha 2.0.1
+ *
+ * @param data Reference to an array that is to be integrated
+ *
+ * @return std::array<int,800> containing the integral
+ *
+ * @warning Does integrate the whole interval for that the data object provides data.
+ */
+const array<int,800> DataProcessor::integrate(const array<uint16_t,800>& data)
+{
+	array<int,800> result;
+	result[0] = 0;
+	for(unsigned int i = 1; i < data.size(); i++)
+	{
+		result[i] = data[i] + result[i-1];
+	}
 	return result;
 }
 
-///**
-// * Calculate the derivative of an event data sample given as std::array<int,800> so 800 FADC bins containing the
-// * raw FADC resolved measurement steps.
-// *
-// * @author Stefan Bieschke
-// * @date April 10,2017
-// * @version Alpha 2.0
-// *
-// * @param data Reference to a std::array containing the data, for which the derivative is to be calculated
-// *
-// * @return std::array containing the derivative
-// */
-//static const array<int,800> DataProcessor::derivate(const array<int,800>& data) const
-//{
-//	array<int,800> result;
-//	for (int i = 0; i < data.size() - 1; i++)
-//	{
-//		result[i] = data[i + 1]- data[i];
-//	}
-//	//TODO what happens to the last bin in the derivative?
-//	//TODO does the qualitative result remain the same after scaling to mV and ns?
-//	return result;
-//}
+/**
+ * Computes the integral of a given array and subtracts the integral of a constant function with value error over that same interval.
+ * With the result I, Event e and error \f$\Delta e\f$ this can be described as:
+ * \f[I = \int_{x_0}^{x} (e(x) - \Delta e)\, dx \f]
+ *
+ * @brief Array integrator with error correction
+ *
+ * @author Stefan Bieschke
+ * @date September 19, 2017
+ * @version Alpha 2.0.1
+ *
+ * @param data array containing the data to be integrated
+ * @param error constat error subtracted from each databin
+ * @return the error-corrected integral of the array
+ */
+const array<int,800> DataProcessor::integrate(const array<uint16_t,800>& data, const uint16_t error)
+{
+	array<int,800> result;
+	result[0] = 0;
+	for(unsigned int i = 1; i < data.size(); i++)
+	{
+		result[i] = data[i] + result[i-1] - error;
+	}
+	return result;
+}
 
 /**
  * Find the position of the minimum of the given data. Will only find the absolute
@@ -301,9 +343,6 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
  */
 short DataProcessor::findDriftTimeBin(const Event& data, unsigned short threshold)
 {
-//if threshold given positive, change sign
-//	threshold *= (threshold < 0 ? 1 : -1);
-
 	for(unsigned short i = 0; i < data.getData().size(); i++)
 	{
 		if(data[i] < threshold)
