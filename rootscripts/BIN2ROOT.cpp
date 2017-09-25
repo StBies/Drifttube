@@ -32,7 +32,7 @@ void BIN2ROOT(string file)
 	TString ofName = ifName(0,ifName.Last('.'));
 	ofName.Append(".root");
 
-	cout << "creating file" << ofName << endl;
+	cout << "creating file " << ofName << endl;
 
 	TFile* f = new TFile(ofName,"RECREATE");
 	for(size_t tube = 0; tube < nTubes; tube++)
