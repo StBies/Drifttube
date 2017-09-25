@@ -39,11 +39,6 @@ Archive::Archive(string filename)
  */
 Archive::~Archive()
 {
-	stringstream name;
-	name << m_directory << "processed_" << m_file;
-	string filename(name.str());
-	cout << "Saving data to: " << filename << endl;
-//	writeToFile(filename);
 }
 
 /**

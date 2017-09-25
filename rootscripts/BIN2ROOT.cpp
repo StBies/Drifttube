@@ -15,6 +15,7 @@ void BIN2ROOT(string file)
 {
 	ifstream infile(file.c_str(),ios::binary);
 
+	//read binary file header
 	size_t nTubes, eventSize, nEvents;
 	if(infile.is_open())
 	{
@@ -26,7 +27,14 @@ void BIN2ROOT(string file)
 
 	cout << nTubes << "\t" << nEvents << endl;
 
-	TFile* f = new TFile("bla.root","RECREATE");
+	//create name for the replace .drift filetype with .root
+	TString ifName(file);
+	TString ofName = ifName(0,ifName.Last('.'));
+	ofName.Append(".root");
+
+	cout << "creating file" << ofName << endl;
+
+	TFile* f = new TFile(ofName,"RECREATE");
 	for(size_t tube = 0; tube < nTubes; tube++)
 	{
 		cout << "Tube " << tube << endl;
