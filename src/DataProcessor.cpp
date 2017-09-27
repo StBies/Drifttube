@@ -186,8 +186,6 @@ unsigned short DataProcessor::findMinimumBin(const Event& data)
 const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet& data)
 {
 	//can not run in parallel - at least not this way
-	unsigned short triggerpos = ADC_TRIGGERPOS_BIN;
-
 	unique_ptr<array<uint32_t, 800>> result(new array<uint32_t, 800>);
 	result->fill(0);
 	unsigned int rejected = 0;
@@ -299,7 +297,7 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 		//assume the pulse has already ended
 		bool pulseEnded = true;
 		Event voltage = tube.getDataSet().getEvent(i);
-		int nBins = voltage.getData().size();
+		unsigned int nBins = voltage.getData().size();
 		//check, if the signal already ended at max drift time
 		if(voltage[maxDriftTimeBin] <= EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE)
 		{

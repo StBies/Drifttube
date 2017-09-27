@@ -22,3 +22,4 @@ rootscripts/*.dat
 
 #Google test
 gtest/
+/Release/

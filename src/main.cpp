@@ -78,6 +78,7 @@ int main(int argc, char** argv)
 		f << 4*i << "\t" << dt1[i] << "\t" << rt1[i] << endl;
 	}
 	f.close();
+
 	//TODO get rid of system call... why system() is evil http://www.cplusplus.com/forum/articles/11153/
 	system("gnuplot -p scripts/plots/dtAndRt.plt");
 
