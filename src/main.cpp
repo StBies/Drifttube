@@ -39,6 +39,14 @@ ParsedArgs parseCmdArgs(int argc, char** argv);
  */
 int main(int argc, char** argv)
 {
+	//catch wrong use of the application
+	//TODO improve handling
+	if(argc == 1)
+	{
+		cerr << "Arguments must be provided" << endl;
+		return -1;
+	}
+
 	ParsedArgs args = parseCmdArgs(argc,argv);
 //	DataProcessor processor;
 
@@ -66,7 +74,7 @@ int main(int argc, char** argv)
 	unsigned int afterpulses = DataProcessor::countAfterpulses(*archive.getTubes()[0]);
 	DriftTimeSpectrum dt1 = archive.getTubes()[0]->getDriftTimeSpectrum();
 	RtRelation rt1 = archive.getTubes()[0]->getRtRelation();
-	cout << "Afterpulses: " << afterpulses << " Probability: " << afterpulses/(double)(dt1.getEntries() - dt1.getRejected()) <<  endl;
+	cout << "Afterpulses: " << afterpulses << " Probability: " << afterpulses/(double)(dt1.getEntries() - dt1.getRejected()) << endl;
 
 	double endRuntime = omp_get_wtime();
 
