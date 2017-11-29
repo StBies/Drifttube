@@ -132,7 +132,7 @@ const array<T,800>& Data<T>::getData() const
 
 /**
  * Implementation of the bracket operator [] commonly used to address a single element of an array. This returns a reference to the requested
- * value so that data[i] can be used as lvalue.
+ * value so that @c ata[i] can be used as lvalue.
  *
  * @brief Bracket operator for addressing
  *
@@ -141,7 +141,7 @@ const array<T,800>& Data<T>::getData() const
  * @date May 15, 2017
  *
  * @param bin
- * @return Content of the requested bin. This is a reference to the content so that it can be used as lvalue. E.g. data[i] = 5;
+ * @return Content of the requested bin. This is a reference to the content so that it can be used as lvalue. E.g. @c data[i] = 5;
  */
 template<typename T>
 const T& Data<T>::operator[](const unsigned short bin) const
