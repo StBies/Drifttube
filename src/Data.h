@@ -132,7 +132,7 @@ const array<T,800>& Data<T>::getData() const
 
 /**
  * Implementation of the bracket operator [] commonly used to address a single element of an array. This returns a reference to the requested
- * value so that @c ata[i] can be used as lvalue.
+ * value so that @c data[i] can be used as lvalue.
  *
  * @brief Bracket operator for addressing
  *
@@ -140,7 +140,7 @@ const array<T,800>& Data<T>::getData() const
  * @version 0.1
  * @date May 15, 2017
  *
- * @param bin
+ * @param bin Number of the bin as a @c size_t, which is basically an unsigned integer
  * @return Content of the requested bin. This is a reference to the content so that it can be used as lvalue. E.g. @c data[i] = 5;
  */
 template<typename T>
@@ -150,7 +150,7 @@ const T& Data<T>::operator[](const unsigned short bin) const
 }
 
 /**
- * Assignment operator. The Data<T> object on the right hand side (rhs) gets assigned to the left hand side (lhs) Data<T> object. Due to the
+ * Assignment operator. The Data<T> object on the right hand side (rhs) gets assigned to the left hand side (lhs) @c Data<T> object. Due to the
  * constness of the parameter rhs, temporary objects can be assigned to non temporary lvalues.
  *
  * @brief assignment operator
@@ -159,8 +159,8 @@ const T& Data<T>::operator[](const unsigned short bin) const
  * @date August 1, 2017
  * @version Alpha 2.0
  *
- * @param rhs const reference to the Data<T> object on the right hand side of the assignment
- * @return Reference to the lhs object - basically the adress that the lhs is assigned to
+ * @param rhs const reference to the @c Data<T> object on the right hand side of the assignment
+ * @return Reference to the lhs object - basically the address that the lhs is assigned to
  */
 template<typename T>
 Data<T>& Data<T>::operator=(const Data<T>& rhs)

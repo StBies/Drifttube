@@ -78,7 +78,9 @@ const array<int, 800> DataProcessor::integrate(const Event& data)
 /**
  * Computes the integral of a given Event and subtracts the integral of a constant function with value error over that same interval.
  * With the result I, Event e and error \f$\Delta e\f$ this can be described as:
- *  \f[I = \int_{x_0}^{x} (e(x) - \Delta e)\, dx \f]
+ *  \f[
+ *  I(x) = \int_{x_0}^{x} (e(x) - \Delta e)\, dx
+ *  \f]
  *
  * @brief Event integrator with error correction
  *
@@ -98,7 +100,11 @@ const std::array<int,800> DataProcessor::integrate(const Event& data, const uint
 
 /**
  * Computes the integral of a passed array containing raw FADC data. The result is an array, which contains the
- * integral per bin
+ * integral per bin. The integral \f$I(x)\f$ can be described as:
+ * \f[
+ *  I(x) = \int_{x_0}^{x} (e(x)\, dx
+ * \f]
+ * Here, \f$ e(x)\f$ is the eventarray at bin x.
  *
  * @brief Array integrator
  *
@@ -108,7 +114,7 @@ const std::array<int,800> DataProcessor::integrate(const Event& data, const uint
  *
  * @param data Reference to an array that is to be integrated
  *
- * @return std::array<int,800> containing the integral
+ * @return @c std::array<int,800> containing the integral
  *
  * @warning Does integrate the whole interval for that the data object provides data.
  */

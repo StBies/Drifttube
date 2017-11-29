@@ -64,6 +64,11 @@ const unsigned int Event::getEventNumber() const
 
 /**
  * Getter method for the drift time of the event in nanoseconds.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date Nov 29, 2017
+ *
  * @return Drift time of the event
  */
 const double Event::getDriftTime() const
@@ -83,7 +88,7 @@ const double Event::getDriftTime() const
  * @version Alpha 2.0
  *
  * @param rhs const reference to the Event object on the right hand side of the assignment
- * @return Reference to the lhs object - basically the adress that the rhs is assigned to
+ * @return Reference to the lhs object - basically the address that the rhs is assigned to
  */
 Event& Event::operator=(const Event& rhs)
 {
