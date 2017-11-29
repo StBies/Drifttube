@@ -102,7 +102,7 @@ const std::array<int,800> DataProcessor::integrate(const Event& data, const uint
  * Computes the integral of a passed array containing raw FADC data. The result is an array, which contains the
  * integral per bin. The integral \f$I(x)\f$ can be described as:
  * \f[
- *  I(x) = \int_{x_0}^{x} (e(x)\, dx
+ *  I(x) = \int_{x_0}^{x} e(x)\, dx
  * \f]
  * Here, \f$ e(x)\f$ is the eventarray at bin x.
  *
