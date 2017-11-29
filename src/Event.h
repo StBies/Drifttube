@@ -19,7 +19,7 @@ class DataProcessor;
 
 /**
  * Class that represents the data for one event.
- * This is basically a wrapper class for a std::array. It contains an array and an integer which holds the number of the event. So for the third
+ * This is basically a wrapper class for a @c std::array. It contains an @c array and an  @c int which holds the number of the event. So for the third
  * triggered event of the detector, the event number will be 2, as counting starts at zero
  *
  * @brief Event class

@@ -15,6 +15,17 @@
 
 /**
  * A class for basic data types. This is basically a wrapper for arrays of any primitive data type values. The Data class is a base class for Events and drift time spectra.
+ * If no typename is provided, the default is @c uint16_t. So if you plan to build your own class, let's call it @c Child for now, that inherits
+ * from Data and you want it to carry @c uint16_t type data you can simply write the following:
+ * @code{.cpp}
+ * class Child : public Data<>
+ * { ... }
+ * @endcode
+ * A class that inherits from Data and holds @c double type numbers would be declared as:
+ * @code{.cpp}
+ * class DoubleChild : public Data<double>
+ * { ... }
+ * @endcode
  *
  * @brief Data class, wrapper for arrays
  *
@@ -163,7 +174,7 @@ Data<T>& Data<T>::operator=(const Data<T>& rhs)
 
 /**
  * Computes a normalized version of this Data object. This method does not change the calling data object but computes the normalized version and
- * returns it in the form of an array<double,800> in a unique_ptr.
+ * returns it in the form of an @c array<double,800> in a @c unique_ptr.
  *
  * @brief Compute normalized data
  *
@@ -171,7 +182,7 @@ Data<T>& Data<T>::operator=(const Data<T>& rhs)
  * @date July 27, 2017
  * @version Alpha 2.0
  *
- * @return std::unique_ptr<std::array<double,800>> containing the normalized data
+ * @return @c std::unique_ptr<std::array<double,800>> containing the normalized data
  */
 template<typename T>
 unique_ptr<array<double,800>> Data<T>::normalized() const
@@ -196,7 +207,7 @@ unique_ptr<array<double,800>> Data<T>::normalized() const
 
 /**
  * Implementation of the bracket operator [] commonly used to address a single element of an array. This returns a reference to the requested
- * value so that data[i] can be used as lvalue.
+ * value so that @c data[i] can be used as lvalue.
  *
  * @brief Bracket operator for addressing
  *
@@ -204,8 +215,8 @@ unique_ptr<array<double,800>> Data<T>::normalized() const
  * @version 0.1
  * @date May 15, 2017
  *
- * @param bin
- * @return Content of the requested bin. This is a reference to the content so that it can be used as lvalue. E.g. data[i] = 5;
+ * @param bin Number of the bin as a @c size_t, which is basically an unsigned integer
+ * @return Content of the requested bin. This is a reference to the content so that it can be used as lvalue. E.g. @c data[i] = 5;
  */
 template<typename T>
 T& Data<T>::operator[](const unsigned short bin)
