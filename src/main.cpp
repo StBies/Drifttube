@@ -4,6 +4,7 @@
 #include "omp.h"
 #include <cmath>
 #include <fstream>
+#include "teaching.h"
 
 
 using namespace std;
@@ -87,17 +88,7 @@ int main(int argc, char** argv)
 	}
 	f.close();
 
-	Event e = archive.getTubes()[0]->getDataSet()[5];
-	array<uint16_t,800> data = e.getData();
-
-	ofstream numpyDump("event.npy",ios::out | ios::binary);
-	for(uint16_t datum : data)
-	{
-		double value = (double)(datum - 2200) * 12/4096;
-		numpyDump.write((char*)&value,sizeof(double));
-	}
-	numpyDump.close();
-
+	int written = teaching_writePythonData(archive.getTubes()[0]->getDataSet());
 
 	//TODO get rid of system call... why system() is evil http://www.cplusplus.com/forum/articles/11153/
 	system("gnuplot -p scripts/plots/dtAndRt.plt");
