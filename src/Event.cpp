@@ -9,6 +9,8 @@
 
 using namespace std;
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
 /**
  * Constructor
  *
@@ -21,7 +23,7 @@ using namespace std;
  * @param eventNumber number of the event
  * @param data Data that should be stored
  */
-Event::Event(unsigned int eventNumber, unique_ptr<array<uint16_t,800>> data) : Data(move(data))
+Event::Event(unsigned int eventNumber, unique_ptr<vector<uint16_t>> data) : Data(move(data))
 {
 	m_event_number = eventNumber;
 	m_drift_time = ADC_BINS_TO_TIME * DataProcessor::findDriftTimeBin(*this,2150);

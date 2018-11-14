@@ -12,10 +12,14 @@
 #include <cstdlib>
 #include "Data.h"
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
+
+//TODO add class Doc
 class DriftTimeSpectrum: public Data<uint32_t>
 {
 public:
-	DriftTimeSpectrum(std::unique_ptr<std::array<uint32_t,800>>,unsigned int nEntries,unsigned int rejected);
+	DriftTimeSpectrum(std::unique_ptr<std::vector<uint32_t>>,unsigned int nEntries,unsigned int rejected);
 	DriftTimeSpectrum(const DriftTimeSpectrum& original);
 	virtual ~DriftTimeSpectrum();
 	//TODO check if a constructor should be given, where a DataSet is passed and the dt-spect is autocalculating itself - kind of

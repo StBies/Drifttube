@@ -19,6 +19,8 @@
 
 using namespace std;
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
 /**
  * Struct containing parameters that are read from the header of the binary file containing raw data.
  * This contains the number of drift tubes, the number of events per tube and the size of one event (number of data points.
