@@ -9,10 +9,9 @@ class DriftTimeSpectrumTest : public ::testing::Test
 public:
 	DriftTimeSpectrumTest()
 	{
-		std::unique_ptr<std::array<uint32_t,800>> a(new std::array<uint32_t,800>);
-		std::unique_ptr<std::array<uint32_t,800>> b(new std::array<uint32_t,800>);
-		a->fill(0xFFFFFFFF);
-		b->fill(0);
+		unique_ptr<vector<uint32_t>> a(new vector<uint32_t>(800,0xFFFFFFFF));
+		unique_ptr<vector<uint32_t>> b(new vector<uint32_t>(800,0));
+
 		spect1 = new DriftTimeSpectrum(move(a),25000,0);
 		spect2 = new DriftTimeSpectrum(move(b),0,0);
 
@@ -60,7 +59,7 @@ TEST_F(DriftTimeSpectrumTest,TestGetEntries)
 
 TEST_F(DriftTimeSpectrumTest,TestCapacityVsEvent)
 {
-	unique_ptr<array<uint16_t,800>> a(new array<uint16_t,800>);
+	unique_ptr<vector<uint16_t>> a(new vector<uint16_t>(800));
 	Event e(1,move(a));
 	e[0] = 0xFFFF;
 	e[0]++;

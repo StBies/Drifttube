@@ -9,10 +9,8 @@ class RtRelationTest : public ::testing::Test
 public:
 	RtRelationTest()
 	{
-		std::unique_ptr<std::array<double,800>> a(new std::array<double,800>);
-		std::unique_ptr<std::array<double,800>> b(new std::array<double,800>);
-		a->fill(0xFFFFFFFF);
-		b->fill(0);
+		unique_ptr<vector<double>> a(new vector<double>(800,0xFFFFFFFF));
+		unique_ptr<vector<double>> b(new vector<double>(800,0));
 		rt1 = new RtRelation(move(a));
 		rt2 = new RtRelation(move(b));
 	}
