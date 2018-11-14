@@ -160,7 +160,8 @@ TEST_F(EventTest, TestNormalized)
 	Event e(1,move(arr));
 	res = e.normalized();
 
-	for(unsigned int i = 0; i < arr->size(); i++)
+	ASSERT_EQ(800,res->size());
+	for(unsigned int i = 0; i < res->size(); i++)
 	{
 		ASSERT_DOUBLE_EQ(1/(double)800,(*res)[i]);
 	}
