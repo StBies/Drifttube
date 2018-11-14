@@ -14,8 +14,7 @@ public:
 
 		//create data for a DataSet containing one event with a voltage under 2200-50 channels in bin 50 (real dt = 40ns)
 		vector<unique_ptr<Event>> data;
-		unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
-		arr->fill(2200);
+		unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(800,2200));
 		(*arr)[50] = 2100;
 		unique_ptr<Event> e1(new Event(1,move(arr)));
 		data.push_back(move(e1));
@@ -98,8 +97,7 @@ TEST_F(DrifttubeTest,TestDataSet)
 
 TEST_F(DrifttubeTest,TestDriftTimeSpectrum)
 {
-	unique_ptr<array<uint32_t,800>> dt(new array<uint32_t,800>);
-	dt->fill(0);
+	unique_ptr<vector<uint32_t>> dt(new vector<uint32_t>(800,0));
 	(*dt)[10] = 1;
 	DriftTimeSpectrum wanted(move(dt),1,0);
 	ASSERT_EQ(wanted.getEntries(),d3_filled->getDriftTimeSpectrum().getEntries());
@@ -109,8 +107,7 @@ TEST_F(DrifttubeTest,TestDriftTimeSpectrum)
 
 TEST_F(DrifttubeTest,TestRtRelation)
 {
-	unique_ptr<array<double,800>> rt(new array<double,800>);
-	rt->fill(18.15);
+	unique_ptr<vector<double>> rt(new vector<double>(800,18.15));
 	for(size_t i = 0; i < 11; i++)
 	{
 		(*rt)[i] = 0;
