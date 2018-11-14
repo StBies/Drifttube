@@ -9,6 +9,8 @@
 
 using namespace std;
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
 /**
  * Constructor of the DriftTimeSpectrum. Initializes an object with passed values.
  *
@@ -22,7 +24,7 @@ using namespace std;
  * @param nEntries Total number of entries contained in the spectrum. nEntries = valid entries + rejected entries
  * @param rejected Number of rejected entries. A.k.a entries without drift time found
  */
-DriftTimeSpectrum::DriftTimeSpectrum(unique_ptr<array<uint32_t,800>> spect, unsigned int nEntries, unsigned int rejected)
+DriftTimeSpectrum::DriftTimeSpectrum(unique_ptr<vector<uint32_t>> spect, unsigned int nEntries, unsigned int rejected)
 : Data(move(spect))
 {
 	m_entries = nEntries;

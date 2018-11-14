@@ -12,10 +12,14 @@
 #include "globals.h"
 #include <iostream>
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
+
+//TODO Add class doc
 class RtRelation: public Data<double>
 {
 public:
-	RtRelation(std::unique_ptr<std::array<double,800>> data);
+	RtRelation(std::unique_ptr<std::vector<double>> data);
 	RtRelation(const RtRelation& original);
 	virtual ~RtRelation();
 
