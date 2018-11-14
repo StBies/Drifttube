@@ -128,6 +128,12 @@ TEST_F(DataProcessorTest,TestcalculateRtRelation)
 	}
 }
 
+TEST_F(DataProcessorTest,TestCalculateDriftTimeSpectrum)
+{
+	//TODO implement
+	ASSERT_TRUE(false);
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
