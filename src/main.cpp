@@ -48,7 +48,6 @@ int main(int argc, char** argv)
 	}
 
 	ParsedArgs args = parseCmdArgs(argc,argv);
-//	DataProcessor processor;
 
 	string filename = args.infilename;
 	cout << "using file: " << filename << endl;
