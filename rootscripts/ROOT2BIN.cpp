@@ -7,6 +7,9 @@
 
 using namespace std;
 
+//TODO rework documentation
+//TODO add useful filename for output file
+
 /**
  * First version of a binary file conversion tool. For now, only works with a single drift tube
  * @param filename
