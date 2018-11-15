@@ -33,9 +33,9 @@ using namespace std;
  */
 typedef struct
 {
-	size_t nTubes;
-	size_t eventSize;
-	size_t nEvents;
+	uint32_t nTubes;
+	uint32_t eventSize;
+	uint32_t nEvents;
 	streampos endOfHeader;
 }FileParams;
 
