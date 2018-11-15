@@ -17,17 +17,17 @@ void ROOT2BIN(TString filename)
 	TTree* tree = (TTree*) file.Get("Tfadc");
 	cout << "Reading tree" << endl;
 
-	size_t nEntries = tree->GetEntries();
-	const size_t numberOfChannels = 800;
-	size_t nTubes = 1;
+	uint32_t nEntries = tree->GetEntries();
+	const uint32_t numberOfChannels = 800;
+	uint32_t nTubes = 1;
 
 	cout << "Beginning conversion. Entries: " << nEntries << endl;
 
-	ofstream of("unitTestingData.drift", ios::out | ios::binary);
+	ofstream of("unitTestingData_new.drift", ios::out | ios::binary);
 	//write header
-	of.write((char*)&nTubes,sizeof(size_t));
-	of.write((char*)&nEntries,sizeof(size_t));
-	of.write((char*)&numberOfChannels,sizeof(size_t));
+	of.write((char*)&nTubes,sizeof(uint32_t));
+	of.write((char*)&nEntries,sizeof(uint32_t));
+	of.write((char*)&numberOfChannels,sizeof(uint32_t));
 
 	//write data
 	double voltage[800];
