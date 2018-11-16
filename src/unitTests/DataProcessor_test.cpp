@@ -4,6 +4,7 @@
 #include "../Event.h"
 #include "../RtRelation.h"
 #include "../DriftTimeSpectrum.h"
+#include "../DataSet.h"
 
 using namespace std;
 
@@ -131,6 +132,16 @@ TEST_F(DataProcessorTest,TestcalculateRtRelation)
 TEST_F(DataProcessorTest,TestCalculateDriftTimeSpectrum)
 {
 	//TODO implement
+
+	//Create an Event
+	unique_ptr<vector<uint16_t>> data(new vector<uint16_t>(800,2200));
+	data[50] = 2100;
+	Event e(move(data));
+	DataSet test_set(move(e));
+
+	DriftTimeSpectrum spect = DataProcessor::calculateDriftTimeSpectrum(test_set);
+
+	//Create a DataSet
 	ASSERT_TRUE(false);
 }
 
