@@ -5,6 +5,7 @@
 #include "../RtRelation.h"
 #include "../DriftTimeSpectrum.h"
 #include "../DataSet.h"
+#include "../globals.h"
 
 using namespace std;
 
@@ -131,19 +132,28 @@ TEST_F(DataProcessorTest,TestcalculateRtRelation)
 
 TEST_F(DataProcessorTest,TestCalculateDriftTimeSpectrum)
 {
-	//TODO implement
-	//FIXME bug probably here
+	//Create event data
+	unique_ptr<vector<uint16_t>> data(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
+	(*data)[50] = OFFSET_ZERO_VOLTAGE + 2 * EVENT_THRESHOLD_VOLTAGE;
 
-	//Create an Event
-	unique_ptr<vector<uint16_t>> data(new vector<uint16_t>(800,2200));
-	data[50] = 2100;
-	Event e(move(data));
-	DataSet test_set(move(e));
+
+	//create vector of events to build a DataSet
+	vector<unique_ptr<Event>> evts;
+	ASSERT_EQ(0,evts.size());
+	evts.push_back(unique_ptr<Event>(new Event(0,move(data))));
+	ASSERT_EQ(nullptr,data.get());
+	ASSERT_EQ(1,evts.size());
+	ASSERT_EQ(800,evts[0]->getSize());
+
+	//build DataSet
+	DataSet test_set(evts);
+	ASSERT_EQ(0,evts.size());
 
 	DriftTimeSpectrum spect = DataProcessor::calculateDriftTimeSpectrum(test_set);
 
 	//Create a DataSet
-	ASSERT_TRUE(false);
+	ASSERT_EQ(1,spect.getEntries());
+	ASSERT_EQ(1,spect[50]);
 }
 
 int main(int argc, char **argv)
