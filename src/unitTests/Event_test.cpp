@@ -1,5 +1,6 @@
 #include "../Event.h"
 #include <gtest/gtest.h>
+#include "../globals.h"
 
 /**
  * Unit test for the Event class utilizing the Google Test Framework (see https://github.com/google/googletest )
@@ -142,9 +143,9 @@ TEST_F(EventTest, TestConstCorrectness)
 
 TEST_F(EventTest, TestDriftTime)
 {
-	unique_ptr<vector<uint16_t>> arr = unique_ptr<vector<uint16_t>>(new vector<uint16_t>(800,2200));
-	unique_ptr<vector<uint16_t>> arr2 = unique_ptr<vector<uint16_t>>(new vector<uint16_t>(800,2200));
-	(*arr)[50] = 2100;
+	unique_ptr<vector<uint16_t>> arr = unique_ptr<vector<uint16_t>>(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
+	unique_ptr<vector<uint16_t>> arr2 = unique_ptr<vector<uint16_t>>(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
+	(*arr)[50] = OFFSET_ZERO_VOLTAGE + (2 * EVENT_THRESHOLD_VOLTAGE);
 	Event e(1,move(arr));
 	Event e2(2,move(arr2));
 
