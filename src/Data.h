@@ -41,7 +41,7 @@ template<typename T = uint16_t>
 class Data
 {
 public:
-	virtual ~Data() = 0;
+	virtual ~Data() = 0; //not meant for instantiation
 
 	const std::vector<T>& getData() const;
 	T& operator[](const unsigned short bin);
@@ -52,7 +52,7 @@ public:
 
 protected:
 	Data<T>& operator=(const Data<T>& rhs);
-	Data(std::unique_ptr<std::vector<T>> data); //not meant for instantiation
+	Data(std::unique_ptr<std::vector<T>> data);
 	Data(const Data<T>& data);
 
 	std::unique_ptr<std::vector<T>> m_data;
