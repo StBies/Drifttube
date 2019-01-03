@@ -16,6 +16,7 @@ class DataProcessor;
 #include <cstdlib>
 #include "Data.h"
 #include "DataProcessor.h"
+#include "globals.h"
 
 //TODO Change all doc to vector and variable length (Nov. 14, 2018)
 
