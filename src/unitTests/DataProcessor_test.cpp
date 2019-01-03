@@ -132,6 +132,7 @@ TEST_F(DataProcessorTest,TestcalculateRtRelation)
 TEST_F(DataProcessorTest,TestCalculateDriftTimeSpectrum)
 {
 	//TODO implement
+	//FIXME bug probably here
 
 	//Create an Event
 	unique_ptr<vector<uint16_t>> data(new vector<uint16_t>(800,2200));
