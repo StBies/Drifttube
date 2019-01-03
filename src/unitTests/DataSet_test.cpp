@@ -3,7 +3,7 @@
 
 using namespace std;
 
-size_t DataSetTestSize = 100000;
+uint32_t DataSetTestSize = 100000;
 
 class DataSetTest : public ::testing::Test
 {
@@ -15,8 +15,7 @@ public:
 		#pragma omp parallel for
 		for(int i = 0; i < DataSetTestSize; i++)
 		{
-			unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
-			arr->fill(i);
+			unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(800,i));
 			unique_ptr<Event> a(new Event(i,move(arr)));
 			initVector[i] = move(a);
 		}
@@ -68,13 +67,10 @@ TEST_F(DataSetTest,TestCopyConstruction)
 TEST_F(DataSetTest,TestAddData)
 {
 	//build test arrays that are filled with 42 or 1337 respectively
-	array<uint16_t,800> test1, test2;
-	test1.fill(42);
-	test2.fill(1337);
+	vector<uint16_t> test1(800,42), test2(800,1337);
 
 	//create a unique pointer to an Event containing an array filled with 42 and push it to d1
-	unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
-	arr->fill(42);
+	unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(800,42));
 	unique_ptr<Event> evt(new Event(13378,move(arr)));
 	d1->addData(move(evt));
 
@@ -82,8 +78,7 @@ TEST_F(DataSetTest,TestAddData)
 	size_t oldSize = d2->getSize();
 
 	//create a unique pointer to an Event containing an array filled with 1337 and push it to d2
-	unique_ptr<array<uint16_t,800>> arr2(new array<uint16_t,800>);
-	arr2->fill(1337);
+	unique_ptr<vector<uint16_t>> arr2(new vector<uint16_t>(800,1337));
 	unique_ptr<Event> evt2(new Event(13378,move(arr2)));
 	d2->addData(move(evt2));
 

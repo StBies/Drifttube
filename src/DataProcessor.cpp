@@ -193,7 +193,14 @@ unsigned short DataProcessor::findMinimumBin(const Event& data)
  */
 const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet& data)
 {
+	if(data.getSize() == 0)
+	{
+		unique_ptr<vector<uint32_t>> empty(new vector<uint32_t>(0));
+		return DriftTimeSpectrum(move(empty), 0, 0);
+	}
 	//can not run in parallel - at least not this way
+
+	//FIXME this crashes when data is empty
 	unique_ptr<vector<uint32_t>> result(new vector<uint32_t>(data[0].getSize(),0));
 
 	unsigned int rejected = 0;
@@ -255,6 +262,10 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
  */
 const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtSpect)
 {
+	if(dtSpect.getSize() == 0)
+	{
+		return RtRelation(move(unique_ptr<vector<double>>(new vector<double>(0))));
+	}
 	size_t nBins = dtSpect.getSize();
 	unique_ptr<vector<double>> result(new vector<double>(nBins,0.0));
 
