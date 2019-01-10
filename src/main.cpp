@@ -49,7 +49,6 @@ int main(int argc, char** argv)
 	}
 
 	ParsedArgs args = parseCmdArgs(argc,argv);
-//	DataProcessor processor;
 
 	string filename = args.infilename;
 	cout << "using file: " << filename << endl;
@@ -60,7 +59,7 @@ int main(int argc, char** argv)
 	string outFileName = archive.getDirname();
 	outFileName.append("processed_");
 	outFileName.append(archive.getFilename());
-	vector<array<int,800>> integrals;
+	vector<vector<int>> integrals;
 	for(size_t i = 0; i < archive.getTubes()[0]->getDataSet().getSize(); i++)
 	{
 		try

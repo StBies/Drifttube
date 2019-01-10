@@ -24,9 +24,9 @@ protected:
 
 TEST_F(ArchiveTest,TestBinaryRead)
 {
-	size_t nTubes = a->getTubes().size();
+	uint32_t nTubes = a->getTubes().size();
 	ASSERT_EQ(1,nTubes);
-	size_t sizeOfTubeDataSet = a->getTubes()[0]->getDataSet().getSize();
+	uint32_t sizeOfTubeDataSet = a->getTubes()[0]->getDataSet().getSize();
 	ASSERT_EQ(17069,sizeOfTubeDataSet);
 }
 

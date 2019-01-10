@@ -2,6 +2,8 @@
 
 using namespace std;
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
 /**
  * Constructor, initializes the DataProcessor object. This is private as this class is not meant to be instanced
  * 
@@ -68,9 +70,9 @@ int DataProcessor::computeIntegral(const Event& data)
  * 
  * @warning Does integrate the whole interval for that the data object provides data.
  */
-const array<int, 800> DataProcessor::integrate(const Event& data)
+const vector<int> DataProcessor::integrate(const Event& data)
 {
-	array<uint16_t, 800> dataArray = data.getData();
+	vector<uint16_t> dataArray = data.getData();
 	//TODO check if returning a copy isn't too slow
 	return integrate(dataArray);
 }
@@ -92,9 +94,9 @@ const array<int, 800> DataProcessor::integrate(const Event& data)
  * @param error constat error subtracted from each databin
  * @return the error-corrected integral of the Event
  */
-const std::array<int,800> DataProcessor::integrate(const Event& data, const uint16_t error)
+const vector<int> DataProcessor::integrate(const Event& data, const uint16_t error)
 {
-	array<uint16_t, 800> dataArray = data.getData();
+	vector<uint16_t> dataArray = data.getData();
 	return integrate(dataArray,error);
 }
 
@@ -118,9 +120,9 @@ const std::array<int,800> DataProcessor::integrate(const Event& data, const uint
  *
  * @warning Does integrate the whole interval for that the data object provides data.
  */
-const array<int,800> DataProcessor::integrate(const array<uint16_t,800>& data)
+const vector<int> DataProcessor::integrate(const vector<uint16_t>& data)
 {
-	array<int,800> result;
+	vector<int> result(data.size());
 	result[0] = 0;
 	for(unsigned int i = 1; i < data.size(); i++)
 	{
@@ -144,9 +146,9 @@ const array<int,800> DataProcessor::integrate(const array<uint16_t,800>& data)
  * @param error constat error subtracted from each databin
  * @return the error-corrected integral of the array
  */
-const array<int,800> DataProcessor::integrate(const array<uint16_t,800>& data, const uint16_t error)
+const vector<int> DataProcessor::integrate(const vector<uint16_t>& data, const uint16_t error)
 {
-	array<int,800> result;
+	vector<int> result(data.size());
 	result[0] = 0;
 	for(unsigned int i = 1; i < data.size(); i++)
 	{
@@ -191,9 +193,16 @@ unsigned short DataProcessor::findMinimumBin(const Event& data)
  */
 const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet& data)
 {
+	if(data.getSize() == 0)
+	{
+		unique_ptr<vector<uint32_t>> empty(new vector<uint32_t>(0));
+		return DriftTimeSpectrum(move(empty), 0, 0);
+	}
 	//can not run in parallel - at least not this way
-	unique_ptr<array<uint32_t, 800>> result(new array<uint32_t, 800>);
-	result->fill(0);
+
+	//FIXME this crashes when data is empty
+	unique_ptr<vector<uint32_t>> result(new vector<uint32_t>(data[0].getSize(),0));
+
 	unsigned int rejected = 0;
 
 	#ifdef ZEROSUP
@@ -253,13 +262,17 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
  */
 const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtSpect)
 {
-	unsigned int nBins = dtSpect.getData().size();
-	unique_ptr<array<double, 800>> result(new array<double, 800>);
+	if(dtSpect.getSize() == 0)
+	{
+		return RtRelation(move(unique_ptr<vector<double>>(new vector<double>(0))));
+	}
+	size_t nBins = dtSpect.getSize();
+	unique_ptr<vector<double>> result(new vector<double>(nBins,0.0));
 
 	double integral = 0.0;
 	double scalingFactor = DRIFT_TUBE_RADIUS / (dtSpect.getEntries() - dtSpect.getRejected());
 
-	for(unsigned int i = 0; i < nBins; i++)
+	for(size_t i = 0; i < nBins; i++)
 	{
 		(*result)[i] = integral;
 		integral += dtSpect[i] * scalingFactor;

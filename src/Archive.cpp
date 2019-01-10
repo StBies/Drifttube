@@ -8,6 +8,8 @@
 
 using namespace std;
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
 /**
  * Constructor, initializes the Archive object.
  *
@@ -112,29 +114,30 @@ void Archive::writeToFile(const string& filename)
 
 	//write header... must contain: nTubes, nEvents per tube,...
 	//TODO complete impl
-	size_t nTubes = m_tubes.size();
-	size_t nEvents = m_tubes[0]->getDataSet().getSize() - m_tubes[0]->getDriftTimeSpectrum().getRejected();
-	size_t nEventSize = 800;
-	file.write((char*)&nTubes,sizeof(size_t));
-	file.write((char*)&nEvents,sizeof(size_t));
-	file.write((char*)&nEventSize,sizeof(size_t));
+	uint32_t nTubes = m_tubes.size();
+	uint32_t nEvents = m_tubes[0]->getDataSet().getSize() - m_tubes[0]->getDriftTimeSpectrum().getRejected();
+	//assumes all events have the same number of bins
+	uint32_t eventSize = m_tubes[0]->getDataSet()[0].getSize();
+	file.write((char*)&nTubes,sizeof(uint32_t));
+	file.write((char*)&nEvents,sizeof(uint32_t));
+	file.write((char*)&eventSize,sizeof(uint32_t));
 
 	//loop over tubes
-	for(size_t i = 0; i < m_tubes.size(); i++)
+	for(uint32_t i = 0; i < m_tubes.size(); i++)
 	{
 		//loop over DataSet for each tube
-		for(size_t j = 0; j < m_tubes[i]->getDataSet().getSize(); j++)
+		for(uint32_t j = 0; j < m_tubes[i]->getDataSet().getSize(); j++)
 		{
 			try
 			{
 				Event e = m_tubes[i]->getDataSet()[j];
-				array<int,800> integral = DataProcessor::integrate(e,OFFSET_ZERO_VOLTAGE);
+				vector<int> integral = DataProcessor::integrate(e,OFFSET_ZERO_VOLTAGE);
 
 				//write eventnumber
 
-				file.write((char*)&j,sizeof(size_t));
+				file.write((char*)&j,sizeof(uint32_t));
 				//write event
-				for(size_t k = 0; k < e.getData().size(); k++)
+				for(size_t k = 0; k < e.getSize(); k++)
 				{
 					double datum = (e[k] - OFFSET_ZERO_VOLTAGE) * ADC_CHANNELS_TO_VOLTAGE;
 					file.write((char*)&datum,sizeof(double));
@@ -142,9 +145,9 @@ void Archive::writeToFile(const string& filename)
 				//write integral
 				//TODO use precomputed integrals - see above doc comment for this method
 
-				for(size_t k = 0; k < e.getData().size(); k++)
+				for(size_t k = 0; k < e.getSize(); k++)
 				{
-					int correctedIntegral = integral[k];
+					int32_t correctedIntegral = integral[k];
 					file.write((char*)&correctedIntegral,sizeof(int));
 				}
 			}
@@ -154,7 +157,7 @@ void Archive::writeToFile(const string& filename)
 			}
 		}
 		//write dtSpect
-		for(size_t bin = 0; bin < m_tubes[i]->getDriftTimeSpectrum().getData().size(); bin++)
+		for(size_t bin = 0; bin < m_tubes[i]->getDriftTimeSpectrum().getSize(); bin++)
 		{
 			file.write((char*)&m_tubes[i]->getDriftTimeSpectrum()[bin],sizeof(uint32_t));
 		}
@@ -181,22 +184,22 @@ void Archive::convertAllEntries(const string filename)
 	ifstream file(filename, ios::binary);
 	FileParams par(readHeader(file));
 
-	const size_t nEvents = par.nEvents;
+	const uint32_t nEvents = par.nEvents;
 	//cannot create std::arrays with a size that is not known at compiletime
-	const size_t eventSize = 800;
-	const size_t nTubes = par.nTubes;
+	const uint32_t eventSize = par.eventSize;
+	const uint32_t nTubes = par.nTubes;
 
 	cout << "Beginning conversion:" << endl;
 	cout << "Events: " << nEvents << endl << "tubes: " << nTubes << endl << "Bins per event: " << par.eventSize << endl;
 	file.seekg(par.endOfHeader);
 
-	for(size_t i = 0; i < nTubes; i++)
+	for(uint32_t i = 0; i < nTubes; i++)
 	{
 		vector<unique_ptr<Event>> events(nEvents);
 //		cout << "vector with events initialized. Size: " << events.size() << endl;
 		for(size_t j = 0; j < events.size(); j++)
 		{
-			unique_ptr<array<uint16_t,eventSize>> arr(new array<uint16_t,eventSize>);
+			unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(eventSize));
 //			cout << "Array for event #" << j << " initialized. Size: " << arr->size() << endl;
 			for(size_t k = 0; k < arr->size(); k++)
 			{
@@ -290,13 +293,13 @@ string Archive::parseFile(string filename)
  */
 FileParams Archive::readHeader(ifstream& file)
 {
-	size_t nTubes, eventSize, nEvents;
+	uint32_t nTubes, eventSize, nEvents;
 	if(file.is_open())
 	{
 		file.seekg(0,ios::beg);
-		file.read((char*)&nTubes,sizeof(size_t));
-		file.read((char*)&nEvents,sizeof(size_t));
-		file.read((char*)&eventSize,sizeof(size_t));
+		file.read((char*)&nTubes,sizeof(uint32_t));
+		file.read((char*)&nEvents,sizeof(uint32_t));
+		file.read((char*)&eventSize,sizeof(uint32_t));
 	}
 
 	streampos pos = file.tellg();

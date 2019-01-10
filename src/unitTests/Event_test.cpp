@@ -1,5 +1,6 @@
 #include "../Event.h"
 #include <gtest/gtest.h>
+#include "../globals.h"
 
 /**
  * Unit test for the Event class utilizing the Google Test Framework (see https://github.com/google/googletest )
@@ -9,12 +10,13 @@ class EventTest : public ::testing::Test
 public:
 	EventTest()
 	{
-		std::unique_ptr<std::array<uint16_t,800>> a(new std::array<uint16_t,800>);
-		std::unique_ptr<std::array<uint16_t,800>> b(new std::array<uint16_t,800>);
-		a->fill(42);
-		b->fill(1337);
+		std::unique_ptr<std::vector<uint16_t>> a(new std::vector<uint16_t>(800,42));
+		std::unique_ptr<std::vector<uint16_t>> b(new std::vector<uint16_t>(800,1337));
+		std::unique_ptr<std::vector<uint16_t>> c(new std::vector<uint16_t>(1024,1));
+
 		e1 = new Event(42,move(a));
 		e2 = new Event(1337,move(b));
+		e3 = new Event(9001, move(c));
 	}
 
 	void SetUp()
@@ -31,11 +33,13 @@ public:
 	{
 		delete e1;
 		delete e2;
+		delete e3;
 	}
 
 protected:
 	Event* e1;
 	Event* e2;
+	Event* e3;
 };
 
 TEST_F(EventTest, TestEventNumber)
@@ -48,12 +52,21 @@ TEST_F(EventTest, TestEventEntries)
 {
 	ASSERT_EQ(42,e1->getData().at(0));
 	ASSERT_EQ(1337,e2->getData().at(5));
+	ASSERT_EQ(1,e3->getData().at(42));
 }
 
 TEST_F(EventTest, TestEventSize)
 {
 	ASSERT_EQ(800,e1->getData().size());
 	ASSERT_EQ(800,e2->getData().size());
+	ASSERT_EQ(1024,e3->getData().size());
+}
+
+TEST_F(EventTest, TestGetSize)
+{
+	ASSERT_EQ(e1->getData().size(),e1->getSize());
+	ASSERT_EQ(e2->getData().size(),e2->getSize());
+	ASSERT_EQ(e3->getData().size(),e3->getSize());
 }
 
 TEST_F(EventTest, TestAccessOperator)
@@ -130,11 +143,9 @@ TEST_F(EventTest, TestConstCorrectness)
 
 TEST_F(EventTest, TestDriftTime)
 {
-	unique_ptr<array<uint16_t,800>> arr = unique_ptr<array<uint16_t,800>>(new array<uint16_t,800>);
-	unique_ptr<array<uint16_t,800>> arr2 = unique_ptr<array<uint16_t,800>>(new array<uint16_t,800>);
-	arr->fill(2200);
-	arr2->fill(2200);
-	(*arr)[50] = 2100;
+	unique_ptr<vector<uint16_t>> arr = unique_ptr<vector<uint16_t>>(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
+	unique_ptr<vector<uint16_t>> arr2 = unique_ptr<vector<uint16_t>>(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
+	(*arr)[50] = OFFSET_ZERO_VOLTAGE + (2 * EVENT_THRESHOLD_VOLTAGE);
 	Event e(1,move(arr));
 	Event e2(2,move(arr2));
 
@@ -144,14 +155,14 @@ TEST_F(EventTest, TestDriftTime)
 
 TEST_F(EventTest, TestNormalized)
 {
-	unique_ptr<array<uint16_t,800>> arr = unique_ptr<array<uint16_t,800>>(new array<uint16_t,800>);
-	unique_ptr<array<double,800>> res;
+	unique_ptr<vector<uint16_t>> arr = unique_ptr<vector<uint16_t>>(new vector<uint16_t>(800,1));
+	unique_ptr<vector<double>> res;
 
-	arr->fill(1);
 	Event e(1,move(arr));
 	res = e.normalized();
 
-	for(unsigned int i = 0; i < arr->size(); i++)
+	ASSERT_EQ(800,res->size());
+	for(unsigned int i = 0; i < res->size(); i++)
 	{
 		ASSERT_DOUBLE_EQ(1/(double)800,(*res)[i]);
 	}

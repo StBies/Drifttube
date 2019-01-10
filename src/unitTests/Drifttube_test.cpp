@@ -9,14 +9,16 @@ class DrifttubeTest : public ::testing::Test
 public:
 	DrifttubeTest()
 	{
-		d1 = new Drifttube(1,2,move(unique_ptr<DataSet>(new DataSet())));
-		d2 = new Drifttube(3,4,move(unique_ptr<DataSet>(new DataSet())));
+		unique_ptr<DataSet> d1_data(new DataSet());
+		d1 = new Drifttube(1,2,move(d1_data));
+
+		unique_ptr<DataSet> d2_data(new DataSet());
+		d2 = new Drifttube(3,4,move(d2_data));
 
 		//create data for a DataSet containing one event with a voltage under 2200-50 channels in bin 50 (real dt = 40ns)
 		vector<unique_ptr<Event>> data;
-		unique_ptr<array<uint16_t,800>> arr(new array<uint16_t,800>);
-		arr->fill(2200);
-		(*arr)[50] = 2100;
+		unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
+		(*arr)[50] = OFFSET_ZERO_VOLTAGE + (2 * EVENT_THRESHOLD_VOLTAGE);
 		unique_ptr<Event> e1(new Event(1,move(arr)));
 		data.push_back(move(e1));
 		data.shrink_to_fit();
@@ -53,6 +55,7 @@ TEST_F(DrifttubeTest,TestCopyConstruction)
 	ASSERT_EQ(d3_filled->getDriftTimeSpectrum().getRejected(), copyOfD3.getDriftTimeSpectrum().getRejected());
 
 	//Test, if the RtRelation holds the same values at another memory location
+	//FIXME this doesn't pass
 	ASSERT_EQ(d3_filled->getRtRelation().getData(), copyOfD3.getRtRelation().getData());
 	ASSERT_FALSE(&d3_filled->getRtRelation() == &copyOfD3.getRtRelation());
 }
@@ -98,9 +101,8 @@ TEST_F(DrifttubeTest,TestDataSet)
 
 TEST_F(DrifttubeTest,TestDriftTimeSpectrum)
 {
-	unique_ptr<array<uint32_t,800>> dt(new array<uint32_t,800>);
-	dt->fill(0);
-	(*dt)[10] = 1;
+	unique_ptr<vector<uint32_t>> dt(new vector<uint32_t>(800,0));
+	(*dt)[50] = 1;
 	DriftTimeSpectrum wanted(move(dt),1,0);
 	ASSERT_EQ(wanted.getEntries(),d3_filled->getDriftTimeSpectrum().getEntries());
 	ASSERT_EQ(wanted.getRejected(),d3_filled->getDriftTimeSpectrum().getRejected());
@@ -109,9 +111,8 @@ TEST_F(DrifttubeTest,TestDriftTimeSpectrum)
 
 TEST_F(DrifttubeTest,TestRtRelation)
 {
-	unique_ptr<array<double,800>> rt(new array<double,800>);
-	rt->fill(18.15);
-	for(size_t i = 0; i < 11; i++)
+	unique_ptr<vector<double>> rt(new vector<double>(800,18.15));
+	for(size_t i = 0; i < 51; i++)
 	{
 		(*rt)[i] = 0;
 	}
@@ -153,10 +154,7 @@ TEST_F(DrifttubeTest,TestAssignmentOperators)
 
 TEST_F(DrifttubeTest,TestMaxDrifttime)
 {
-	//44 expected: Event is in bin 50:
-	// 50 - ADC_TRIGGERPOS = 10
-	// So 99.9% of all events happened in bin 11 -> 44ns
-	ASSERT_EQ(44,d3_filled->getMaxDrifttime());
+	ASSERT_EQ((50 - ADC_TRIGGERPOS_BIN + 1) * 4,d3_filled->getMaxDrifttime());
 }
 
 int main(int argc, char **argv)

@@ -8,9 +8,11 @@
 #ifndef DATA_H_
 #define DATA_H_
 
-#include <array>
+#include <vector>
 #include <memory>
 #include <cstdlib>
+
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
 
 
 /**
@@ -39,20 +41,21 @@ template<typename T = uint16_t>
 class Data
 {
 public:
-	virtual ~Data() = 0;
+	virtual ~Data() = 0; //not meant for instantiation
 
-	const std::array<T,800>& getData() const;
+	const std::vector<T>& getData() const;
 	T& operator[](const unsigned short bin);
 	const T& operator[](const unsigned short bin) const;
-	std::unique_ptr<std::array<double,800>> normalized() const;
+	std::unique_ptr<std::vector<double>> normalized() const;
+	const size_t getSize() const;
 
 
 protected:
 	Data<T>& operator=(const Data<T>& rhs);
-	Data(std::unique_ptr<std::array<T,800>> data); //not meant for instantiation
+	Data(std::unique_ptr<std::vector<T>> data);
 	Data(const Data<T>& data);
 
-	std::unique_ptr<std::array<T,800>> m_data;
+	std::unique_ptr<std::vector<T>> m_data;
 };
 
 
@@ -73,7 +76,7 @@ using namespace std;
  * @warning Protected: should only be called by inheriting class' constructors
  */
 template<typename T>
-Data<T>::Data(unique_ptr<array<T,800>> data)
+Data<T>::Data(unique_ptr<vector<T>> data)
 {
 	m_data = move(data);
 }
@@ -93,7 +96,8 @@ Data<T>::Data(unique_ptr<array<T,800>> data)
 template<typename T>
 Data<T>::Data(const Data<T>& data)
 {
-	unique_ptr<array<T,800>> temp(new array<T,800>);
+	unique_ptr<vector<T>> temp(new vector<T>);
+	temp->resize(data.m_data->size());
 
 	//deep copy
 	#pragma omp parallel for
@@ -125,7 +129,7 @@ Data<T>::~Data()
  * @return Reference to the array that is contained
  */
 template<typename T>
-const array<T,800>& Data<T>::getData() const
+const vector<T>& Data<T>::getData() const
 {
 	return *m_data;
 }
@@ -165,6 +169,8 @@ const T& Data<T>::operator[](const unsigned short bin) const
 template<typename T>
 Data<T>& Data<T>::operator=(const Data<T>& rhs)
 {
+	//TODO check for same sizes
+	//TODO if not of the same size: Fix LHS size
 	for(size_t i = 0; i < m_data->size(); i++)
 	{
 		(*m_data)[i] = (*rhs.m_data)[i];
@@ -185,9 +191,9 @@ Data<T>& Data<T>::operator=(const Data<T>& rhs)
  * @return @c std::unique_ptr<std::array<double,800>> containing the normalized data
  */
 template<typename T>
-unique_ptr<array<double,800>> Data<T>::normalized() const
+unique_ptr<vector<double>> Data<T>::normalized() const
 {
-	unique_ptr<array<double,800>> result(new array<double,800>);
+	unique_ptr<vector<double>> result(new vector<double>(m_data->size()));
 	//TODO include DataProcessor and let it perform the integration
 
 	double integral = 0;
@@ -203,6 +209,26 @@ unique_ptr<array<double,800>> Data<T>::normalized() const
 	}
 
 	return move(result);
+}
+
+
+//TODO test
+/**
+ * Return the size of the vector that stores the measured or calculated bin contents
+ * stored in this Data object. This is returned as a @c size_t value.
+ *
+ * @brief Returns size of the vector holding data
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date Nov. 14, 2018
+ *
+ * @return The size of the data array stored in this Data object as @c size_t
+ */
+template<typename T>
+const size_t Data<T>::getSize() const
+{
+	return m_data->size();
 }
 
 /**

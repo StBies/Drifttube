@@ -4,6 +4,8 @@
 #include "../Event.h"
 #include "../RtRelation.h"
 #include "../DriftTimeSpectrum.h"
+#include "../DataSet.h"
+#include "../globals.h"
 
 using namespace std;
 
@@ -12,11 +14,11 @@ class DataProcessorTest : public ::testing::Test
 public:
 	DataProcessorTest()
 	{
-		unique_ptr<array<uint16_t,800>> sine_array(new array<uint16_t,800>);
-		unique_ptr<array<uint16_t,800>> const1_array(new array<uint16_t,800>);
-		unique_ptr<array<uint16_t,800>> const0_array(new array<uint16_t,800>);
-		unique_ptr<array<uint16_t,800>> max_uint_array(new array<uint16_t,800>);
-		unique_ptr<array<uint16_t,800>> min_at_400_array(new array<uint16_t,800>);
+		unique_ptr<vector<uint16_t>> sine_array(new vector<uint16_t>(800));
+		unique_ptr<vector<uint16_t>> const1_array(new vector<uint16_t>(800));
+		unique_ptr<vector<uint16_t>> const0_array(new vector<uint16_t>(800));
+		unique_ptr<vector<uint16_t>> max_uint_array(new vector<uint16_t>(800));
+		unique_ptr<vector<uint16_t>> min_at_400_array(new vector<uint16_t>(800));
 
 		double sine_range_to_bins = M_PI / 800;
 
@@ -72,9 +74,9 @@ TEST_F(DataProcessorTest,TestComputeIntegralOverflow)
 
 TEST_F(DataProcessorTest,TestIntegrate)
 {
-	array<int,800> const1_int_exp;
-	array<int,800> const0_int_exp;
-	array<int,800> max_uint_int_exp;
+	vector<int> const1_int_exp(800);
+	vector<int> const0_int_exp(800);
+	vector<int> max_uint_int_exp(800);
 
 	for(int i = 0; i < 800; i++)
 	{
@@ -111,14 +113,12 @@ TEST_F(DataProcessorTest,TestFindLastFilledBin)
 
 TEST_F(DataProcessorTest,TestcalculateRtRelation)
 {
-	unique_ptr<array<uint32_t,800>> dtArr(new array<uint32_t,800>);
-	dtArr->fill(0);
+	unique_ptr<vector<uint32_t>> dtArr(new vector<uint32_t>(800,0));
 	(*dtArr)[30] = 1;
 	DriftTimeSpectrum spect(move(dtArr),1,0);
 	RtRelation rt = DataProcessor::calculateRtRelation(spect);
 
-	array<double,800> expectedRt;
-	expectedRt.fill(0);
+	vector<double> expectedRt(800,0.0);
 	for(size_t i = 31; i < expectedRt.size(); i++)
 	{
 		expectedRt[i] = DRIFT_TUBE_RADIUS;
@@ -128,6 +128,32 @@ TEST_F(DataProcessorTest,TestcalculateRtRelation)
 	{
 		ASSERT_DOUBLE_EQ(expectedRt[i],rt.getData()[i]);
 	}
+}
+
+TEST_F(DataProcessorTest,TestCalculateDriftTimeSpectrum)
+{
+	//Create event data
+	unique_ptr<vector<uint16_t>> data(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
+	(*data)[50] = OFFSET_ZERO_VOLTAGE + 2 * EVENT_THRESHOLD_VOLTAGE;
+
+
+	//create vector of events to build a DataSet
+	vector<unique_ptr<Event>> evts;
+	ASSERT_EQ(0,evts.size());
+	evts.push_back(unique_ptr<Event>(new Event(0,move(data))));
+	ASSERT_EQ(nullptr,data.get());
+	ASSERT_EQ(1,evts.size());
+	ASSERT_EQ(800,evts[0]->getSize());
+
+	//build DataSet
+	DataSet test_set(evts);
+	ASSERT_EQ(0,evts.size());
+
+	DriftTimeSpectrum spect = DataProcessor::calculateDriftTimeSpectrum(test_set);
+
+	//Create a DataSet
+	ASSERT_EQ(1,spect.getEntries());
+	ASSERT_EQ(1,spect[50]);
 }
 
 int main(int argc, char **argv)

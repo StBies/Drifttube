@@ -19,6 +19,8 @@
 
 using namespace std;
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
 /**
  * Struct containing parameters that are read from the header of the binary file containing raw data.
  * This contains the number of drift tubes, the number of events per tube and the size of one event (number of data points.
@@ -31,9 +33,9 @@ using namespace std;
  */
 typedef struct
 {
-	size_t nTubes;
-	size_t eventSize;
-	size_t nEvents;
+	uint32_t nTubes;
+	uint32_t eventSize;
+	uint32_t nEvents;
 	streampos endOfHeader;
 }FileParams;
 

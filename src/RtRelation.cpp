@@ -9,6 +9,8 @@
 
 using namespace std;
 
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
+
 /**
  * Constructor. Initializes a RtRelation object.
  *
@@ -20,7 +22,7 @@ using namespace std;
  *
  * @param data unique_ptr to an std::array<double,800> containing the rt-relation raw data.
  */
-RtRelation::RtRelation(unique_ptr<array<double,800>> data) : Data(move(data))
+RtRelation::RtRelation(unique_ptr<vector<double>> data) : Data(move(data))
 {
 }
 

@@ -16,6 +16,9 @@ class DataProcessor;
 #include <cstdlib>
 #include "Data.h"
 #include "DataProcessor.h"
+#include "globals.h"
+
+//TODO Change all doc to vector and variable length (Nov. 14, 2018)
 
 /**
  * Class that represents the data for one event.
@@ -31,7 +34,7 @@ class DataProcessor;
 class Event : public Data<>
 {
 public:
-	Event(const unsigned int eventNumber, std::unique_ptr<std::array<uint16_t,800>> data);
+	Event(const unsigned int eventNumber, std::unique_ptr<std::vector<uint16_t>> data);
 	virtual ~Event();
 	Event(const Event& original);
 
