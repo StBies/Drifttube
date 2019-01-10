@@ -19,8 +19,11 @@
  *
  * @ensure returns the same number as written in the header.
  */
+//TODO write bins per event into header
+//TODO maybe write headertype for simplicity
 int teaching_writePythonData(const DataSet& data)
 {
+	//TODO change to uint64_t (check if that has the same endianess as numpy types read
 	size_t nEvents = data.getSize();
 
 	ofstream numpyDump("event.npy",ios::out | ios::binary);
@@ -38,7 +41,7 @@ int teaching_writePythonData(const DataSet& data)
 		{
 			std::cout << "trying to write event #" << i <<".";
 			Event e = data[i];
-			array<uint16_t,800> raw_data = e.getData();
+			vector<uint16_t> raw_data = e.getData();
 
 			for(uint16_t datum : raw_data)
 			{
