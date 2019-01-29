@@ -19,19 +19,29 @@
  *
  * @ensure returns the same number as written in the header.
  */
-//TODO write bins per event into header
 //TODO maybe write headertype for simplicity
 int teaching_writePythonData(const DataSet& data)
 {
 	//TODO change to uint64_t (check if that has the same endianess as numpy types read
-	size_t nEvents = data.getSize();
+	uint64_t nEvents = data.getSize();
+	uint32_t n_bins = 0;
+	if(&data[0])
+	{
+		n_bins = data[0].getSize();
+	}
+	else
+	{
+		n_bins = 800;
+		std::cerr << "Could not read n_bins, using 800 as default" << std::endl;
+	}
 
 	ofstream numpyDump("event.npy",ios::out | ios::binary);
 	size_t headerPosition = numpyDump.tellp();
 	size_t eventsWritten = 0;
 
-	//write Header: 8bytes: nEvents
-	numpyDump.write((char*)&nEvents,sizeof(size_t));
+	//write Header: 8bytes: nEvents, 4bytes: n_bins
+	numpyDump.write((char*)&nEvents,sizeof(uint64_t));
+	numpyDump.write((char*)&n_bins,sizeof(uint32_t));
 
 	//loop over the DataSet
 	for(size_t i = 0; i < nEvents; i++)
