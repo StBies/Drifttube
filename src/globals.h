@@ -27,6 +27,6 @@ static const unsigned short OFFSET_ZERO_VOLTAGE = 2200; //channels
 static const double DRIFT_TUBE_RADIUS = 18.15;//mm
 
 //values for actual physics:
-static const short EVENT_THRESHOLD_VOLTAGE = -300; //channels relative to OFFSET_ZERO_VOLTAGE
+static const short EVENT_THRESHOLD_VOLTAGE = -100; //channels relative to OFFSET_ZERO_VOLTAGE
 
 #endif /* GLOBALS_H_ */

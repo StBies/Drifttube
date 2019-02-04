@@ -281,8 +281,70 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
 	return RtRelation(move(result));
 }
 
+
+//TODO test
+/**
+ * Counts the number of pulses undershooting a given threshold voltage. Returns a list of two element arrays. These contain
+ * the times of the falling and the rising edge of the pulse.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date February 4, 2019
+ *
+ * @param data Event for that the pulses over threshold are to be analyzed
+ * @param threshold threshold that must be undershot in order to identify a "pulse"
+ * @return A vector containing a list of pulses, each with time of falling and rising edge in ns
+ */
+const vector<array<uint16_t,2>> DataProcessor::pulses_over_threshold(const Event& data, unsigned short threshold)
+{
+	return pulses_over_threshold(data,threshold,0,data.getSize());
+}
+
+
+//TODO test
+/**
+ * Counts the number of pulses undershooting a given threshold voltage. Returns a list of two element arrays. These contain
+ * the times of the falling and the rising edge of the pulse. Here, only pulses between the bins from and to are counted.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date February 4, 2019
+ *
+ * @param data Event for that the pulses over threshold are to be analyzed
+ * @param threshold threshold that must be undershot in order to identify a "pulse"
+ * @param from
+ * @param to
+ * @return A vector containing a list of pulses, each with time of falling and rising edge in ns
+ */
+const vector<array<uint16_t, 2>> DataProcessor::pulses_over_threshold(
+		const Event& data, unsigned short threshold, size_t from, size_t to)
+{
+	vector<array<uint16_t,2>> result(0);
+	bool first_is_rising = data[from] < threshold ? true : false;
+	bool pulse_ended = !first_is_rising;
+
+	//from maximum drift time on: loop over the event to even higher drift times
+	for (unsigned int i = from; i < to; i++)
+	{
+		//if-else switches a variable in order not to count a single pulse bin per bin
+		if (data[i] <= threshold && pulse_ended)
+		{
+			result.push_back(array<uint16_t,2>());
+			result.back()[0] = ADC_BINS_TO_TIME * i; //ns
+			pulse_ended = false;
+		}
+		else if (data[i] > threshold && !pulse_ended)
+		{
+			result.back()[1] = ADC_BINS_TO_TIME * i; //ns
+			pulse_ended = true;
+		}
+	}
+
+	return result;
+}
 //TODO threshold as parameter?
 //TODO possibility to use any other t_max as parameter
+//TODO Test
 /**
  * Count the number of afterpulses in a Drifttube. An afterpulse is counted,
  * if the after the maximum drift time, a threshold voltage is undershot. This maximum drift time is
@@ -291,11 +353,10 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
  * @brief Count afterpulses. Multiple afterpulses per event are allowed.
  *
  * @author Stefan Bieschke
- * @version 0.9
- * @date Dec. 15, 2016
+ * @version Alpha 2.0
+ * @date February 4, 2019
  *
- * @param rawData DataSet object containing voltage pulses
- * @param rtRelation TH1D histogram object containing the rt-Relation.
+ * @param tube Drifttube object for that the afterpulses should be count
  *
  * @return number of afterpulses
  */
@@ -316,29 +377,9 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 		//assume the pulse has already ended
 		bool pulseEnded = true;
 		Event voltage = tube.getDataSet().getEvent(i);
-		unsigned int nBins = voltage.getData().size();
-		//check, if the signal already ended at max drift time
-		if(voltage[maxDriftTimeBin] <= EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE)
-		{
-			pulseEnded = false;
-		}
-
-		//from maximum drift time on: loop over the event to even higher drift times
-		for(unsigned int j = maxDriftTimeBin + ADC_TRIGGERPOS_BIN; j < nBins;j++)
-		{
-			//if-else switches a variable in order not to count a single pulse bin per bin
-			if(voltage[j] <= EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE && pulseEnded)
-			{
-//				cout << "event " <<i << " time: " << j*4 << endl;
-				++nAfterPulses;
-				pulseEnded = false;
-			}
-			else if(voltage[j] > EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE && !pulseEnded)
-			{
-				pulseEnded = true;
-			}
-
-		}
+		uint16_t threshold = EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE;
+		vector<array<uint16_t,2>> pulses = pulses_over_threshold(voltage, threshold, maxDriftTimeBin, voltage.getSize());
+		nAfterPulses += pulses.size();
 	}
 
 	return nAfterPulses;

@@ -50,6 +50,9 @@ public:
 	static unsigned short findLastFilledBin(const Event& data, unsigned short threshold);
 	static const DriftTimeSpectrum calculateDriftTimeSpectrum(const DataSet& data);
 	static const RtRelation calculateRtRelation(const DriftTimeSpectrum& dtSpect);
+	static const std::vector<std::array<uint16_t,2>> pulses_over_threshold(const Event& data, unsigned short threshold);
+	static const std::vector<std::array<uint16_t,2>> pulses_over_threshold(const Event& data, unsigned short threshold, size_t from, size_t to);
+	static const std::vector<uint16_t> time_over_threshold(const std::vector<array<uint16_t,2>>& pulses);
 	static const unsigned int countAfterpulses(const Drifttube& tube);
 
 private:
