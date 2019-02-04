@@ -322,6 +322,11 @@ const vector<array<uint16_t, 2>> DataProcessor::pulses_over_threshold(
 	vector<array<uint16_t,2>> result(0);
 	bool first_is_rising = data[from] < threshold ? true : false;
 	bool pulse_ended = !first_is_rising;
+	if(first_is_rising)
+	{
+		result.push_back(array<uint16_t,2>());
+		result.back()[0] = 0xFFFF; //error for first is rising
+	}
 
 	//from maximum drift time on: loop over the event to even higher drift times
 	for (unsigned int i = from; i < to; i++)
