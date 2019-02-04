@@ -371,20 +371,27 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 	unsigned int nAfterPulses = 0;
 
 	//counting loop
-	for(unsigned int i = 0; i < tube.getDataSet().getSize(); i++)
+	for (unsigned int i = 0; i < tube.getDataSet().getSize(); i++)
 	{
 		//skip events missing due to zero suppression
-		if(tube.getDataSet().getData()[i].get() == nullptr)
+		if (tube.getDataSet().getData()[i].get() == nullptr)
 		{
 			continue;
 		}
 
-		//assume the pulse has already ended
-		bool pulseEnded = true;
-		Event voltage = tube.getDataSet().getEvent(i);
-		uint16_t threshold = EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE;
-		vector<array<uint16_t,2>> pulses = pulses_over_threshold(voltage, threshold, maxDriftTimeBin, voltage.getSize());
-		nAfterPulses += pulses.size();
+		try
+		{
+			//assume the pulse has already ended
+			bool pulseEnded = true;
+			Event voltage = tube.getDataSet().getEvent(i);
+			uint16_t threshold = EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE;
+			vector<array<uint16_t, 2>> pulses = pulses_over_threshold(voltage,
+					threshold, maxDriftTimeBin, voltage.getSize());
+			nAfterPulses += pulses.size();
+		} catch (Exception& e)
+		{
+			continue;
+		}
 	}
 
 	return nAfterPulses;
