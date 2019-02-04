@@ -320,12 +320,13 @@ const vector<array<uint16_t, 2>> DataProcessor::pulses_over_threshold(
 		const Event& data, unsigned short threshold, size_t from, size_t to)
 {
 	vector<array<uint16_t,2>> result(0);
-	bool first_is_rising = data[from] < threshold ? true : false;
+	bool first_is_rising = data[from] <= threshold ? true : false;
 	bool pulse_ended = !first_is_rising;
+	//comment this if block when we don't want to count cases where the first edge is rising
 	if(first_is_rising)
 	{
 		result.push_back(array<uint16_t,2>());
-		result.back()[0] = 0xFFFF; //error for first is rising
+		result.back()[0] = 0xFFFF; //error for first is rising - results in negative time over threshold
 	}
 
 	//from maximum drift time on: loop over the event to even higher drift times
@@ -338,6 +339,11 @@ const vector<array<uint16_t, 2>> DataProcessor::pulses_over_threshold(
 			result.back()[0] = ADC_BINS_TO_TIME * i; //ns
 			pulse_ended = false;
 		}
+		//in case we don't want to count cases where the first edge is rising
+//		else if (data[i] > threshold && !pulse_ended && result.size() == 0)
+//		{
+//			pulse_ended = true;
+//		}
 		else if (data[i] > threshold && !pulse_ended)
 		{
 			result.back()[1] = ADC_BINS_TO_TIME * i; //ns
@@ -373,18 +379,12 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 	//counting loop
 	for (unsigned int i = 0; i < tube.getDataSet().getSize(); i++)
 	{
-		//skip events missing due to zero suppression
-		if (tube.getDataSet().getData()[i].get() == nullptr)
-		{
-			continue;
-		}
-
 		try
 		{
 			//assume the pulse has already ended
 			bool pulseEnded = true;
 			Event voltage = tube.getDataSet().getEvent(i);
-			uint16_t threshold = EVENT_THRESHOLD_VOLTAGE + OFFSET_ZERO_VOLTAGE;
+			uint16_t threshold = OFFSET_ZERO_VOLTAGE + EVENT_THRESHOLD_VOLTAGE;
 			vector<array<uint16_t, 2>> pulses = pulses_over_threshold(voltage,
 					threshold, maxDriftTimeBin, voltage.getSize());
 			nAfterPulses += pulses.size();
