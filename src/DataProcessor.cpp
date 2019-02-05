@@ -294,8 +294,10 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
  * @param data Event for that the pulses over threshold are to be analyzed
  * @param threshold threshold that must be undershot in order to identify a "pulse"
  * @return A vector containing a list of pulses, each with time of falling and rising edge in ns
+ *
+ * @warning vector contains raw heap pointers, caller should manage deletion himself
  */
-const vector<array<uint16_t,2>> DataProcessor::pulses_over_threshold(const Event& data, unsigned short threshold)
+const vector<array<uint16_t,2>*> DataProcessor::pulses_over_threshold(const Event& data, unsigned short threshold)
 {
 	return pulses_over_threshold(data,threshold,0,data.getSize());
 }
@@ -315,18 +317,20 @@ const vector<array<uint16_t,2>> DataProcessor::pulses_over_threshold(const Event
  * @param from
  * @param to
  * @return A vector containing a list of pulses, each with time of falling and rising edge in ns
+ *
+ * @warning vector contains raw heap pointers, caller should manage deletion himself
  */
-const vector<array<uint16_t, 2>> DataProcessor::pulses_over_threshold(
+const vector<array<uint16_t, 2>*> DataProcessor::pulses_over_threshold(
 		const Event& data, unsigned short threshold, size_t from, size_t to)
 {
-	vector<array<uint16_t,2>> result(0);
+	vector<array<uint16_t,2>*> result(0);
 	bool first_is_rising = data[from] <= threshold ? true : false;
 	bool pulse_ended = !first_is_rising;
 	//comment this if block when we don't want to count cases where the first edge is rising
 	if(first_is_rising)
 	{
-		result.push_back(array<uint16_t,2>());
-		result.back()[0] = 0xFFFF; //error for first is rising - results in negative time over threshold
+		result.push_back(new array<uint16_t,2>());
+		(*result.back())[0] = 0xFFFF; //error for first is rising - results in negative time over threshold
 	}
 
 	//from maximum drift time on: loop over the event to even higher drift times
@@ -335,8 +339,8 @@ const vector<array<uint16_t, 2>> DataProcessor::pulses_over_threshold(
 		//if-else switches a variable in order not to count a single pulse bin per bin
 		if (data[i] <= threshold && pulse_ended)
 		{
-			result.push_back(array<uint16_t,2>());
-			result.back()[0] = ADC_BINS_TO_TIME * i; //ns
+			result.push_back(new array<uint16_t,2>());
+			(*result.back())[0] = ADC_BINS_TO_TIME * i; //ns
 			pulse_ended = false;
 		}
 		//in case we don't want to count cases where the first edge is rising
@@ -346,13 +350,46 @@ const vector<array<uint16_t, 2>> DataProcessor::pulses_over_threshold(
 //		}
 		else if (data[i] > threshold && !pulse_ended)
 		{
-			result.back()[1] = ADC_BINS_TO_TIME * i; //ns
+			(*result.back())[1] = ADC_BINS_TO_TIME * i; //ns
 			pulse_ended = true;
 		}
+	}
+	if(!pulse_ended)
+	{
+		(*result.back())[1] = 0xFFFF; //error for last rising edge missing
 	}
 
 	return result;
 }
+
+/**
+ * Counts the time over threshold for a set of pulse edge times that is passed to this method as parameter.
+ *
+ * @author Stefan Bieschke
+ * @version Alpha 2.0
+ * @date February 5, 2019
+ *
+ * @param pulses A vector containing arrays with times for falling and rising edges of each pulse. Thus, this array
+ * has is as long as the number of identified pulses is long and each contained array has the time of the falling edge in its
+ * [0] entry and the rising edge in its [1] entry.
+ *
+ * @return A vector that contains the time over threshold in nanoseconds for each identified pulse in the passed parameter vector.
+ *
+ * @ensure result.size() == pulses.size()
+ * @note As the time over threshold is an unsigned integer the case of a missing edge should result in very high time over thresholds, as
+ * the time of a missing edge is set to 0xFFFF, which in either case should result in a high time over threshold.
+ */
+const vector<uint16_t> DataProcessor::time_over_threshold(const vector<array<uint16_t, 2>*>& pulses)
+{
+	vector<uint16_t> result(pulses.size());
+	for(int i = 0; i < pulses.size(); i++)
+	{
+		result[i] = (*pulses[i])[1] - (*pulses[i])[0];
+	}
+	return result;
+}
+
+
 //TODO threshold as parameter?
 //TODO possibility to use any other t_max as parameter
 //TODO Test
@@ -385,9 +422,13 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 			bool pulseEnded = true;
 			Event voltage = tube.getDataSet().getEvent(i);
 			uint16_t threshold = OFFSET_ZERO_VOLTAGE + EVENT_THRESHOLD_VOLTAGE;
-			vector<array<uint16_t, 2>> pulses = pulses_over_threshold(voltage,
+			vector<array<uint16_t, 2>*> pulses = pulses_over_threshold(voltage,
 					threshold, maxDriftTimeBin, voltage.getSize());
 			nAfterPulses += pulses.size();
+			for(array<uint16_t,2>* arr : pulses)
+			{
+				delete [] arr;
+			}
 		} catch (Exception& e)
 		{
 			continue;

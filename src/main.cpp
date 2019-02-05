@@ -86,6 +86,32 @@ int main(int argc, char** argv)
 	}
 	f.close();
 
+	cout << "Time over threshold for threshold -100" << endl;
+
+	for(size_t i = 0; i < archive.getTubes()[0]->getDataSet().getSize(); i++)
+	{
+		try
+		{
+			Event e = archive.getTubes()[0]->getDataSet()[i];
+			vector<array<uint16_t,2>*> edges = DataProcessor::pulses_over_threshold(e, -300 + OFFSET_ZERO_VOLTAGE);
+			vector<uint16_t> time_over_threshold = DataProcessor::time_over_threshold(edges);
+			for(size_t j = 0; j < time_over_threshold.size(); j++)
+			{
+				cout << time_over_threshold[j] << endl;
+			}
+			//delete arrays
+			for(array<uint16_t,2>* arr : edges)
+			{
+				delete [] arr;
+			}
+		}
+		catch(Exception& e)
+		{
+			cerr << e.error() << endl;
+			continue;
+		}
+	}
+
 	//TODO get rid of system call... why system() is evil http://www.cplusplus.com/forum/articles/11153/
 	system("gnuplot -p scripts/plots/dtAndRt.plt");
 
