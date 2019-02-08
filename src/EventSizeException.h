@@ -30,7 +30,7 @@ public:
 	EventSizeException(int event);
 	virtual ~EventSizeException();
 
-	string error();
+	virtual string error();
 private:
 	int _event;
 };

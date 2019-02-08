@@ -30,8 +30,8 @@ using namespace std;
 class Exception
 {
 public:
-	Exception();
-	virtual ~Exception();
+//	Exception();
+//	virtual ~Exception() = 0;
 	virtual string error() = 0;
 };
 
