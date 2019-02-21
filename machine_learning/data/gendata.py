@@ -1,5 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+
+if len(sys.argv) < 2:
+    print("File path argument must be provided. Exiting.")
+    exit(-1)
+fname = sys.argv[1]
 
 class Data:
     """ The Data class is basically a container for an array that contains the raw voltage
@@ -141,30 +147,29 @@ class Data:
         else:
             first_is_rising = False
             
-	pulse_ended = not first_is_rising;
+        pulse_ended = not first_is_rising
 	#comment this if block when we don't want to count cases where the first edge is rising
-	if(first_is_rising):
+        if first_is_rising:
             edges.append([0xFFFF,0]) #error for first is rising - results in negative time over threshold
-	
 
 	#from maximum drift time on: loop over the event to even higher drift times
-	for i in range(len(self._raw_data)):
-	    #if-else switches a variable in order not to count a single pulse bin per bin
-	    if self._raw_data[i] <= threshold and pulse_ended:
-		result.push_back(new array<uint16_t,2>());
+        for i in range(len(self._raw_data)):
+            #if-else switches a variable in order not to count a single pulse bin per bin
+            if self._raw_data[i] <= threshold and pulse_ended:
                 edges.append([4 * i,0])
-		pulse_ended = False;
+                pulse_ended = False;
 		#in case we don't want to count cases where the first edge is rising
 		#elif self._raw_data[i] > threshold and not pulse_ended and len(edges) == 0:
 	            #pulse_ended = true;
             elif self._raw_data[i] > threshold and not pulse_ended:
-                edges[len(edges)][1] = 4 * i #ns
-		pulse_ended = True;
-                         
-	if not pulse_ended:
-            edges[len(edges)][1] = 0xFFFF #error for last rising edge missing
-
-	return edges
+                edges[len(edges)-1][1] = 4 * i #ns
+                pulse_ended = True
+        
+        if not pulse_ended:
+            edges[len(edges)-1][1] = 0xFFFF #error for last rising edge missing
+            
+        return edges
+    
 
     def plot_data(self):
         """ Plot the Data
@@ -181,6 +186,19 @@ class Data:
         plt.xlabel("time [ns]")
         plt.ylabel("voltage [V]")
         plt.plot(time_bins,self._raw_data)
+        plt.show()
+
+    def plot_with_threshold(self,threshold):
+        n_bins = len(self._raw_data)
+        time_per_bin = 4 #ns
+        time_bins = [time_per_bin * i for i in range(n_bins)]
+        thr = [threshold] * n_bins
+        
+        plt.title("Event #{} voltage".format(self._event_number))
+        plt.xlabel("time [ns]")
+        plt.ylabel("voltage [V]")
+        plt.plot(time_bins,self._raw_data)
+        plt.plot(time_bins,thr)
         plt.show()
 
 class DataSet:
@@ -299,7 +317,7 @@ class DataSet:
         if t_min == -1:
             t_min = 0
         if t_max == -1:
-            t_max = len(self._events[0].get_array())
+            t_max = len(self._events[0].get_array()) * 4
         drifttimes = []
         for event in self._events:
             drifttimes.append(event.get_drift_time(threshold,dataset.is_calibrated()))
@@ -327,7 +345,7 @@ class DataSet:
 #----------------------------------------------------------------------
 #                           Begin program execution
 #----------------------------------------------------------------------
-file = open("event.npy",'rb') #read binary mode
+file = open(fname,'rb') #read binary mode
 events = []
 
 #Read first 8 Bytes
@@ -347,11 +365,7 @@ mean, dev = dataset.perform_ground_calibration()
 print("Noise sigma found to be: Sigma = {} mV".format(dev))
 
 #TODO: Create drift time spectrum
-dt_spect = dataset.calculate_drift_time_spectrum(-5 * dev)         
-
-#TODO: Drift time spectrum and rt-relation for several threshold voltages
-
-dt_spect = plt.hist(drifttimes,bins=500)
+dt_spect = dataset.calculate_drift_time_spectrum(-5 * dev,0,1600)         
 plt.title("Drift time spectrum")
 plt.xlabel("drift time [ns]")
 plt.ylabel("#")
