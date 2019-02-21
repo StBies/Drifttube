@@ -156,13 +156,13 @@ class Data:
         for i in range(len(self._raw_data)):
             #if-else switches a variable in order not to count a single pulse bin per bin
             if self._raw_data[i] <= threshold and pulse_ended:
-                edges.append([4 * i,0])
+                edges.append([i,0])
                 pulse_ended = False;
 		#in case we don't want to count cases where the first edge is rising
 		#elif self._raw_data[i] > threshold and not pulse_ended and len(edges) == 0:
 	            #pulse_ended = true;
             elif self._raw_data[i] > threshold and not pulse_ended:
-                edges[len(edges)-1][1] = 4 * i #ns
+                edges[len(edges)-1][1] = i #ns
                 pulse_ended = True
         
         if not pulse_ended:
@@ -199,6 +199,25 @@ class Data:
         plt.ylabel("voltage [V]")
         plt.plot(time_bins,self._raw_data)
         plt.plot(time_bins,thr)
+        plt.show()
+
+    def plot_full(self,threshold,pulse_edges,local_min):
+        n_bins = len(self._raw_data)
+        time_per_bin = 4 #ns
+        time_bins = [time_per_bin * i for i in range(n_bins)]
+        thr = [threshold] * n_bins
+        plt.title("Event #{} voltage".format(self._event_number))
+        plt.xlabel("time [ns]")
+        plt.ylabel("voltage [V]")
+        plt.plot(time_bins,self._raw_data)
+        arrowlen = abs(local_min[1] * 0.05)
+        ax = plt.axes()
+        ax.annotate("",
+                    xy=(local_min[0]*4,local_min[1]),
+                    xytext=(local_min[0]*4,local_min[1]-arrowlen),
+                    arrowprops=dict(arrowstyle="->"))
+        plt.plot(time_bins,thr)
+        plt.plot(time_bins[pulse_edges[0]:pulse_edges[1]],self._raw_data[pulse_edges[0]:pulse_edges[1]])
         plt.show()
 
 class DataSet:
@@ -378,3 +397,9 @@ plt.title("rt-relation")
 plt.xlabel("drift time [ns]")
 plt.ylabel("radius [mm]")
 plt.show()
+
+ev = dataset.get_event(0)
+edges = ev.find_edges(-5 * dev)
+e0 = edges[0]
+minimum = ev.find_min(e0[0],e0[1])
+ev.plot_full(-5*dev,e0,minimum)
