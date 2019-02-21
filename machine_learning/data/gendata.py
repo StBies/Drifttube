@@ -364,6 +364,23 @@ class DataSet:
 #----------------------------------------------------------------------
 #                           Begin program execution
 #----------------------------------------------------------------------
+def user_ask_labels(event,threshold):
+    """ Ask user to label pulses found in an event
+
+    """
+    edges = event.find_edges(threshold)
+    mins = []
+    labels = []
+    for e in edges:
+        mins.append(event.find_min(e[0],e[1]))
+
+    n_pulses = len(edges)
+    for i in range(n_pulses):
+        event.plot_full(threshold,edges[i],mins[i])
+        label = input("Enter n for noise, m for muon: ")
+        labels.append(label)
+    return [edges,mins,labels]
+
 file = open(fname,'rb') #read binary mode
 events = []
 
@@ -403,3 +420,23 @@ edges = ev.find_edges(-5 * dev)
 e0 = edges[0]
 minimum = ev.find_min(e0[0],e0[1])
 ev.plot_full(-5*dev,e0,minimum)
+
+#Test for first 5 events
+labelled = []
+for i in range(2):
+    ev = dataset.get_event(i)
+    labelled.append(user_ask_labels(ev,-500*dev))
+    
+
+with open("labeled.dat","w") as outfile:
+    n_evts = len(labelled)
+    for i in range(n_evts):
+        outfile.write("#Evt No{}\n".format(i))
+        ev_info = labelled[i]
+        n_pulses = len(ev_info[0])
+        for j in range(n_pulses):
+            tot = (ev_info[0][j][1] - ev_info[0][j][0]) * 4
+            ampl = ev_info[1][j][1]
+            label = ev_info[2][j]
+            #TOT, Min, Label
+            outfile.write("{}\t{}\t{}\n".format(tot,ampl,label))
