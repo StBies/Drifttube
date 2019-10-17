@@ -21,9 +21,9 @@ For a full build instruction follow the build instructions given on it's github 
 
 Last, let's set environment variables used when building the Drifttube software:
 ```
-GTEST_BUILD=\`pwd\`
+GTEST_BUILD=`pwd`
 cd ../googletest/googletest
-GTEST_SRC=\`pwd\`
+GTEST_SRC=`pwd`
 ```
 
 ## Drifttube build instructions
