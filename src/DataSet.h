@@ -43,6 +43,8 @@ public:
 	size_t getSize() const;
 	const Event& getEvent(const unsigned int event) const;
 	const std::vector<std::unique_ptr<Event>>& getData() const;
+	const double& get_mean_offset_voltage() const;
+	const double& get_mean_noise_amplitude() const;
 
 	const Event& operator[](const unsigned int event) const;
 

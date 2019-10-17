@@ -194,6 +194,42 @@ const Event& DataSet::getEvent(const unsigned int event) const
 	return *(m_data[event]);
 }
 
+/**
+ * Getter for the mean offset zero voltage. This returns a const reference to the mean
+ * offset of the zero voltage for all the events in this DataSet. For calculation details
+ * see the documentation of the function @c calc_mean_offset_voltage().
+ *
+ * @brief Getter for mean noise amplitude
+ *
+ * @author Stefan Bieschke
+ * @date Oct. 17, 2019
+ * @version 1.0
+ *
+ * @return Mean offset in FADC units
+ */
+const double& DataSet::get_mean_offset_voltage() const
+{
+	return m_mean_offset_zero_voltage;
+}
+
+/**
+ * Getter for the mean noise amplitude. This returns a const reference to the mean
+ * amplitude of the voltage for all the events in this DataSet. For calculation details
+ * see the documentation of the function @c calc_mean_noise_amplitude(const double& mean_offset).
+ *
+ * @brief Getter for mean noise amplitude
+ *
+ * @author Stefan Bieschke
+ * @date Oct. 17, 2019
+ * @version 1.0
+ *
+ * @return Mean noise amplitude in FADC units
+ */
+const double& DataSet::get_mean_noise_amplitude() const
+{
+	return m_mean_noise_amplitude;
+}
+
 //operators
 
 /**
