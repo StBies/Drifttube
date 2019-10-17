@@ -133,8 +133,8 @@ TEST_F(DataProcessorTest,TestcalculateRtRelation)
 TEST_F(DataProcessorTest,TestCalculateDriftTimeSpectrum)
 {
 	//Create event data
-	unique_ptr<vector<uint16_t>> data(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
-	(*data)[50] = OFFSET_ZERO_VOLTAGE + 2 * EVENT_THRESHOLD_VOLTAGE;
+	unique_ptr<vector<uint16_t>> data(new vector<uint16_t>(800,ABSOLUTE_OFFSET_ZERO_VOLTAGE));
+	(*data)[50] = ABSOLUTE_OFFSET_ZERO_VOLTAGE + 2 * ABSOLUTE_EVENT_THRESHOLD_VOLTAGE;
 
 
 	//create vector of events to build a DataSet

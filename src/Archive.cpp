@@ -131,7 +131,7 @@ void Archive::writeToFile(const string& filename)
 			try
 			{
 				Event e = m_tubes[i]->getDataSet()[j];
-				vector<int> integral = DataProcessor::integrate(e,OFFSET_ZERO_VOLTAGE);
+				vector<int> integral = DataProcessor::integrate(e,ABSOLUTE_OFFSET_ZERO_VOLTAGE);
 
 				//write eventnumber
 
@@ -139,7 +139,7 @@ void Archive::writeToFile(const string& filename)
 				//write event
 				for(size_t k = 0; k < e.getSize(); k++)
 				{
-					double datum = (e[k] - OFFSET_ZERO_VOLTAGE) * ADC_CHANNELS_TO_VOLTAGE;
+					double datum = (e[k] - ABSOLUTE_OFFSET_ZERO_VOLTAGE) * ADC_CHANNELS_TO_VOLTAGE;
 					file.write((char*)&datum,sizeof(double));
 				}
 				//write integral
