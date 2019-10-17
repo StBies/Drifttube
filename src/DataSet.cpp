@@ -47,14 +47,22 @@ DataSet::DataSet(vector<unique_ptr<Event>>& data)
 	m_data.resize(size);
 
 	#pragma omp parallel for
-	for(int i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		m_data[i] = move(data[i]);
 	}
 	data.clear();
 	data.resize(0);
-	m_mean_offset_zero_voltage = calc_mean_offset();
-	m_mean_noise_amplitude = calc_mean_noise_amplitude(m_mean_offset_zero_voltage);
+	try
+	{
+		m_mean_offset_zero_voltage = calc_mean_offset();
+		m_mean_noise_amplitude = calc_mean_noise_amplitude(m_mean_offset_zero_voltage);
+	}
+	catch(const DataPresenceException& e)
+	{
+		m_mean_offset_zero_voltage = -1.0;
+		m_mean_noise_amplitude = -1.0;
+	}
 }
 
 /**
@@ -299,6 +307,11 @@ double DataSet::calc_mean_offset() const
 		}
 	}
 
+	if(n_events - zerosupressed_events == 0)
+	{
+		//TODO use c++ standard exceptions and a more fitting exception type
+		throw DataPresenceException();
+	}
 	mean /= (n_events - zerosupressed_events);
 
 	return mean;

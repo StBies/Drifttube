@@ -89,6 +89,34 @@ TEST_F(DataSetTest,TestAddData)
 	ASSERT_TRUE(test2 == (*d2)[d2->getSize()-1].getData());
 }
 
+TEST_F(DataSetTest,TestMeanOffsetVoltage)
+{
+	//TEST for empty DataSet
+	ASSERT_EQ(0,d1->get_mean_offset_voltage());
+	//TEST for filled dataset
+	vector<unique_ptr<Event>> initVector(2);
+	#pragma omp parallel for
+	for(int i = 0; i < 2; i++)
+	{
+		unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(800,i+1));
+		unique_ptr<Event> a(new Event(i,move(arr)));
+		initVector[i] = move(a);
+	}
+	initVector.shrink_to_fit();
+	DataSet* d = new DataSet(initVector);
+	//d contains two events, one all filled with 1, and one all filled with 2
+	//this should result in a mean offset voltage of 1.5
+	ASSERT_DOUBLE_EQ(1.5,d->get_mean_offset_voltage());
+	delete d;
+
+	//TEST for build with empty vector which should result in -1 set but a valid construction run.
+	initVector.resize(0);
+
+	d = new DataSet(initVector);
+	ASSERT_DOUBLE_EQ(-1,d->get_mean_offset_voltage());
+	delete d;
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
