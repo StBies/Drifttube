@@ -17,8 +17,8 @@ public:
 
 		//create data for a DataSet containing one event with a voltage under 2200-50 channels in bin 50 (real dt = 40ns)
 		vector<unique_ptr<Event>> data;
-		unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(800,OFFSET_ZERO_VOLTAGE));
-		(*arr)[50] = OFFSET_ZERO_VOLTAGE + (2 * EVENT_THRESHOLD_VOLTAGE);
+		unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(800,ABSOLUTE_OFFSET_ZERO_VOLTAGE));
+		(*arr)[50] = ABSOLUTE_OFFSET_ZERO_VOLTAGE + (2 * ABSOLUTE_EVENT_THRESHOLD_VOLTAGE);
 		unique_ptr<Event> e1(new Event(1,move(arr)));
 		data.push_back(move(e1));
 		data.shrink_to_fit();

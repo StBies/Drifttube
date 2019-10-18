@@ -421,7 +421,7 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 			//assume the pulse has already ended
 			bool pulseEnded = true;
 			Event voltage = tube.getDataSet().getEvent(i);
-			uint16_t threshold = OFFSET_ZERO_VOLTAGE + EVENT_THRESHOLD_VOLTAGE;
+			uint16_t threshold = ABSOLUTE_OFFSET_ZERO_VOLTAGE + ABSOLUTE_EVENT_THRESHOLD_VOLTAGE;
 			vector<array<uint16_t, 2>*> pulses = pulses_over_threshold(voltage,
 					threshold, maxDriftTimeBin, voltage.getSize());
 			nAfterPulses += pulses.size();
