@@ -102,7 +102,7 @@ const vector<int> DataProcessor::integrate(const Event& data, const uint16_t err
 
 /**
  * Computes the integral of a passed array containing raw FADC data. The result is an array, which contains the
- * integral per bin. The integral \f$I(x)\f$ can be described as:
+ * integral per bin. The integral \f$ I(x)\f$ can be described as:
  * \f[
  *  I(x) = \int_{x_0}^{x} e(x)\, dx
  * \f]
@@ -134,7 +134,9 @@ const vector<int> DataProcessor::integrate(const vector<uint16_t>& data)
 /**
  * Computes the integral of a given array and subtracts the integral of a constant function with value error over that same interval.
  * With the result I, Event e and error \f$\Delta e\f$ this can be described as:
- * \f[I = \int_{x_0}^{x} (e(x) - \Delta e)\, dx \f]
+ * \f[
+ * I = \int_{x_0}^{x} (e(x) - \Delta e)\, dx
+ * \f]
  *
  * @brief Array integrator with error correction
  *
@@ -200,12 +202,22 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	}
 	//can not run in parallel - at least not this way
 
-	//FIXME this crashes when data is empty
-	unique_ptr<vector<uint32_t>> result(new vector<uint32_t>(data[0].getSize(),0));
-
 	unsigned int rejected = 0;
 
 	#ifdef ZEROSUP
+	unique_ptr<vector<uint32_t>> result;
+	for (size_t i = 0; i < data.getSize(); ++i)
+	{
+		try
+		{
+			result = make_unique<vector<uint32_t>>(data[i].getSize(),0);
+			break;
+		}
+		catch(const DataPresenceException& e)
+		{
+			continue;
+		}
+	}
 //	#pragma omp parallel for schedule(static) reduction(+:rejected)
 	for(size_t i = 0; i < data.getSize(); i++)
 	{
@@ -225,6 +237,8 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 		}
 	}
 	#else
+	unique_ptr<vector<uint32_t>> result = make_unique<vector<uint32_t>>(data[0].getSize(),0);
+
 //	#pragma omp parallel for schedule(static) shared(rejected)
 	for(size_t i = 0; i < data.getSize(); i++)
 	{
