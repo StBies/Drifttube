@@ -124,7 +124,7 @@ const vector<int> DataProcessor::integrate(const vector<uint16_t>& data)
 {
 	vector<int> result(data.size());
 	result[0] = 0;
-	for(unsigned int i = 1; i < data.size(); i++)
+	for(unsigned int i = 1; i < data.size(); ++i)
 	{
 		result[i] = data[i] + result[i-1];
 	}
@@ -152,7 +152,7 @@ const vector<int> DataProcessor::integrate(const vector<uint16_t>& data, const u
 {
 	vector<int> result(data.size());
 	result[0] = 0;
-	for(unsigned int i = 1; i < data.size(); i++)
+	for(unsigned int i = 1; i < data.size(); ++i)
 	{
 		result[i] = data[i] + result[i-1] - error;
 	}
@@ -173,7 +173,7 @@ const vector<int> DataProcessor::integrate(const vector<uint16_t>& data, const u
 unsigned short DataProcessor::findMinimumBin(const Event& data)
 {
 	int minBin = 0;
-	for(unsigned short i = 0; i < data.getData().size(); i++)
+	for(unsigned short i = 0; i < data.getData().size(); ++i)
 	{
 		minBin = data[i] < data[minBin] ? i : minBin;
 	}
@@ -219,20 +219,20 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 		}
 	}
 //	#pragma omp parallel for schedule(static) reduction(+:rejected)
-	for(size_t i = 0; i < data.getSize(); i++)
+	for(size_t i = 0; i < data.getSize(); ++i)
 	{
 		try
 		{
 			short driftTimeBin = (short)(data[i].getDriftTime() / ADC_BINS_TO_TIME) - ADC_TRIGGERPOS_BIN;
 			//TODO THIS IS BAD!!!! Maybe it should be rejected, maybe not - more thinking needed
 			driftTimeBin = driftTimeBin < 0 ? 0 : driftTimeBin;
-			(*result)[driftTimeBin]++;
+			++(*result)[driftTimeBin];
 		}
-		catch(Exception& e)
+		catch(const Exception& e)
 		{
 //			#pragma omp critical
 //			{
-				rejected++;
+				++rejected;
 //			}
 		}
 	}
@@ -240,7 +240,7 @@ const DriftTimeSpectrum DataProcessor::calculateDriftTimeSpectrum(const DataSet&
 	unique_ptr<vector<uint32_t>> result = make_unique<vector<uint32_t>>(data[0].getSize(),0);
 
 //	#pragma omp parallel for schedule(static) shared(rejected)
-	for(size_t i = 0; i < data.getSize(); i++)
+	for(size_t i = 0; i < data.getSize(); ++i)
 	{
 		short driftTimeBin = (short) (data[i].getDriftTime() / ADC_BINS_TO_TIME);
 		if(driftTimeBin != -42)
@@ -286,7 +286,7 @@ const RtRelation DataProcessor::calculateRtRelation(const DriftTimeSpectrum& dtS
 	double integral = 0.0;
 	double scalingFactor = DRIFT_TUBE_RADIUS / (dtSpect.getEntries() - dtSpect.getRejected());
 
-	for(size_t i = 0; i < nBins; i++)
+	for(size_t i = 0; i < nBins; ++i)
 	{
 		(*result)[i] = integral;
 		integral += dtSpect[i] * scalingFactor;
@@ -348,7 +348,7 @@ const vector<array<uint16_t, 2>*> DataProcessor::pulses_over_threshold(
 	}
 
 	//from maximum drift time on: loop over the event to even higher drift times
-	for (unsigned int i = from; i < to; i++)
+	for (unsigned int i = from; i < to; ++i)
 	{
 		//if-else switches a variable in order not to count a single pulse bin per bin
 		if (data[i] <= threshold && pulse_ended)
@@ -396,7 +396,7 @@ const vector<array<uint16_t, 2>*> DataProcessor::pulses_over_threshold(
 const vector<uint16_t> DataProcessor::time_over_threshold(const vector<array<uint16_t, 2>*>& pulses)
 {
 	vector<uint16_t> result(pulses.size());
-	for(int i = 0; i < pulses.size(); i++)
+	for(int i = 0; i < pulses.size(); ++i)
 	{
 		result[i] = (*pulses[i])[1] - (*pulses[i])[0];
 	}
@@ -428,7 +428,7 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
 	unsigned int nAfterPulses = 0;
 
 	//counting loop
-	for (unsigned int i = 0; i < tube.getDataSet().getSize(); i++)
+	for (unsigned int i = 0; i < tube.getDataSet().getSize(); ++i)
 	{
 		try
 		{
@@ -468,7 +468,7 @@ const unsigned int DataProcessor::countAfterpulses(const Drifttube& tube)
  */
 short DataProcessor::findDriftTimeBin(const Event& data, unsigned short threshold)
 {
-	for(unsigned short i = 0; i < data.getData().size(); i++)
+	for(unsigned short i = 0; i < data.getData().size(); ++i)
 	{
 		if(data[i] < threshold)
 		{
@@ -493,7 +493,7 @@ short DataProcessor::findDriftTimeBin(const Event& data, unsigned short threshol
 unsigned short DataProcessor::findLastFilledBin(const Event& data, unsigned short threshold)
 {
 	unsigned short defaultBin = 0;
-	for(unsigned short i = data.getData().size() - 1; i > 0; i--)
+	for(unsigned short i = data.getData().size() - 1; i > 0; --i)
 	{
 		if(data[i] <= threshold)
 		{
