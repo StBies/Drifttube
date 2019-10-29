@@ -134,10 +134,10 @@ void Archive::writeToFile(const string& filename)
 	file.write((char*)&eventSize,sizeof(uint32_t));
 
 	//loop over tubes
-	for(uint32_t i = 0; i < m_tubes.size(); i++)
+	for(uint32_t i = 0; i < m_tubes.size(); ++i)
 	{
 		//loop over DataSet for each tube
-		for(uint32_t j = 0; j < m_tubes[i]->getDataSet().getSize(); j++)
+		for(uint32_t j = 0; j < m_tubes[i]->getDataSet().getSize(); ++j)
 		{
 			try
 			{
@@ -148,7 +148,7 @@ void Archive::writeToFile(const string& filename)
 
 				file.write((char*)&j,sizeof(uint32_t));
 				//write event
-				for(size_t k = 0; k < e.getSize(); k++)
+				for(size_t k = 0; k < e.getSize(); ++k)
 				{
 					double datum = (e[k] - ABSOLUTE_OFFSET_ZERO_VOLTAGE) * ADC_CHANNELS_TO_VOLTAGE;
 					file.write((char*)&datum,sizeof(double));
@@ -156,7 +156,7 @@ void Archive::writeToFile(const string& filename)
 				//write integral
 				//TODO use precomputed integrals - see above doc comment for this method
 
-				for(size_t k = 0; k < e.getSize(); k++)
+				for(size_t k = 0; k < e.getSize(); ++k)
 				{
 					int32_t correctedIntegral = integral[k];
 					file.write((char*)&correctedIntegral,sizeof(int));
@@ -168,7 +168,7 @@ void Archive::writeToFile(const string& filename)
 			}
 		}
 		//write dtSpect
-		for(size_t bin = 0; bin < m_tubes[i]->getDriftTimeSpectrum().getSize(); bin++)
+		for(size_t bin = 0; bin < m_tubes[i]->getDriftTimeSpectrum().getSize(); ++bin)
 		{
 			file.write((char*)&m_tubes[i]->getDriftTimeSpectrum()[bin],sizeof(uint32_t));
 		}
@@ -204,15 +204,15 @@ void Archive::convertAllEntries(const string filename)
 	cout << "Events: " << nEvents << endl << "tubes: " << nTubes << endl << "Bins per event: " << par.eventSize << endl;
 	file.seekg(par.endOfHeader);
 
-	for(uint32_t i = 0; i < nTubes; i++)
+	for(uint32_t i = 0; i < nTubes; ++i)
 	{
 		vector<unique_ptr<Event>> events(nEvents);
 //		cout << "vector with events initialized. Size: " << events.size() << endl;
-		for(size_t j = 0; j < events.size(); j++)
+		for(size_t j = 0; j < events.size(); ++j)
 		{
 			unique_ptr<vector<uint16_t>> arr(new vector<uint16_t>(eventSize));
 //			cout << "Array for event #" << j << " initialized. Size: " << arr->size() << endl;
-			for(size_t k = 0; k < arr->size(); k++)
+			for(size_t k = 0; k < arr->size(); ++k)
 			{
 				uint16_t buffer;
 				file.read((char*)&buffer,sizeof(uint16_t));

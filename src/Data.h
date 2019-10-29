@@ -101,7 +101,7 @@ Data<T>::Data(const Data<T>& data)
 
 	//deep copy
 	#pragma omp parallel for
-	for(int i = 0; i < data.m_data->size(); i++)
+	for(int i = 0; i < data.m_data->size(); ++i)
 	{
 		(*temp)[i] = (*data.m_data)[i];
 	}
@@ -171,7 +171,7 @@ Data<T>& Data<T>::operator=(const Data<T>& rhs)
 {
 	//TODO check for same sizes
 	//TODO if not of the same size: Fix LHS size
-	for(size_t i = 0; i < m_data->size(); i++)
+	for(size_t i = 0; i < m_data->size(); ++i)
 	{
 		(*m_data)[i] = (*rhs.m_data)[i];
 	}
@@ -198,12 +198,12 @@ unique_ptr<vector<double>> Data<T>::normalized() const
 
 	double integral = 0;
 //	#pragma omp parallel for reduction(+,integral)
-	for(size_t i = 0; i < m_data->size(); i++)
+	for(size_t i = 0; i < m_data->size(); ++i)
 	{
 		integral += (*m_data)[i];
 	}
 
-	for(size_t i = 0; i < m_data->size(); i++)
+	for(size_t i = 0; i < m_data->size(); ++i)
 	{
 		(*result)[i] = (*this)[i] / integral;
 	}

@@ -37,7 +37,7 @@ Drifttube::Drifttube(int posX, int posY, unique_ptr<DataSet> data)
 
 	//TODO check, if this is faster than putting m_rtRel.getData().size() in the for loop conditional
 	size_t arraySize = m_rtRel.getData().size();
-	for(size_t i = 0; i < arraySize; i++)
+	for(size_t i = 0; i < arraySize; ++i)
 	{
 		if(m_rtRel[i] >= DRIFT_TUBE_RADIUS - DRIFT_TUBE_RADIUS * 0.0005)
 		{
