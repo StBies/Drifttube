@@ -117,7 +117,18 @@ void Archive::writeToFile(const string& filename)
 	uint32_t nTubes = m_tubes.size();
 	uint32_t nEvents = m_tubes[0]->getDataSet().getSize() - m_tubes[0]->getDriftTimeSpectrum().getRejected();
 	//assumes all events have the same number of bins
-	uint32_t eventSize = m_tubes[0]->getDataSet()[0].getSize();
+	uint32_t eventSize;
+	for (size_t i = 0; i < m_tubes[0]->getDataSet().getSize(); ++i)
+	{
+		try
+		{
+			eventSize = m_tubes[0]->getDataSet()[i].getSize();
+			break;
+		} catch (const DataPresenceException& e)
+		{
+			continue;
+		}
+	}
 	file.write((char*)&nTubes,sizeof(uint32_t));
 	file.write((char*)&nEvents,sizeof(uint32_t));
 	file.write((char*)&eventSize,sizeof(uint32_t));
