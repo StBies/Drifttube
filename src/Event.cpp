@@ -26,7 +26,8 @@ using namespace std;
 Event::Event(unsigned int eventNumber, unique_ptr<vector<uint16_t>> data) : Data(move(data))
 {
 	m_event_number = eventNumber;
-	m_drift_time = ADC_BINS_TO_TIME * DataProcessor::findDriftTimeBin(*this,OFFSET_ZERO_VOLTAGE+EVENT_THRESHOLD_VOLTAGE);
+	//TODO rework where and when to calculate this
+	m_drift_time = ADC_BINS_TO_TIME * DataProcessor::findDriftTimeBin(*this,ABSOLUTE_OFFSET_ZERO_VOLTAGE+ABSOLUTE_EVENT_THRESHOLD_VOLTAGE);
 }
 
 Event::~Event()

@@ -17,6 +17,8 @@
 DataSet::DataSet()
 {
 	m_data.resize(0);
+	m_mean_offset_zero_voltage = 0;
+	m_mean_noise_amplitude = 0;
 }
 
 
@@ -45,12 +47,22 @@ DataSet::DataSet(vector<unique_ptr<Event>>& data)
 	m_data.resize(size);
 
 	#pragma omp parallel for
-	for(int i = 0; i < size; i++)
+	for (int i = 0; i < size; ++i)
 	{
 		m_data[i] = move(data[i]);
 	}
 	data.clear();
 	data.resize(0);
+	try
+	{
+		m_mean_offset_zero_voltage = calc_mean_offset();
+		m_mean_noise_amplitude = calc_mean_noise_amplitude(m_mean_offset_zero_voltage);
+	}
+	catch(const DataPresenceException& e)
+	{
+		m_mean_offset_zero_voltage = -1.0;
+		m_mean_noise_amplitude = -1.0;
+	}
 }
 
 /**
@@ -71,12 +83,14 @@ DataSet::DataSet(const DataSet& original)
 	//deep copy
 	//note: range based for (aka for each) does not work, since that would be a copy of the unique pointer
 	#pragma omp parallel for
-	for(size_t i = 0; i < original.getSize(); i++)
+	for(size_t i = 0; i < original.getSize(); ++i)
 	{
 		unique_ptr<Event> temp(new Event(original[i]));
 
 		m_data[i] = move(temp);
 	}
+	m_mean_offset_zero_voltage = original.m_mean_offset_zero_voltage;
+	m_mean_noise_amplitude = original.m_mean_noise_amplitude;
 }
 
 /**
@@ -188,6 +202,42 @@ const Event& DataSet::getEvent(const unsigned int event) const
 	return *(m_data[event]);
 }
 
+/**
+ * Getter for the mean offset zero voltage. This returns a const reference to the mean
+ * offset of the zero voltage for all the events in this DataSet. For calculation details
+ * see the documentation of the function @c calc_mean_offset_voltage().
+ *
+ * @brief Getter for mean noise amplitude
+ *
+ * @author Stefan Bieschke
+ * @date Oct. 17, 2019
+ * @version 1.0
+ *
+ * @return Mean offset in FADC units
+ */
+const double& DataSet::get_mean_offset_voltage() const
+{
+	return m_mean_offset_zero_voltage;
+}
+
+/**
+ * Getter for the mean noise amplitude. This returns a const reference to the mean
+ * amplitude of the voltage for all the events in this DataSet. For calculation details
+ * see the documentation of the function @c calc_mean_noise_amplitude(const double& mean_offset).
+ *
+ * @brief Getter for mean noise amplitude
+ *
+ * @author Stefan Bieschke
+ * @date Oct. 17, 2019
+ * @version 1.0
+ *
+ * @return Mean noise amplitude in FADC units
+ */
+const double& DataSet::get_mean_noise_amplitude() const
+{
+	return m_mean_noise_amplitude;
+}
+
 //operators
 
 /**
@@ -219,3 +269,93 @@ const Event& DataSet::operator[](const unsigned int event) const
 	}
 }
 
+/**
+ * Calculate the mean value of the offset zero voltage. This needs the trigger position
+ * of the FADC to be set to a positive time bin > 0. This calculates the mean of the voltages
+ * in FADC units for the bin number zero in all events stored in this DataSet object.
+ * This value can later be subtracted from all entries when storing the events in a form
+ * containing voltages in Volts.
+ *
+ * @brief Compute mean offset zero voltage
+ *
+ * @author Stefan Bieschke
+ * @date Oct. 17, 2019
+ * @version 1.0
+ *
+ * @return Mean value of offset zero voltage
+ */
+double DataSet::calc_mean_offset() const
+{
+	double mean = 0;
+
+	size_t n_events = m_data.size();
+	unsigned int zerosupressed_events = 0;
+
+	//TODO parallel computation
+	for(size_t i = 0; i < n_events; ++i)
+	{
+		try
+		{
+			Event e = getEvent(i);
+			uint16_t voltage_zero = e[0];
+			mean += voltage_zero;
+		}
+		catch(const Exception& e)
+		{
+			++zerosupressed_events;
+			continue;
+		}
+	}
+
+	if(n_events - zerosupressed_events == 0)
+	{
+		//TODO use c++ standard exceptions and a more fitting exception type
+		throw DataPresenceException();
+	}
+	mean /= (n_events - zerosupressed_events);
+
+	return mean;
+}
+
+/**
+ * Calculate the mean noise amplitude. This mean amplitude, considering a Gaussian distribution
+ * of noise amplitudes, can be interpreted as the standard deviation of the very first
+ * entries in all events stored in this DataSet. Therefore, the mean value of these values
+ * is passed to this method as parameter.
+ *
+ * @brief Calculate the mean noise amplitude
+ *
+ * @author Stefan Bieschke
+ * @date Oct. 17, 2019
+ * @version 1.0
+ *
+ * @param mean_offset The mean value of the offset zero voltages
+ * @return Mean amplitude of noise in FADC units
+ */
+double DataSet::calc_mean_noise_amplitude(const double& mean_offset) const
+{
+	double std = 0; //standard deviation from mean
+
+	size_t n_events = m_data.size();
+	unsigned int zerosupressed_events = 0;
+
+	//TODO parallel computation
+	for (size_t i = 0; i < n_events; ++i)
+	{
+		try
+		{
+			Event e = getEvent(i);
+			uint16_t voltage_zero = e[0];
+			std += pow((double)voltage_zero - mean_offset,2);
+		} catch (const Exception& e)
+		{
+			++zerosupressed_events;
+			continue;
+		}
+	}
+
+	std /= (n_events - zerosupressed_events);
+	std = sqrt(std);
+
+	return std;
+}

@@ -13,6 +13,7 @@
 #include <vector>
 #include <memory>
 #include "Event.h"
+#include <cmath>
 
 /**
  * A class representing a DataSet. This is a collection of raw data arrays
@@ -42,12 +43,19 @@ public:
 	size_t getSize() const;
 	const Event& getEvent(const unsigned int event) const;
 	const std::vector<std::unique_ptr<Event>>& getData() const;
+	const double& get_mean_offset_voltage() const;
+	const double& get_mean_noise_amplitude() const;
 
 	const Event& operator[](const unsigned int event) const;
 
 private:
+	//private helper methods
+	double calc_mean_offset() const;
+	double calc_mean_noise_amplitude(const double& mean_offset) const;
 	//standard library vector, that stores unique pointers to the raw data arrays
 	std::vector<std::unique_ptr<Event>> m_data;
+	double m_mean_offset_zero_voltage;
+	double m_mean_noise_amplitude;
 };
 
 #endif /* DATASET_H_ */

@@ -16,13 +16,13 @@ void BIN2ROOT(string file)
 	ifstream infile(file.c_str(),ios::binary);
 
 	//read binary file header
-	size_t nTubes, eventSize, nEvents;
+	uint32_t nTubes, eventSize, nEvents;
 	if(infile.is_open())
 	{
 		infile.seekg(0,ios::beg);
-		infile.read((char*)&nTubes,sizeof(size_t));
-		infile.read((char*)&nEvents,sizeof(size_t));
-		infile.read((char*)&eventSize,sizeof(size_t));
+		infile.read((char*)&nTubes,sizeof(uint32_t));
+		infile.read((char*)&nEvents,sizeof(uint32_t));
+		infile.read((char*)&eventSize,sizeof(uint32_t));
 	}
 
 	cout << nTubes << "\t" << nEvents << endl;

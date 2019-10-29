@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 	outFileName.append("processed_");
 	outFileName.append(archive.getFilename());
 	vector<vector<int>> integrals;
-	for(size_t i = 0; i < archive.getTubes()[0]->getDataSet().getSize(); i++)
+	for(size_t i = 0; i < archive.getTubes()[0]->getDataSet().getSize(); ++i)
 	{
 		try
 		{
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 	//save data as ASCII table for plotting in gnuplot - don't like it
 	ofstream f("scripts/plots/data/out.dat");
 
-	for(size_t i = 0; i < dt1.getData().size(); i++)
+	for(size_t i = 0; i < dt1.getData().size(); ++i)
 	{
 		f << 4*i << "\t" << dt1[i] << "\t" << rt1[i] << endl;
 	}
@@ -93,7 +93,6 @@ int main(int argc, char** argv)
 	system("gnuplot -p scripts/plots/dtAndRt.plt");
 
 	archive.writeToFile(outFileName);
-
 
 
 	cout << "Computation without saving took " << endRuntime - beginRuntime << " seconds" << endl;
