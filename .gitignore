@@ -19,7 +19,13 @@ rootscripts/*.dat
 *.dat
 *.drift
 *.root
+*.log
+*.npy
 
 #Google test
 gtest/
 /Release/
+
+#Eclipse IDE project settings
+.cproject
+.settings
