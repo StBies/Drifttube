@@ -24,15 +24,19 @@ int teaching_writePythonData(const DataSet& data)
 {
 	//TODO change to uint64_t (check if that has the same endianess as numpy types read
 	uint64_t nEvents = data.getSize();
-	uint32_t n_bins = 0;
-	if(&data[0])
+	uint32_t n_bins;
+
+	for(size_t i = 0; i < nEvents; ++i)
 	{
-		n_bins = data[0].getSize();
-	}
-	else
-	{
-		n_bins = 800;
-		std::cerr << "Could not read n_bins, using 800 as default" << std::endl;
+		try
+		{
+			n_bins = data[i].getSize();
+			break;
+		}
+		catch(const DataPresenceException& e)
+		{
+			continue;
+		}
 	}
 
 	ofstream numpyDump("event.npy",ios::out | ios::binary);
@@ -44,7 +48,7 @@ int teaching_writePythonData(const DataSet& data)
 	numpyDump.write((char*)&n_bins,sizeof(uint32_t));
 
 	//loop over the DataSet
-	for(size_t i = 0; i < nEvents; i++)
+	for(size_t i = 0; i < nEvents; ++i)
 	{
 		//try to get the event - might be zero supressed and not present however
 		try
@@ -55,14 +59,14 @@ int teaching_writePythonData(const DataSet& data)
 
 			for(uint16_t datum : raw_data)
 			{
-				double value = ((double)datum) * 12/4096;
+				double value = ((double)datum) * ADC_CHANNELS_TO_VOLTAGE;
 				//std::cout << value << std::endl;
 				numpyDump.write((char*)&value,sizeof(double));
 			}
 			std::cout << " Done." << std::endl;
 			++eventsWritten;
 		}
-		catch(Exception& ex) //if event i is zerosupressed - go to next event
+		catch(const Exception& ex) //if event i is zerosupressed - go to next event
 		{
 			std::cout << "Not written. Zero supressed." << std::endl;
 			continue;
