@@ -29,7 +29,7 @@ static const unsigned short ABSOLUTE_OFFSET_ZERO_VOLTAGE = 2200; //channels
 static const double DRIFT_TUBE_RADIUS = 18.15;//mm
 
 //values for actual physics:
-static const short ABSOLUTE_EVENT_THRESHOLD_VOLTAGE = -300; //channels relative to OFFSET_ZERO_VOLTAGE
+static const short ABSOLUTE_EVENT_THRESHOLD_VOLTAGE = -100; //channels relative to OFFSET_ZERO_VOLTAGE
 static const short RELATIVE_THRESHOLD_VOLTAGE = -5; // times the mean amplitude of the noise
 
 
